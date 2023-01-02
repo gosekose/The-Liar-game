@@ -1,6 +1,5 @@
-application.yml
-application-oauth.yml
-*.yml
-
 src/**/*.yml
 .idea/
+
+*.yml
+/**/*.yml
