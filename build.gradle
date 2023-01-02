@@ -1,8 +1,21 @@
+// <-- start query dsl -->
+buildscript {
+	dependencies {
+		classpath("gradle.plugin.com.ewerk.gradle.plugins:querydsl-plugin:1.0.10")
+	}
+}
+// <-- end query dsl -->
+
 plugins {
 	id 'java'
 	id 'org.springframework.boot' version '2.7.7'
 	id 'io.spring.dependency-management' version '1.0.15.RELEASE'
 }
+
+// <-- start query dsl -->
+apply plugin: 'io.spring.dependency-management'
+apply plugin: "com.ewerk.gradle.plugins.querydsl"
+// <-- end query dsl -->
 
 group = 'liar'
 version = '0.0.1-SNAPSHOT'
@@ -21,15 +34,43 @@ repositories {
 dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+
 	implementation 'org.springframework.boot:spring-boot-starter-security'
+	implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
+
+	implementation 'org.springframework.boot:spring-boot-starter-validation'
+
 	implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	implementation 'org.thymeleaf.extras:thymeleaf-extras-springsecurity5'
+
+	//mockito
+	testImplementation 'org.mockito:mockito-core:4.10.0'
+	testImplementation 'org.mockito:mockito-junit-jupiter:4.10.0'
+
+	//json
+	implementation 'com.google.code.gson:gson:2.10'
+
+	//xss
+	implementation 'com.navercorp.lucy:lucy-xss-servlet:2.0.0'
+	implementation 'com.navercorp.lucy:lucy-xss:1.6.3'
+
+	//StringEscapeUtils
+	implementation 'org.apache.commons:commons-text:1.8'
+
+
+	// <-- start query dsl -->
+	implementation 'com.querydsl:querydsl-jpa'
+	implementation 'com.querydsl:querydsl-apt'
+	// <-- end query dsl -->
+
 	compileOnly 'org.projectlombok:lombok'
 	developmentOnly 'org.springframework.boot:spring-boot-devtools'
+
 	runtimeOnly 'com.h2database:h2'
 	runtimeOnly 'com.mysql:mysql-connector-j'
 	annotationProcessor 'org.projectlombok:lombok'
+
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'org.springframework.security:spring-security-test'
 }
@@ -37,3 +78,24 @@ dependencies {
 tasks.named('test') {
 	useJUnitPlatform()
 }
+
+// <-- start query dsl -->
+def querydslDir = "$buildDir/generated/querydsl"
+
+querydsl {
+	library = "com.querydsl:querydsl-apt"
+	jpa = true
+	querydslSourcesDir = querydslDir
+}
+
+sourceSets {
+	main.java.srcDir querydslDir
+}
+
+compileQuerydsl{
+	options.annotationProcessorPath = configurations.querydsl
+}
+
+configurations {querydsl.extendsFrom compileClasspath
+}
+// <-- end query dsl -->
