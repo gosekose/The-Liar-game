@@ -1,0 +1,5 @@
+src/**/*.yml
+.idea/
+
+*.yml
+/**/*.yml
