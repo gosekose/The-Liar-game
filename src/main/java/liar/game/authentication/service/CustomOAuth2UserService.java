@@ -17,8 +17,8 @@ import org.springframework.stereotype.Service;
 @Service
 public class CustomOAuth2UserService extends AbstractOAuth2UserService implements OAuth2UserService<OAuth2UserRequest, OAuth2User> {
 
-    public CustomOAuth2UserService(MemberService memberService, MemberRepository memberRepository) {
-        super(memberService, memberRepository);
+    public CustomOAuth2UserService(MemberService memberService) {
+        super(memberService);
     }
 
     @Override

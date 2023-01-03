@@ -35,6 +35,11 @@ public class MemberService {
         return member;
     }
 
+    public Member findByEmailNoOptional(String email) {
+        return memberRepository.findByEmail(email);
+    }
+
+
     public Member findByRegisterId(String registeredId) {
         Optional<Member> findMember = memberRepository.findByRegisterId(registeredId);
         Member member = findMember.orElseThrow(

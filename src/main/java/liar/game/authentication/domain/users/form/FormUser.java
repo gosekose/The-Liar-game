@@ -43,10 +43,6 @@ public class FormUser implements ProviderUser {
         return email;
     }
 
-    @Override
-    public String getProvider() {
-        return provider;
-    }
 
     @Override
     public String getPicture() {

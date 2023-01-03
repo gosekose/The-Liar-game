@@ -1,6 +1,6 @@
 package liar.game.member.domain;
 
-import liar.game.authentication.domain.BaseEntity;
+import liar.game.common.BaseEntity;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -24,6 +24,7 @@ public class Member extends BaseEntity {
     private String picture;
 
     private String authorities;
+    private String username;
 
     @Builder
     public Member(String registrationId, String registerId, String password, String email, String picture, String authorities) {

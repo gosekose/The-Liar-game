@@ -12,7 +12,6 @@ public interface ProviderUser {
     String getUsername();
     String getPassword();
     String getEmail();
-    String getProvider();
     String getPicture();
     List<? extends GrantedAuthority> getAuthorities();
     Map<String, Object> getAttributes();

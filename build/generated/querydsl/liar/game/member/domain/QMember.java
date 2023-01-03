@@ -19,7 +19,7 @@ public class QMember extends EntityPathBase<Member> {
 
     public static final QMember member = new QMember("member1");
 
-    public final liar.game.authentication.domain.QBaseEntity _super = new liar.game.authentication.domain.QBaseEntity(this);
+    public final liar.game.common.QBaseEntity _super = new liar.game.common.QBaseEntity(this);
 
     public final StringPath authorities = createString("authorities");
 
@@ -40,6 +40,8 @@ public class QMember extends EntityPathBase<Member> {
     public final StringPath registerId = createString("registerId");
 
     public final StringPath registrationId = createString("registrationId");
+
+    public final StringPath username = createString("username");
 
     public QMember(String variable) {
         super(Member.class, forVariable(variable));

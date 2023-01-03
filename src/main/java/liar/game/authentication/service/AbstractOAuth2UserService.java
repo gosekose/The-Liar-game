@@ -11,6 +11,7 @@ import liar.game.member.service.MemberService;
 import liar.game.member.domain.Member;
 import liar.game.member.repository.MemberRepository;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.oauth2.client.registration.ClientRegistration;
@@ -26,22 +27,17 @@ public abstract class AbstractOAuth2UserService {
 
     private final MemberService memberService;
 
-    private final MemberRepository memberRepository;
-
-
-    @Autowired
-    public AbstractOAuth2UserService(MemberService memberService, MemberRepository memberRepository) {
+    public AbstractOAuth2UserService(MemberService memberService) {
         this.memberService = memberService;
-        this.memberRepository = memberRepository;
     }
 
     public void register(ProviderUser providerUser, OAuth2UserRequest userRequest){
 
-        Member member = memberRepository.findByEmail(providerUser.getEmail());
+        Member member = memberService.findByEmailNoOptional(providerUser.getEmail());
 
         if(member == null){
             ClientRegistration clientRegistration = userRequest.getClientRegistration();
-            memberService.register(clientRegistration.getRegistrationId(),providerUser);
+            memberService.register(clientRegistration.getRegistrationId(), providerUser);
         }
     }
 

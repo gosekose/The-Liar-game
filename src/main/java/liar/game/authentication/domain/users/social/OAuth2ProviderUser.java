@@ -20,7 +20,6 @@ public abstract class OAuth2ProviderUser implements ProviderUser {
     private Map<String, Object> attributes;
     private OAuth2User oAuth2User;
     private ClientRegistration clientRegistration;
-    private boolean isCertificated;
 
     public OAuth2ProviderUser(Map<String, Object> attributes, OAuth2User oAuth2User, ClientRegistration clientRegistration){
         this.attributes = attributes;
@@ -36,11 +35,6 @@ public abstract class OAuth2ProviderUser implements ProviderUser {
     @Override
     public String getEmail() {
         return (String)attributes.get("email");
-    }
-
-    @Override
-    public String getProvider() {
-        return clientRegistration.getRegistrationId();
     }
 
     @Override

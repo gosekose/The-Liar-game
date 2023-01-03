@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html class="h-100" lang="en"
+      xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<body>
+
+<div class="card-body">
+    <button type="button" th:onclick="|location.href='@{/oauth2/authorization/google}'|" class="btn btn-outline-secondary">GOOGLE</button>
+    <button type="button" th:onclick="|location.href='@{/oauth2/authorization/naver}'|" class="btn btn-outline-success">NAVER</button>
+    <button type="button" th:onclick="|location.href='@{/oauth2/authorization/kakao}'|" class="btn btn-outline-warning">KAKAO</button>
+</div>
+
+</body>
+
+</html>

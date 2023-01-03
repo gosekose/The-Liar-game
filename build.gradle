@@ -58,6 +58,9 @@ dependencies {
 	//StringEscapeUtils
 	implementation 'org.apache.commons:commons-text:1.8'
 
+	//swagger
+	implementation 'org.springdoc:springdoc-openapi-ui:1.6.14'
+
 
 	// <-- start query dsl -->
 	implementation 'com.querydsl:querydsl-jpa'
@@ -73,6 +76,7 @@ dependencies {
 
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'org.springframework.security:spring-security-test'
+	testImplementation 'org.mockito:mockito-inline'
 }
 
 tasks.named('test') {

@@ -9,8 +9,8 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class CustomUserDetailsService extends AbstractOAuth2UserService implements UserDetailsService {
-    public CustomUserDetailsService(MemberService memberService, MemberRepository memberRepository) {
-        super(memberService, memberRepository);
+    public CustomUserDetailsService(MemberService memberService) {
+        super(memberService);
     }
 
     @Override
