@@ -1,8 +1,7 @@
 package liar.game.business.channel.service;
 
-import liar.game.business.channel.controller.dto.FindOneChannelDto;
 import liar.game.business.channel.domain.Channel;
-import liar.game.business.channel.repository.ChannelQueryDslRepository;
+import liar.game.business.channel.repository.ChannelQueryRepository;
 import liar.game.business.channel.repository.ChannelRepository;
 import liar.game.business.channel.repository.condtion.EnterChannelCondition;
 import liar.game.business.channel.repository.dto.EnterChannelDto;
@@ -12,15 +11,13 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Optional;
-
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class ChannelService {
 
     private final ChannelRepository channelRepository;
-    private final ChannelQueryDslRepository channelQueryDslRepository;
+    private final ChannelQueryRepository channelQueryRepository;
 
     @Transactional
     public Long save(Channel channel) {
@@ -29,7 +26,7 @@ public class ChannelService {
     }
 
     public Page<EnterChannelDto> getEnterChannels(EnterChannelCondition condition, Pageable pageable) {
-        return channelQueryDslRepository.getEnterChannelDtoPageComplex(condition, pageable);
+        return channelQueryRepository.getEnterChannelDtoPageComplex(condition, pageable);
     }
 
     public Channel findOne(Long id) {
