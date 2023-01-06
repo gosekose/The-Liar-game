@@ -7,7 +7,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface ChannelQueryDslRepository {
+public interface ChannelQueryRepository {
 
     Page<EnterChannelDto> getEnterChannelDtoPageComplex(EnterChannelCondition condition, Pageable pageable);
 

@@ -1,15 +1,11 @@
 package liar.game.business.channel.repository;
 
-import com.querydsl.core.types.Predicate;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import liar.game.business.channel.domain.Channel;
-import liar.game.business.channel.domain.QChannel;
 import liar.game.business.channel.repository.condtion.EnterChannelCondition;
 import liar.game.business.channel.repository.dto.EnterChannelDto;
 import liar.game.business.channel.repository.dto.QEnterChannelDto;
-import liar.game.member.domain.QMember;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -23,7 +19,7 @@ import static liar.game.member.domain.QMember.member;
 
 @Repository
 @RequiredArgsConstructor
-public class ChannelQueryDslRepositoryImpl implements ChannelQueryDslRepository {
+public class ChannelQueryRepositoryImpl implements ChannelQueryRepository {
 
     private final JPAQueryFactory query;
 
