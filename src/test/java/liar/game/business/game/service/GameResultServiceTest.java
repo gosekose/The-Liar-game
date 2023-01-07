@@ -4,6 +4,7 @@ import liar.game.business.game.domain.Game;
 import liar.game.business.game.domain.GameResult;
 import liar.game.business.game.domain.Result;
 import liar.game.business.game.repository.dto.AllMemberGameResultAnalysisInterface;
+import liar.game.business.game.repository.dto.AllMemberGameResultAnalysisJpqlInterface;
 import liar.game.member.domain.Member;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -99,6 +100,27 @@ class GameResultServiceTest {
         assertThat(result.getContent().get(4).getLose()).isEqualTo(4L);
         assertThat(result.getContent().get(2).getRate()).isEqualTo(20.0);
         assertThat(result.getContent().get(2).getLastjointime()).isBefore(LocalDateTime.now());
+
+    }
+
+    @Test
+    @DisplayName("각 회원의 이긴 횟수, 진 횟수, 승리 확률을 페이징하여 가져 온다.(JPQL)")
+    public void fetchAllMemberGameResultAnalysisJpql() throws Exception {
+        //given
+        Pageable page = PageRequest.of(0, 10);
+
+        //when
+        Page<AllMemberGameResultAnalysisJpqlInterface> result = gameResultService.fetchAllMembersGameResultAnalysisJpql(page);
+
+        //then
+        assertThat(result.getContent().size()).isEqualTo(10);
+        assertThat(result.getContent().get(0).getWin()).isEqualTo(1L);
+        assertThat(result.getContent().get(1).getLose()).isEqualTo(4L);
+        assertThat(result.getContent().get(2).getLose()).isEqualTo(4L);
+        assertThat(result.getContent().get(3).getLose()).isEqualTo(4L);
+        assertThat(result.getContent().get(4).getLose()).isEqualTo(4L);
+        assertThat(result.getContent().get(2).getRate()).isEqualTo(20.0);
+        assertThat(result.getContent().get(2).getLastJoinGameTime()).isBefore(LocalDateTime.now());
 
     }
 
