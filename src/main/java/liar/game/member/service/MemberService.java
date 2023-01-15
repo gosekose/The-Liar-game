@@ -1,13 +1,14 @@
 package liar.game.member.service;
 
 import liar.game.authentication.domain.social.ProviderUser;
+import liar.game.common.exception.exception.UserRegisterConflictException;
 import liar.game.member.domain.Authority;
 import liar.game.member.domain.Member;
 import liar.game.member.repository.AuthorityRepository;
 import liar.game.member.repository.MemberRepository;
 import liar.game.member.service.dto.FormRegisterUserDto;
 import liar.game.token.controller.dto.LoginDto;
-import liar.game.token.controller.exception.NotFoundUserException;
+import liar.game.common.exception.exception.NotFoundUserException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -30,7 +31,7 @@ public class MemberService {
     public Member find(Long id) {
 
         Optional<Member> findMember = memberRepository.findById(id);
-        Member member = findMember.orElseThrow(() -> {throw new IllegalArgumentException("일치하는 회원이 없습니다.");});
+        Member member = findMember.orElseThrow(() -> {throw new NotFoundUserException();});
 
         return member;
     }
@@ -44,7 +45,7 @@ public class MemberService {
         Optional<Member> findMember = memberRepository.findByRegisterId(registeredId);
         Member member = findMember.orElseThrow(
                 () -> {
-                    throw new IllegalArgumentException("일치하는 회원이 없습니다.");
+                    throw new NotFoundUserException();
                 }
         );
 
@@ -61,7 +62,7 @@ public class MemberService {
         Member member = memberRepository.findByEmail(email);
 
         if (member == null) {
-            throw new NotFoundUserException("존재하지 않는 유저입니다.");
+            throw new NotFoundUserException();
         }
 
         return member.getId();
@@ -71,7 +72,7 @@ public class MemberService {
         Optional<Member> optionalUser = memberRepository.findById(id);
 
         return optionalUser.orElseThrow(() -> {
-            throw new IllegalArgumentException("존재하지 않는 유저 입니다.");
+            throw new NotFoundUserException();
         });
     }
 
@@ -113,7 +114,7 @@ public class MemberService {
             return true;
         }
         else {
-            return false;
+            throw new UserRegisterConflictException();
         }
     }
 

@@ -26,7 +26,10 @@ public class JwtFilter extends OncePerRequestFilter {
             "/static/**",
             "/favicon.ico",
             "/api/v1/login",
-            "/api/v1/register"
+            "/api/v1/register",
+            "/oauth2/authorization/google",
+            "/oauth2/authorization/naver",
+            "/oauth2/authorization/kakao"
     };
 
     private final TokenProviderImpl tokenProviderImpl;

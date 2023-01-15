@@ -1,5 +1,8 @@
-package liar.game.token.controller;
+package liar.game.token.controller.controller;
 
+import liar.game.common.exception.exception.BindingInvalidException;
+import liar.game.common.exception.exception.NotFoundUserException;
+import liar.game.common.exception.exception.UserRegisterConflictException;
 import liar.game.member.domain.Authority;
 import liar.game.member.domain.Member;
 import liar.game.member.service.AuthorityService;
@@ -49,11 +52,11 @@ public class LoginController {
                                        BindingResult bindingResult) {
 
         if (bindingResult.hasErrors()) {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            throw new BindingInvalidException();
         }
 
         if (!memberService.registerForm(formRegisterUserDto, passwordEncoder)) {
-            return new ResponseEntity<>(HttpStatus.CONFLICT);
+            throw new UserRegisterConflictException();
         }
 
         return new ResponseEntity<>(HttpStatus.OK);
@@ -75,17 +78,17 @@ public class LoginController {
     public ResponseEntity login(@RequestBody LoginDto loginDto, BindingResult bindingResult) {
 
         if (bindingResult.hasErrors()) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            throw new BindingInvalidException();
         }
 
         Member member = memberService.userLoginCheck(loginDto, passwordEncoder);
         if (member == null) {
-            return new ResponseEntity(HttpStatus.NOT_FOUND);
+            throw new NotFoundUserException();
         }
 
         List<Authority> authorities = authorityService.findAuthorityByUser(member);
         if (authorities.isEmpty()) {
-            return new ResponseEntity(HttpStatus.NOT_FOUND);
+            throw new NotFoundUserException();
         }
 
         return new ResponseEntity(authService.createFormTokenAuth(member.getEmail(), authorities), HttpStatus.OK);
