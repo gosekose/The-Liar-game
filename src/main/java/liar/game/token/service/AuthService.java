@@ -1,6 +1,6 @@
 package liar.game.token.service;
 
-import liar.game.common.exception.NotExistsRefreshTokenException;
+import liar.game.common.exception.exception.NotExistsRefreshTokenException;
 import liar.game.member.domain.Authority;
 import liar.game.token.domain.LogoutAccessToken;
 import liar.game.token.domain.LogoutRefreshToken;
@@ -80,8 +80,6 @@ public class AuthService {
         if (accessToken == null) {
             return ;
         }
-
-
 
         saveLogoutAccessToken(accessToken);
         saveLogoutRefreshToken(refreshToken);

@@ -1,6 +1,7 @@
-package liar.game.token.controller;
+package liar.game.token.controller.controller;
 
 import liar.game.authentication.domain.PrincipalUser;
+import liar.game.common.exception.exception.NotFoundUserException;
 import liar.game.token.service.AuthService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -30,7 +31,8 @@ public class OAuth2LoginController {
     public ResponseEntity loginForProvideToken(@AuthenticationPrincipal PrincipalUser principalUser,
                                                Authentication authentication) {
 
-        if (principalUser == null) return new ResponseEntity(HttpStatus.NOT_FOUND);
+        if (principalUser == null) throw new NotFoundUserException();
+        log.info("Authentication = {}", authentication.getPrincipal());
 
         return new ResponseEntity(authService.createOauthTokenAuth(authentication), HttpStatus.OK);
     }
