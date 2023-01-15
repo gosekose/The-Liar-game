@@ -1,6 +1,6 @@
 package liar.game.authentication.config;
 
-import liar.game.authentication.util.CustomAuthorityMapper;
+import liar.game.authentication.common.authority.CustomAuthorityMapper;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.core.authority.mapping.GrantedAuthoritiesMapper;
@@ -9,8 +9,9 @@ import org.springframework.security.core.authority.mapping.GrantedAuthoritiesMap
 public class OAuth2AppConfig {
 
     @Bean
-    public GrantedAuthoritiesMapper customAuthorityMapper(){
+    public GrantedAuthoritiesMapper customAuthorityMapper() {
         return new CustomAuthorityMapper();
     }
+
 
 }

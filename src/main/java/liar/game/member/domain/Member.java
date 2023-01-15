@@ -6,6 +6,8 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @RequiredArgsConstructor
@@ -23,16 +25,25 @@ public class Member extends BaseEntity {
     private String email;
     private String picture;
 
-    private String authorities;
+    @OneToMany(mappedBy = "member")
+    private List<Authority> authorities = new ArrayList<>();
+
     private String username;
 
+
     @Builder
-    public Member(String registrationId, String registerId, String password, String email, String picture, String authorities) {
+    public Member(String password, String registrationId, String registerId,
+                 String email, String picture, String username) {
+        this.username = username;
+        this.password = password;
         this.registrationId = registrationId;
         this.registerId = registerId;
-        this.password = password;
         this.email = email;
         this.picture = picture;
-        this.authorities = authorities;
+    }
+
+    public void addAuthorities(Authority authority) {
+        this.authorities.add(authority);
+        authority.updateUser(this);
     }
 }

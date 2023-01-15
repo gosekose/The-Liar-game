@@ -1,7 +1,8 @@
 package liar.game.authentication.domain.users;
 
 import liar.game.authentication.domain.Attributes;
-import liar.game.authentication.domain.users.social.GoogleUser;
+import liar.game.authentication.domain.social.GoogleUser;
+import liar.game.authentication.domain.social.ProviderUser;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
