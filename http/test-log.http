@@ -1,0 +1,59 @@
+### 1. 회원가입 폼 성공
+
+POST {{baseUrl}}/register
+Content-Type: application/json
+Accept: */*
+Connection: keep-alive
+
+{
+  "username": "kose",
+  "email": "kose@naver.com",
+  "password": "kose123456"
+}
+
+> {%
+    client.test("회원 가입 요청은 패스워드가 10자 이상 가능", function() {
+        client.assert(response.status === 200, "Response status is OK");
+    });
+%}
+
+
+### 2. 폼 로그인 성공
+
+POST {{baseUrl}}/login
+Content-Type: application/json
+Accept: */*
+Connection: keep-alive
+
+{
+  "email": "kose@naver.com",
+  "password": "kose123456"
+}
+
+> {%
+    client.test("폼 로그인 회원 가입 성공, 토큰 클라이언트 저장", function() {
+        client.assert(response.status === 200, "Response status is OK");
+        client.global.set("accessToken", response.body.accessToken);
+        client.global.set("refreshToken", response.body.refreshToken);
+        client.log(client.global.get("accessToken"));
+        client.log(client.global.get("refreshToken"));
+    });
+%}
+
+
+### 3. 로그 테스트
+
+GET {{baseUrl}}/message?id=13
+Content-Type: application/json
+Accept: */*
+Connection: keep-alive
+Authorization: Bearer {{accessToken}}
+RefreshToken: {{refreshToken}}
+
+> {%
+    client.test("AccessToken을 검증하고, AOP 로그를 출력한다.", function() {
+        client.assert(response.status === 200, "Response status is OK");
+        client.log(client.global.get("accessToken"));
+        client.log(client.global.get("refreshToken"));
+    });
+%}
