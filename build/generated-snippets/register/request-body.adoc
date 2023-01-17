@@ -1,0 +1,4 @@
+[source,options="nowrap"]
+----
+{"username":"kose","email":"kose1234@naver.com","password":"kose123456"}
+----

@@ -181,10 +181,6 @@ public class TokenProviderImpl implements InitializingBean, TokenProvider{
     public Long getRemainTime(String token) {
 
         Claims claims = getClaims(token);
-
-        log.info("claims = {}", claims);
-        log.info("getExpiration = {}", claims.getExpiration());
-
         if (claims == null || claims.getExpiration() == null) {
             return null;
         }

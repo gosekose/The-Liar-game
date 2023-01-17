@@ -49,23 +49,16 @@ public class JwtFilter extends OncePerRequestFilter {
 
         if (isLoginCheckPath(requestURI)) {
 
-            log.info("jwt = {}", jwt);
-
             if (
                     StringUtils.hasText(jwt)
                     && tokenProviderImpl.validateToken(jwt)
                     && isNotLogoutAccessToken(jwt)
             ) {
-                Claims claims = tokenProviderImpl.getClaims(jwt);
-                log.info("claims.getExpiration() = " + claims.getExpiration());
-
+//                Claims claims = tokenProviderImpl.getClaims(jwt);
                 Authentication authentication = tokenProviderImpl.getAuthentication(jwt);
-
                 SecurityContextHolder.getContext().setAuthentication(authentication);
-                log.info("authentication.getName() = {}", authentication.getName());
 
             } else {
-                log.info("유효한 JWT 토큰이 없습니다, uri = {}", requestURI);
                 return ;
             }
 
@@ -77,8 +70,6 @@ public class JwtFilter extends OncePerRequestFilter {
 
     private String resolveToken(HttpServletRequest request) {
         String bearerToken = request.getHeader(AUTHORIZATION_HEADER);
-
-        log.info("bearToken = {}", bearerToken);
 
         if (StringUtils.hasText(bearerToken) && bearerToken.startsWith("Bearer ")) {
             return bearerToken.substring(7);

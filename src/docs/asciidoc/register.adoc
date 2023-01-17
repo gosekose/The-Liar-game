@@ -1,0 +1,14 @@
+[[example_curl_request]]
+== Curl request
+
+include::{snippets}/register/curl-request.adoc[]
+
+[[example_http_request]]
+== HTTP request
+
+include::{snippets}/register/http-request.adoc[]
+
+[[example_http_response]]
+== HTTP response
+
+include::{snippets}/register/http-response.adoc[]
