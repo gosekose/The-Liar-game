@@ -1,0 +1,46 @@
+spring:
+  profiles:
+    include:
+      - oauth
+      - jwt
+
+  h2:
+    console:
+      enabled: true
+
+  datasource:
+    url: jdbc:h2:tcp://localhost/~/h2/h2db/liar
+#    url: jdbc:h2:mem:test
+    username: sa
+    password:
+    driver-class-name: org.h2.Driver
+
+  jpa:
+    spring.jpa.database-platform: org.hibernate.dialect.H2Dialect
+    show-sql: true
+    hibernate:
+      ddl-auto: create
+    properties:
+      hibernate:
+        default_batch_fetch_size: 100
+        jdbc.batch_size: 20
+        format_sql: true
+    open-in-view: false
+#    defer-datasource-initialization: true
+
+  messages:
+    basename: errors
+    encoding: utf-8
+
+  redis:
+    host: localhost
+    port: 6379
+
+logging:
+  level:
+    org.hibernate.SQL: info
+
+multipart:
+  maxFileSize: 5MB
+  maxRequestSize: 5MB
+

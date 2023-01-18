@@ -33,7 +33,7 @@ public class SecurityConfig {
     public WebSecurityCustomizer webSecurityCustomizer() {
         return (web) -> web.ignoring().antMatchers(
                 "/static/**", "/static/js/**", "/static/images/**",
-                "/static/css/**", "/static/scss/**",
+                "/static/css/**", "/static/scss/**", "/static/docs/**",
                 "/h2-console/**", "/favicon.ico", "/error"
         );
     }

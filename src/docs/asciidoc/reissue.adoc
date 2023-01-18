@@ -1,0 +1,13 @@
+[[example_curl_request]]
+== Curl request
+include::{snippets}/reissue/curl-request.adoc[]
+
+[[example_http_request]]
+== HTTP request
+include::{snippets}/reissue/http-request.adoc[]
+
+[[example_http_response]]
+== HTTP response
+include::{snippets}/reissue/http-response.adoc[]
+
+

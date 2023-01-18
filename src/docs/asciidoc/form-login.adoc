@@ -1,0 +1,21 @@
+[[example_curl_request]]
+== Curl request
+include::{snippets}/formLogin/curl-request.adoc[]
+
+[[example_request_fields]]
+== Request fields
+include::{snippets}/formLogin/request-fields.adoc[]
+
+[[example_http_request]]
+== HTTP request
+include::{snippets}/formLogin/http-request.adoc[]
+
+[[example_response_fields]]
+== Response fields
+include::{snippets}/formLogin/response-fields.adoc[]
+
+[[example_http_response]]
+== HTTP response
+include::{snippets}/formLogin/http-response.adoc[]
+
+
