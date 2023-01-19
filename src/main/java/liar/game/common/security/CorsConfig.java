@@ -1,4 +1,4 @@
-package liar.game.common;
+package liar.game.common.security;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

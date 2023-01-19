@@ -1,4 +1,4 @@
-package liar.game.common;
+package liar.game.common.security;
 
 import liar.game.authentication.service.CustomOAuth2UserService;
 import liar.game.authentication.service.CustomOidcUserService;

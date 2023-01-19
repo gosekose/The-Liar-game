@@ -3,6 +3,7 @@ spring:
     include:
       - oauth
       - jwt
+      - kafka
 
   h2:
     console:

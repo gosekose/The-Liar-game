@@ -89,6 +89,9 @@ dependencies {
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'org.springframework.security:spring-security-test'
 	testImplementation 'org.mockito:mockito-inline'
+
+	// kafka
+	implementation 'org.springframework.kafka:spring-kafka'
 }
 
 tasks.named('test') {
@@ -141,4 +144,8 @@ bootJar {
 		from asciidoctor.outputDir
 		into "src/main/resources/static/docs"
 	}
+}
+
+jar {
+	enabled = false
 }
