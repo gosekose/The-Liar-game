@@ -1,0 +1,39 @@
+### 1. 폼 로그인 성공
+
+POST {{baseUrl}}/login
+Content-Type: application/json
+Accept: */*
+Connection: keep-alive
+
+{
+  "email": "kose@naver.com",
+  "password": "kose123456"
+}
+
+> {%
+    client.test("폼 로그인 회원 가입 성공, 토큰 클라이언트 저장", function() {
+        client.assert(response.status === 200, "Response status is OK");
+        client.global.set("accessToken", response.body.accessToken);
+        client.global.set("refreshToken", response.body.refreshToken);
+        client.log(client.global.get("accessToken"));
+        client.log(client.global.get("refreshToken"));
+    });
+%}
+
+### 2. 폼 로그인 실패
+
+POST {{baseUrl}}/login
+Content-Type: application/json
+Accept: */*
+Connection: keep-alive
+
+{
+  "email": "kose@naver.com",
+  "password": "test"
+}
+
+> {%
+    client.test("폼 로그인 회원 가입 실패", function() {
+        client.assert(response.status === 404, "Response status is NOTFOUND");
+    });
+%}

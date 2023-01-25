@@ -1,0 +1,54 @@
+### 1. 회원가입 폼 성공
+
+POST {{baseUrl}}/register
+Content-Type: application/json
+Accept: */*
+Connection: keep-alive
+
+{
+  "username": "kose",
+  "email": "kose@naver.com",
+  "password": "kose123456"
+}
+
+> {%
+    client.test("회원 가입 요청은 패스워드가 10자 이상 가능", function() {
+        client.assert(response.status === 200, "Response status is OK");
+    });
+%}
+
+### 2. 회원가입 폼 실패 (비밀번호 10자 미만)
+POST {{baseUrl}}/register
+Content-Type: application/json
+Accept: */*
+Connection: keep-alive
+
+{
+  "username": "kose",
+  "email": "kose@naver.com",
+  "password": "kose1234"
+}
+
+> {%
+    client.test("회원 가입 요청은 패스워드가 10자 이상 가능", function() {
+        client.assert(response.status === 400, "Response status is BADREQUEST");
+    });
+%}
+
+### 3. 회원가입 폼 실패 (이미 존재하는 계정)
+POST {{baseUrl}}/register
+Content-Type: application/json
+Accept: */*
+Connection: keep-alive
+
+{
+  "username": "kose",
+  "email": "kose@naver.com",
+  "password": "kose123456"
+}
+
+> {%
+    client.test("이미 존재하는 계정은 회원가입 불가", function() {
+        client.assert(response.status === 409, "Response status is CONFLICT");
+    });
+%}
