@@ -32,4 +32,4 @@ rebel.xml
 .gradletasknamecache
  
 **/**/application-oauth2.yml
-
+**.yml
