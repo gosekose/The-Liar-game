@@ -5,16 +5,16 @@ import org.springframework.cloud.gateway.route.builder.RouteLocatorBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-//@Configuration
+@Configuration
 public class FilterConfig {
 
-//    @Bean
+    @Bean
     public RouteLocator gatewayRoutes(RouteLocatorBuilder builder) {
         return builder.routes()
-                .route(r -> r.path("/member-service/**")
-                        .filters(f -> f
-                                .rewritePath("/member-service/(?<segment>/?.*)", "/$\\{segment}"))
-                        .uri("http://localhost:8080"))
+                .route("member-service", r -> r
+                        .path("/member-service/**")
+                        .uri("lb://member-service")
+                )
                 .build();
     }
 
