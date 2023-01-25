@@ -25,9 +25,9 @@ import java.util.List;
 @RestController
 @Slf4j
 @CrossOrigin("http://localhost:3000")
-@RequestMapping("/api/v1")
+@RequestMapping("/member-service")
 @RequiredArgsConstructor
-public class LoginController {
+public class AuthController {
 
     private final MemberService memberService;
     private final PasswordEncoder passwordEncoder;
@@ -104,5 +104,10 @@ public class LoginController {
 
     }
 
+
+    @GetMapping("/test")
+    public ResponseEntity testResponse() {
+        return ResponseEntity.status(HttpStatus.OK).body("OK");
+    }
 
 }
