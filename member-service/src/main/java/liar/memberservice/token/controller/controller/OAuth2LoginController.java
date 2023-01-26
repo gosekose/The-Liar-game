@@ -33,6 +33,7 @@ public class OAuth2LoginController {
 
         if (principalUser == null) throw new NotFoundUserException();
         log.info("Authentication = {}", authentication.getPrincipal());
+        log.info("PrincipalUser = {}", principalUser);
 
         return new ResponseEntity(authService.createOauthTokenAuth(authentication), HttpStatus.OK);
     }
