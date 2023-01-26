@@ -2,6 +2,7 @@ package liar.memberservice.common.config;
 
 import liar.memberservice.authentication.service.CustomOAuth2UserService;
 import liar.memberservice.authentication.service.CustomOidcUserService;
+import liar.memberservice.token.controller.filter.AuthenticationGiveFilter;
 import liar.memberservice.token.controller.filter.JwtFilter;
 import liar.memberservice.token.domain.TokenProviderImpl;
 import liar.memberservice.token.repository.TokenRepositoryImpl;
@@ -84,7 +85,8 @@ public class SecurityConfig {
 
                 // SecurityConfig FilterChain
                 .addFilterBefore(corsFilter, UsernamePasswordAuthenticationFilter.class)
-                .addFilterBefore(jwtFilter(), UsernamePasswordAuthenticationFilter.class);
+//                .addFilterBefore(jwtFilter(), UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(authenticationGiveFilter(), UsernamePasswordAuthenticationFilter.class);
 
 
         return http.build();
@@ -96,5 +98,7 @@ public class SecurityConfig {
         return new JwtFilter(tokenProviderImpl, tokenRepository);
     }
 
+    @Bean
+    public AuthenticationGiveFilter authenticationGiveFilter() { return new AuthenticationGiveFilter(tokenProviderImpl);}
 }
 
