@@ -5,9 +5,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import liar.memberservice.token.domain.TokenProviderImpl;
-import liar.memberservice.token.repository.TokenRepositoryImpl;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.util.PatternMatchUtils;
@@ -16,15 +14,11 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 
-@Slf4j
 @RequiredArgsConstructor
-public class JwtFilter extends OncePerRequestFilter {
+public class AuthenticationGiveFilter extends OncePerRequestFilter {
 
     public static final String AUTHORIZATION_HEADER = "Authorization";
-
-    private final TokenProviderImpl tokenProviderImpl;
-    private final TokenRepositoryImpl tokenRepository;
-
+    private final TokenProviderImpl tokenProvider;
     private static final String[] whitelist = {
             "/",
             "/static/**",
@@ -43,25 +37,15 @@ public class JwtFilter extends OncePerRequestFilter {
         String jwt = resolveToken(request);
         String requestURI = request.getRequestURI();
 
-        if (isLoginCheckPath(requestURI)) {
-
-            if (
-                    StringUtils.hasText(jwt)
-                    && tokenProviderImpl.validateToken(jwt)
-                    && isNotLogoutAccessToken(jwt)
-            ) {
-//                Claims claims = tokenProviderImpl.getClaims(jwt);
-                Authentication authentication = tokenProviderImpl.getAuthentication(jwt);
-                SecurityContextHolder.getContext().setAuthentication(authentication);
-
-            } else {
-                return ;
-            }
-
+        if (isAuthorizationIssueRequired(requestURI)) {
+            SecurityContextHolder.getContext().setAuthentication(tokenProvider.getAuthentication(jwt));
         }
 
         filterChain.doFilter(request, response);
+    }
 
+    private boolean isAuthorizationIssueRequired(String requestURI) {
+        return !PatternMatchUtils.simpleMatch(whitelist, requestURI);
     }
 
     private String resolveToken(HttpServletRequest request) {
@@ -72,22 +56,6 @@ public class JwtFilter extends OncePerRequestFilter {
         }
 
         return null;
-    }
-
-    private boolean isLoginCheckPath(String requestURI) {
-        return !PatternMatchUtils.simpleMatch(whitelist, requestURI);
-    }
-
-
-    /**
-     *
-     * token이 Logout한 AccessToken이라면 , false 출력
-     *
-     * @param token
-     * @return
-     */
-    private boolean isNotLogoutAccessToken(String token) {
-        return !tokenRepository.existsLogoutAccessTokenById(token);
     }
 
 }

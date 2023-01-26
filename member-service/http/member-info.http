@@ -1,0 +1,16 @@
+### 1. 유저 정보 요청
+
+GET {{baseUrl}}/users
+Content-Type: application/json
+Authorization: Bearer {{accessToken}},
+RefreshToken: {{accessToken}},
+userId: {{userId}}
+Accept: */*
+Connection: keep-alive
+
+
+> {%
+    client.test("유저 정보 요청", function() {
+        client.assert(response.status === 200, "Response status is OK");
+    });
+%}
