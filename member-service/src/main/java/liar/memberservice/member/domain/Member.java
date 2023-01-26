@@ -17,6 +17,9 @@ public class Member extends BaseEntity {
     @GeneratedValue
     @Column(name = "member_id")
     private Long id;
+
+    private String userId;
+
     private String registrationId;
 
     private String registerId;
@@ -32,8 +35,9 @@ public class Member extends BaseEntity {
 
 
     @Builder
-    public Member(String password, String registrationId, String registerId,
-                 String email, String picture, String username) {
+    public Member(String userId, String password, String registrationId, String registerId,
+                  String email, String picture, String username) {
+        this.userId = userId;
         this.username = username;
         this.password = password;
         this.registrationId = registrationId;

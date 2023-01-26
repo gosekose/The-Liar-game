@@ -2,7 +2,8 @@ package liar.memberservice.token.service;
 
 import liar.memberservice.exception.exception.NotExistsRefreshTokenException;
 import liar.memberservice.member.domain.Authority;
-import liar.memberservice.token.controller.dto.TokenAuthDto;
+import liar.memberservice.member.service.MemberService;
+import liar.memberservice.token.controller.dto.AuthDto;
 import liar.memberservice.token.domain.LogoutAccessToken;
 import liar.memberservice.token.domain.LogoutRefreshToken;
 import liar.memberservice.token.domain.RefreshToken;
@@ -27,6 +28,7 @@ public class AuthService {
     private final RefreshTokenRedisRepository refreshTokenRedisRepository;
     private final TokenProviderImpl tokenProviderImpl;
     private final TokenRepository tokenRepository;
+    private final MemberService memberService;
 
     /**
      *
@@ -35,15 +37,15 @@ public class AuthService {
      *
      */
     @Transactional
-    public TokenAuthDto createFormTokenAuth(String email, List<Authority> authorities) {
+    public AuthDto createFormTokenAuth(String userId, List<Authority> authorities) {
 
-        String accessToken = tokenProviderImpl.createAccessToken(email, authorities);
-        String refreshToken = createFormNewRefreshToken(email, authorities);
+        String accessToken = tokenProviderImpl.createAccessToken(userId, authorities);
+        String refreshToken = createFormNewRefreshToken(userId, authorities);
 
         log.info("accessToken = {}", accessToken);
         log.info("refreshToken = {}", refreshToken);
 
-        return new TokenAuthDto(accessToken, refreshToken);
+        return new AuthDto(accessToken, refreshToken, userId);
     }
 
     /**
@@ -53,7 +55,7 @@ public class AuthService {
      *
      */
     @Transactional
-    public TokenAuthDto createOauthTokenAuth(Authentication authentication) {
+    public AuthDto createOauthTokenAuth(Authentication authentication) {
 
         String accessToken = tokenProviderImpl.createAccessToken(authentication);
         String newRefreshToken = createOauth2NewRefreshToken(authentication);
@@ -61,9 +63,8 @@ public class AuthService {
         log.info("accessToken = {}", accessToken);
         log.info("refreshToken = {}", newRefreshToken);
 
-        return new TokenAuthDto(accessToken, newRefreshToken);
+        return new AuthDto(accessToken, newRefreshToken, getUserIdAuthentication(authentication));
     }
-
 
 
     /**
@@ -94,24 +95,18 @@ public class AuthService {
      * refreshToken까지 재발급
      *
      */
-    public TokenAuthDto reissue (String refreshToken) {
+    public AuthDto reissue (String refreshToken) {
         isInRedisOrThrow(refreshToken);
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String newAccessToken = tokenProviderImpl.createAccessToken(authentication);
         if (tokenProviderImpl.isMoreThanReissueTime(refreshToken))
-            return TokenAuthDto.of(newAccessToken, refreshToken);
+            return AuthDto.of(newAccessToken, refreshToken, getUserIdAuthentication(authentication));
 
         deleteOriginRefreshToken(refreshToken);
         String newRefreshToken = createOauth2NewRefreshToken(authentication);
-        return TokenAuthDto.of(newAccessToken, newRefreshToken);
+        return AuthDto.of(newAccessToken, newRefreshToken, getUserIdAuthentication(authentication));
     }
-
-
-//    public Users getUsersFromToken(String token) {
-//        String email = getEmailFromToken(token);
-//
-//    }
 
 
     /**
@@ -197,5 +192,10 @@ public class AuthService {
      * "Bearer 제거 및 에러 null 처리"
      */
     private String removeType (String token) {return tokenProviderImpl.removeType(token);}
+
+
+    private String getUserIdAuthentication(Authentication authentication) {
+        return memberService.findByEmail(authentication.getName()).getUserId();
+    }
 
 }

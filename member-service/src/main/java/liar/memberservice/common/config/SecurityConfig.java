@@ -29,14 +29,20 @@ public class SecurityConfig {
     private final TokenProviderImpl tokenProviderImpl;
     private final TokenRepositoryImpl tokenRepository;
 
+    private static final String[] webServiceWhiteList = {
+            "/static/**", "/static/js/**", "/static/images/**",
+            "/static/css/**", "/static/scss/**", "/static/docs/**",
+            "/h2-console/**", "/favicon.ico", "/error"
+    };
+
+    private static final String[] memberServiceWhiteList = {
+            "/member-service/**", "/", "**/member-service/**"
+    };
+
+
     @Bean
     public WebSecurityCustomizer webSecurityCustomizer() {
-        return (web) -> web.ignoring().requestMatchers(
-                "/static/**", "/static/js/**", "/static/images/**",
-                "/static/css/**", "/static/scss/**", "/static/docs/**",
-                "/h2-console/**", "/favicon.ico", "/error",
-                "/member-service/test"
-        );
+        return (web) -> web.ignoring().requestMatchers(webServiceWhiteList);
     }
 
 
@@ -45,7 +51,8 @@ public class SecurityConfig {
 
         http
                 .httpBasic().disable()
-                .csrf().disable()
+                .csrf(csrf -> csrf.disable())
+                .cors().disable()
 
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
 
@@ -62,10 +69,7 @@ public class SecurityConfig {
                 .anonymous()
                 .and()
                 .authorizeHttpRequests((requests) -> requests
-                .requestMatchers(
-                        "/member-service/test",
-                        "/member-service/register"
-                )
+                .requestMatchers(memberServiceWhiteList)
                 .permitAll())
                 .authorizeHttpRequests()
                 .anyRequest().authenticated()

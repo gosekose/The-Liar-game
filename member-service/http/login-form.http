@@ -15,8 +15,10 @@ Connection: keep-alive
         client.assert(response.status === 200, "Response status is OK");
         client.global.set("accessToken", response.body.accessToken);
         client.global.set("refreshToken", response.body.refreshToken);
+        client.global.set("userId", response.body.userId);
         client.log(client.global.get("accessToken"));
         client.log(client.global.get("refreshToken"));
+        client.log(client.global.get("userId"));
     });
 %}
 

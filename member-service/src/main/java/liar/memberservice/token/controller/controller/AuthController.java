@@ -10,7 +10,7 @@ import liar.memberservice.member.service.AuthorityService;
 import liar.memberservice.member.service.MemberService;
 import liar.memberservice.member.service.dto.FormRegisterUserDto;
 import liar.memberservice.token.controller.dto.LoginDto;
-import liar.memberservice.token.controller.dto.TokenAuthDto;
+import liar.memberservice.token.controller.dto.AuthDto;
 import liar.memberservice.token.service.AuthService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -91,22 +91,23 @@ public class AuthController {
             throw new NotFoundUserException();
         }
 
-        return new ResponseEntity(authService.createFormTokenAuth(member.getEmail(), authorities), HttpStatus.OK);
+        return new ResponseEntity(authService.createFormTokenAuth(member.getUserId(), authorities), HttpStatus.OK);
     }
 
 
     @PostMapping("/reissue")
     public ResponseEntity reissueToken(@RequestHeader(value = "RefreshToken") String refreshToken) {
 
-        TokenAuthDto tokenAuthDto = authService.reissue(refreshToken);
+        AuthDto authDto = authService.reissue(refreshToken);
 
-        return new ResponseEntity(tokenAuthDto, HttpStatus.OK);
+        return new ResponseEntity(authDto, HttpStatus.OK);
 
     }
 
 
     @GetMapping("/test")
     public ResponseEntity testResponse() {
+        log.info("test Log result");
         return ResponseEntity.status(HttpStatus.OK).body("OK");
     }
 

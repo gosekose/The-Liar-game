@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
+import java.util.UUID;
 
 import static liar.memberservice.member.domain.Authorities.ROLE_USER;
 
@@ -29,11 +30,11 @@ public class MemberService {
 
 
     public Member find(Long id) {
+        return memberRepository.findById(id).orElseThrow(() -> {throw new NotFoundUserException();});
+    }
 
-        Optional<Member> findMember = memberRepository.findById(id);
-        Member member = findMember.orElseThrow(() -> {throw new NotFoundUserException();});
-
-        return member;
+    public Member findByUserId(String userId) {
+        return memberRepository.findByUserId(userId).orElseThrow(() -> {throw new NotFoundUserException();});
     }
 
     public Member findByEmailNoOptional(String email) {
@@ -42,14 +43,7 @@ public class MemberService {
 
 
     public Member findByRegisterId(String registeredId) {
-        Optional<Member> findMember = memberRepository.findByRegisterId(registeredId);
-        Member member = findMember.orElseThrow(
-                () -> {
-                    throw new NotFoundUserException();
-                }
-        );
-
-        return member;
+        return memberRepository.findByRegisterId(registeredId).orElseThrow(() -> {throw new NotFoundUserException();});
     }
 
     @Transactional
@@ -80,6 +74,7 @@ public class MemberService {
     public void register(String registrationId, ProviderUser providerUser) {
         Member savedMember = memberRepository.save(
                 Member.builder()
+                        .userId(UUID.randomUUID().toString())
                         .registrationId(registrationId)
                         .registerId(providerUser.getId())
                         .password(providerUser.getPassword())
@@ -102,6 +97,7 @@ public class MemberService {
         if (findMember == null)  {
 
             Member user = Member.builder()
+                    .userId(UUID.randomUUID().toString())
                     .username(formRegisterUserDto.getUsername())
                     .password(passwordEncoder.encode(formRegisterUserDto.getPassword()))
                     .email(formRegisterUserDto.getEmail())

@@ -1,4 +1,4 @@
-package liar.gateway.config;
+package liar.gateway.filter;
 
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
@@ -32,6 +32,8 @@ public class GlobalFilter extends AbstractGatewayFilterFactory<GlobalFilter.Conf
             ServerHttpResponse response = exchange.getResponse();
 
             log.info("Global Filter baseMessage = {}", config.getBaseMessage());
+            log.info("request.getHeaders() = {}", request.getHeaders());
+            log.info("request.getURI() = {}", request.getURI());
 
             if (config.isPreLogger()) {
                 log.info("Global Filter Start: request id -> {}", config.getBaseMessage());

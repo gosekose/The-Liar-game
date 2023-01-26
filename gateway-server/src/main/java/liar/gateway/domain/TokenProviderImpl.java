@@ -1,6 +1,5 @@
-package liar.memberservice.token.domain;
+package liar.gateway.domain;
 
-import liar.memberservice.member.domain.Authority;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
@@ -48,58 +47,6 @@ public class TokenProviderImpl implements InitializingBean, TokenProvider{
     public void afterPropertiesSet() {
         byte[] keyBytes = Decoders.BASE64.decode(secretKey);
         this.key = Keys.hmacShaKeyFor(keyBytes);
-    }
-
-    public String createRefreshToken(Authentication authentication) {
-        return createToken(authentication, refreshTokenExpirationTime);
-    }
-
-    public String createAccessToken(Authentication authentication) {
-        return createToken(authentication, accessTokenExpirationTime);
-    }
-
-    public String createAccessToken(String userId, List<Authority> roles) {
-        return createTokenFormLogin(userId, roles, accessTokenExpirationTime);
-    }
-
-    public String createRefreshToken(String userId, List<Authority> roles) {
-        return createTokenFormLogin(userId, roles, refreshTokenExpirationTime);
-    }
-
-    private String createTokenFormLogin(String userId, List<Authority> authorities, long tokenTime) {
-
-        List<String> roles = getRoles(authorities);
-
-        Claims claims = Jwts.claims().setSubject(userId);
-        claims.put(AUTHORITIES_KEY, roles);
-
-        Date now = new Date();
-        Date expiryDate = new Date(now.getTime() + tokenTime);
-
-        return Jwts.builder()
-                .setClaims(claims)
-                .setIssuedAt(now)
-                .setExpiration(expiryDate) // set Expire Time
-                .signWith(key, SignatureAlgorithm.HS512)
-                .compact();
-    }
-
-    private String createToken(Authentication authentication, long tokenTime) {
-
-        String authorities = authentication.getAuthorities().stream()
-                .map(GrantedAuthority::getAuthority)
-                .collect(Collectors.joining(","));
-
-        Date now = new Date();
-        Date expiryDate = new Date(now.getTime() + tokenTime);
-
-        return Jwts.builder()
-                .setSubject(authentication.getName())
-                .setIssuedAt(now)
-                .claim(AUTHORITIES_KEY, authorities)
-                .signWith(key, SignatureAlgorithm.HS512)
-                .setExpiration(expiryDate)
-                .compact();
     }
 
 
@@ -168,14 +115,6 @@ public class TokenProviderImpl implements InitializingBean, TokenProvider{
 
         return token.substring(TOKEN_TYPE.length());
     }
-
-    private List<String> getRoles (List<Authority> authorities) {
-
-        List<String> roles = new ArrayList<>();
-        authorities.forEach(role -> roles.add(role.getAuthorities().getAuthoritiesName()));
-        return roles;
-    }
-
 
     public Long getRemainTime(String token) {
 
