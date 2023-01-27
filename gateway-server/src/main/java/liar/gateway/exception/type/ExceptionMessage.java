@@ -10,4 +10,6 @@ public class ExceptionMessage {
 
     public static final String USER_NOT_AUTHORIZATION_HEADER = "Authorization 헤더가 없습니다.";
 
+    public static final String USER_NOT_USERID_HEADER = "userId 헤더가 없습니다.";
+
 }

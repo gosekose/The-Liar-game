@@ -1,0 +1,23 @@
+server:
+  port: 8000
+
+spring:
+  application:
+    name: gateway-service
+
+  main:
+    allow-bean-definition-overriding: true
+    web-application-type: reactive
+
+  security:
+    user:
+      name: user
+      password: 1234
+
+  profiles:
+    include:
+      - db
+      - jwt
+      - cloud
+      - eureka
+      - redis
