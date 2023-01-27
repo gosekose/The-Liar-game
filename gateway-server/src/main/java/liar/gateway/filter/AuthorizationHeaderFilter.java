@@ -1,15 +1,13 @@
 package liar.gateway.filter;
 
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.ws.rs.NotAuthorizedException;
 import liar.gateway.domain.TokenProviderImpl;
-import liar.gateway.exception.exception.NotAuthorizationCustomException;
+import liar.gateway.exception.exception.NotUserIdHeaderException;
+import liar.gateway.exception.exception.NotAuthorizationHeaderException;
 import liar.gateway.repository.TokenRepositoryImpl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cloud.gateway.filter.GatewayFilter;
 import org.springframework.cloud.gateway.filter.factory.AbstractGatewayFilterFactory;
-import org.springframework.cloud.gateway.route.builder.GatewayFilterSpec;
 import org.springframework.core.env.Environment;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -52,54 +50,76 @@ public class AuthorizationHeaderFilter extends AbstractGatewayFilterFactory<Auth
     public GatewayFilter apply(Config config) {
 
         return (exchange, chain) -> {
-
             ServerHttpRequest request = exchange.getRequest();
-            log.info("request.getHeaders() = {}", request.getHeaders());
-            log.info("request.getURI() = {}", request.getURI());
-            log.info("request.getPath() = {}", request.getPath());
 
-            if (!request.getHeaders().containsKey(HttpHeaders.AUTHORIZATION)) {
-                throw new NotAuthorizationCustomException();
-            }
+            hasAuthorizationHeader(request);
+            hasUserIdHeader(request);
 
-            String jwt = resolveToken(request);
-            String requestURI = request.getURI().getPath();
+            String jwt = parseToken(request);
+            String userId = parseUserId(request);
 
             if (StringUtils.hasText(jwt)
-                            && tokenProviderImpl.validateToken(jwt)
+                            && tokenProviderImpl.validateToken(jwt, userId)
                             && isNotLogoutAccessToken(jwt)) {
                 return chain.filter(exchange);
             }
-
             return onError(exchange, "Error", HttpStatus.BAD_REQUEST);
         };
     }
 
-    private String resolveToken(ServerHttpRequest request) {
-        String bearerToken = request.getHeaders().get(AUTHORIZATION_HEADER).get(0);
 
+    /**
+     * request 요청에서 token 파싱
+     */
+    private String parseToken(ServerHttpRequest request) {
+        String bearerToken = request.getHeaders().get(AUTHORIZATION_HEADER).get(0);
         if (StringUtils.hasText(bearerToken) && bearerToken.startsWith("Bearer ")) {
             return bearerToken.substring(7);
         }
-
         return null;
     }
 
     /**
-     *
+     * request 요청에서 userId 파싱
+     */
+    public String parseUserId(ServerHttpRequest request) {
+        return request.getHeaders().get("userId").get(0);
+    }
+
+    /**
      * token이 Logout한 AccessToken이라면 , false 출력
-     *
-     * @param token
-     * @return
      */
     private boolean isNotLogoutAccessToken(String token) {
         return !tokenRepository.existsLogoutAccessTokenById(token);
     }
 
+    /**
+     * Authorization 헤더 포함 및 header List empty 여부 확인
+     */
+    private static void hasAuthorizationHeader(ServerHttpRequest request) {
+        if (!request.getHeaders().containsKey(HttpHeaders.AUTHORIZATION) ||
+                request.getHeaders().get(HttpHeaders.AUTHORIZATION).get(0).isEmpty()) {
+            throw new NotAuthorizationHeaderException();
+        }
+
+    }
+
+    /**
+     * userId 헤더 포함 및 header List empty 여부 확인
+     */
+    private static void hasUserIdHeader(ServerHttpRequest request) {
+        if (!request.getHeaders().containsKey("userId") ||
+                request.getHeaders().get("userId").get(0).isEmpty()) {
+            throw new NotUserIdHeaderException();
+        }
+    }
+
+    /**
+     * Error Log
+     */
     private Mono<Void> onError(ServerWebExchange exchange, String err, HttpStatus httpStatus) {
         ServerHttpResponse response = exchange.getResponse();
         response.setStatusCode(httpStatus);
-
         log.error(err);
         return response.setComplete();
     }

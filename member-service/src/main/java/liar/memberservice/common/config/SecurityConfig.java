@@ -3,7 +3,6 @@ package liar.memberservice.common.config;
 import liar.memberservice.authentication.service.CustomOAuth2UserService;
 import liar.memberservice.authentication.service.CustomOidcUserService;
 import liar.memberservice.token.controller.filter.AuthenticationGiveFilter;
-import liar.memberservice.token.controller.filter.JwtFilter;
 import liar.memberservice.token.domain.TokenProviderImpl;
 import liar.memberservice.token.repository.TokenRepositoryImpl;
 import lombok.RequiredArgsConstructor;
@@ -93,10 +92,10 @@ public class SecurityConfig {
 
     }
 
-    @Bean
-    public JwtFilter jwtFilter() {
-        return new JwtFilter(tokenProviderImpl, tokenRepository);
-    }
+//    @Bean
+//    public JwtFilter jwtFilter() {
+//        return new JwtFilter(tokenProviderImpl, tokenRepository);
+//    }
 
     @Bean
     public AuthenticationGiveFilter authenticationGiveFilter() { return new AuthenticationGiveFilter(tokenProviderImpl);}

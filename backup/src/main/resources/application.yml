@@ -1,0 +1,15 @@
+spring:
+  application:
+    name: member-service
+
+  profiles:
+    include:
+      - db
+      - aspect
+      - cloud
+      - oauth
+      - jwt
+      - kafka
+
+server:
+  port: 8080

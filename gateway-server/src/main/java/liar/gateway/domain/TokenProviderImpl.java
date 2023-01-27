@@ -21,8 +21,6 @@ import java.util.stream.Collectors;
 @Component
 public class TokenProviderImpl implements InitializingBean, TokenProvider{
 
-    public static final String TOKEN_TYPE = "Bearer ";
-    private static final String AUTHORITIES_KEY = "auth";
     private Key key;
 
     private final String secretKey;
@@ -41,30 +39,16 @@ public class TokenProviderImpl implements InitializingBean, TokenProvider{
         this.reissueRefreshTime = reissueRefreshTime;
     }
 
-
-
     @Override
     public void afterPropertiesSet() {
         byte[] keyBytes = Decoders.BASE64.decode(secretKey);
         this.key = Keys.hmacShaKeyFor(keyBytes);
     }
 
-
-    public String getUserEmailFromToken(String token) {
-        Claims claims = getClaims(token);
-        return claims.getSubject();
-    }
-
-
     public long getRemainingTimeFromToken(String token) {
         Date expiration = getClaims(token).getExpiration();
         return expiration.getTime() - (new Date()).getTime();
     }
-
-    public boolean isMoreThanReissueTime(String token) {
-        return getRemainingTimeFromToken(token) >= reissueRefreshTime;
-    }
-
 
     public Claims getClaims(String token) {
 
@@ -77,23 +61,14 @@ public class TokenProviderImpl implements InitializingBean, TokenProvider{
     }
 
 
-    public Authentication getAuthentication(String token) {
-
-        Claims claims = getClaims(token);
-
-        Collection<? extends GrantedAuthority> authorities =
-                Arrays.stream(claims.get(AUTHORITIES_KEY).toString().split(","))
-                        .map(SimpleGrantedAuthority::new)
-                        .collect(Collectors.toList());
-
-        User principal = new User(claims.getSubject(), "", authorities);
-
-        return new UsernamePasswordAuthenticationToken(principal, token, authorities);
-    }
-
-    public boolean validateToken(String token) {
+    public boolean validateToken(String token, String userId) {
         try {
-            Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token);
+            Jws<Claims> claimsJws = Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token);
+
+            if (!isEqualDecodeIdAndUserId(claimsJws.getBody().getSubject(), userId)) {
+                return false;
+            };
+
             return true;
         } catch (io.jsonwebtoken.security.SecurityException | MalformedJwtException e) {
             log.info("잘못된 JWT 서명입니다.");
@@ -107,23 +82,8 @@ public class TokenProviderImpl implements InitializingBean, TokenProvider{
         return false;
     }
 
-    public String removeType(String token) {
-
-        if (token == null || token.length() < TOKEN_TYPE.length()) {
-            return null;
-        }
-
-        return token.substring(TOKEN_TYPE.length());
-    }
-
-    public Long getRemainTime(String token) {
-
-        Claims claims = getClaims(token);
-        if (claims == null || claims.getExpiration() == null) {
-            return null;
-        }
-
-        return claims.getExpiration().getTime();
+    private boolean isEqualDecodeIdAndUserId(String token, String userId) {
+        return token.equals(userId);
     }
 
 }
