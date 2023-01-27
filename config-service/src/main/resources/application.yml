@@ -8,4 +8,4 @@ spring:
     config:
       server:
         git:
-          uri: file:///home/koseyun/IdeaProjects/liargame/msa/yml
+          uri: file:///home/koseyun/IdeaProjects/liargame/msa
