@@ -69,6 +69,8 @@ public class SecurityConfig {
                 .anonymous()
                 .and()
                 .authorizeHttpRequests((requests) -> requests
+//                        .requestMatchers("/member-service/actuator/**")
+//                        .hasRole("ROLE_ADMIN")
                 .requestMatchers(memberServiceWhiteList)
                 .permitAll())
                 .authorizeHttpRequests()

@@ -1,0 +1,33 @@
+### 1. 암호화 테스트
+
+POST {{baseUrl}}/encrypt
+Content-Type: text/plain
+Accept: */*
+Connection: keep-alive
+
+1234
+
+> {%
+    client.test("인증 메세지는 암호화 되어야 한다.", function () {
+        client.assert(response.status === 200, "Response status is OK")
+        client.assert(response.body !== "1234")
+        client.global.set("dbPassword", response.body.trim())
+    })
+ %}
+
+### 2. 복호화 테스트
+POST {{baseUrl}}/decrypt
+Content-Type: text/plain
+Accept: */*
+Connection: keep-alive
+
+{{dbPassword}}
+
+> {%
+    client.test("인증 메세지는 복호화 되어야 한다.", function () {
+        client.assert(response.status === 200, "Response status is OK")
+        client.assert(response.body.trim() === '1234')
+    })
+
+
+ %}

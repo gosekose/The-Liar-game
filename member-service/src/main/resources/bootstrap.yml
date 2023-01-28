@@ -2,7 +2,7 @@ spring:
   cloud:
     config:
       url: http://localhost:8888
-      name: common
+      name: common, member-service
 
 #  profiles:
 #    active: dev
