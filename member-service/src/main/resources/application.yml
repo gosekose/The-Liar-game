@@ -1,6 +1,11 @@
 spring:
   application:
     name: member-service
+  rabbitmq:
+    host: 127.0.0.1
+    port: 5672
+    username: guest
+    password: guest
 
   profiles:
     include:
@@ -8,8 +13,13 @@ spring:
       - aspect
       - cloud
       - oauth
-      - jwt
       - kafka
 
 server:
   port: 8080
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: refresh, health, beans, httptrace, busrefresh
