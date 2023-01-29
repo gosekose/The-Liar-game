@@ -1,0 +1,9 @@
+spring:
+  kafka:
+    bootstrap-servers: localhost:9092
+    consumer:
+      group-id:
+        retry:
+          back-off-period: 2000
+          max-attempts: 2
+      auto-offset-reset: earliest
