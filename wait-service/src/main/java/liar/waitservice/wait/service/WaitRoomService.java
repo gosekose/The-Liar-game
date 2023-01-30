@@ -24,15 +24,15 @@ public class WaitRoomService {
      * 호스트가 아닌 다른 유저 대기방 요청 승인
      */
     public boolean addMembers(JoinStatusWaitRoomDto joinStatusWaitRoomDto) {
-        WaitRoom waitRoom = findByRoomId(joinStatusWaitRoomDto.getRoomId());
-        return waitRoom.addMembers(joinStatusWaitRoomDto.getUserId());
+        WaitRoom waitRoom = findById(joinStatusWaitRoomDto.getRoomId());
+        return waitRoom.joinMembers(joinStatusWaitRoomDto.getUserId());
     }
 
     /**
      * 호스트가 아닌 다른 유저 대기방 나가기
      */
     public void leaveMembers(JoinStatusWaitRoomDto joinStatusWaitRoomDto) {
-        WaitRoom waitRoom = findByRoomId(joinStatusWaitRoomDto.getRoomId());
+        WaitRoom waitRoom = findById(joinStatusWaitRoomDto.getRoomId());
         waitRoom.leaveMembers(joinStatusWaitRoomDto.getUserId());
     }
 
@@ -40,7 +40,7 @@ public class WaitRoomService {
      * 대기방 탈퇴 요청이 호스트라면, 대기방 전체 삭제
      */
     public void leaveWaitRoomByHost(JoinStatusWaitRoomDto join) {
-        WaitRoom waitRoom = findByRoomId(join.getRoomId());
+        WaitRoom waitRoom = findById(join.getRoomId());
 
         if (isHost(waitRoom, join.getUserId())) {
             waitRoomRepository.delete(waitRoom);
@@ -51,8 +51,7 @@ public class WaitRoomService {
         return waitRoom.isHost(userId);
     }
 
-    private WaitRoom findByRoomId(String roomId) {
-        return  waitRoomRepository.findWaitRoomByRoomId(roomId).orElseThrow(() -> {throw new NotExistsRoomIdException();});
+    private WaitRoom findById(String roomId) {
+        return  waitRoomRepository.findById(roomId).orElseThrow(NotExistsRoomIdException::new);
     }
-
 }

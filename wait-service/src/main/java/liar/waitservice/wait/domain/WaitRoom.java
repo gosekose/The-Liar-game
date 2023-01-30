@@ -5,36 +5,38 @@ import liar.waitservice.wait.controller.dto.CreateWaitRoomDto;
 import lombok.*;
 import org.springframework.data.redis.core.RedisHash;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
 
+import static java.time.LocalDateTime.now;
+
 @Getter
 @RedisHash("waitRoom")
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class WaitRoom {
+public class WaitRoom implements Serializable {
 
     @Id
     private String id;
-
     private String roomName;
-
     private String hostId;
-
-    private String roomId;
 
     private int limitMembers;
     private List<String> members = new LinkedList<>();
 
     private LocalDateTime createdAt;
+    private LocalDateTime modifiedAt;
 
-    protected WaitRoom (CreateWaitRoomDto createWaitRoomDto) {
-        this.roomName = createWaitRoomDto.getRoomName();
-        this.hostId = createWaitRoomDto.getUserId();
-        this.limitMembers = createWaitRoomDto.getLimitMembers();
-        this.roomId = UUID.randomUUID().toString();
+    protected WaitRoom (CreateWaitRoomDto roomDto) {
+        id = UUID.randomUUID().toString();
+        roomName = roomDto.getRoomName();
+        hostId = roomDto.getUserId();
+        limitMembers = roomDto.getLimitMembers();
+        createdAt = now();
+        modifiedAt = now();
         members.add(hostId);
     }
 
@@ -45,10 +47,11 @@ public class WaitRoom {
     /**
      * 대기방 인원이 여유가 있고, 요청이 호스트가 아니라면 회원 추가
      */
-    public boolean addMembers(String userId) {
+    public boolean joinMembers(String userId) {
 
-        if (isNotFullMembers() || !isHost(userId)) {
+        if (isNotFullMembers() && !isHost(userId)) {
             members.add(userId);
+            modifiedAt = now();
             return true;
         }
         return false;
@@ -58,7 +61,10 @@ public class WaitRoom {
      * 대기방에 있는 유저 나가기
      */
     public void leaveMembers(String userId) {
-        if (!isHost(userId)) members.remove(userId);
+        if (!isHost(userId)) {
+            members.remove(userId);
+            modifiedAt = now();
+        }
     }
 
     /**

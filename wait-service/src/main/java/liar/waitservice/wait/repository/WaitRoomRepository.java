@@ -7,6 +7,6 @@ import java.util.Optional;
 
 public interface WaitRoomRepository extends CrudRepository<WaitRoom, String> {
 
-    Optional<WaitRoom> findWaitRoomByRoomId(String roomId);
+//    Optional<WaitRoom> findWaitRoomByRoomId(String roomId);
 
 }
