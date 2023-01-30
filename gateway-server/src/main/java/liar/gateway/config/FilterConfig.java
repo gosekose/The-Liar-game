@@ -27,6 +27,12 @@ public class FilterConfig {
                         .filters(spec -> spec.filter(authorizationHeaderFilter.apply(new AuthorizationHeaderFilter.Config())))
                         .uri("lb://member-service"))
 
+                .route("wait-service", r -> r
+                        .path("/wait-service/**")
+                        .filters(spec -> spec.filter(authorizationHeaderFilter.apply(new AuthorizationHeaderFilter.Config())))
+                        .uri("lb://wait-service"))
+
+
                 .build();
     }
 
