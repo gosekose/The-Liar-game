@@ -1,10 +1,8 @@
 package liar.waitservice.wait.controller.dto;
 
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
-@Data
+@Getter
 @NoArgsConstructor
 public class CreateWaitRoomDto {
 

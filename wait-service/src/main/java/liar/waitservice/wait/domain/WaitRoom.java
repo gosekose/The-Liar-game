@@ -1,8 +1,8 @@
 package liar.waitservice.wait.domain;
 
-import jakarta.persistence.Id;
 import liar.waitservice.wait.controller.dto.CreateWaitRoomDto;
 import lombok.*;
+import org.springframework.data.annotation.Id;
 import org.springframework.data.redis.core.RedisHash;
 
 import java.io.Serializable;
@@ -23,6 +23,7 @@ public class WaitRoom implements Serializable {
     private String id;
     private String roomName;
     private String hostId;
+    private String hostName;
 
     private int limitMembers;
     private List<String> members = new LinkedList<>();
@@ -30,18 +31,19 @@ public class WaitRoom implements Serializable {
     private LocalDateTime createdAt;
     private LocalDateTime modifiedAt;
 
-    protected WaitRoom (CreateWaitRoomDto roomDto) {
+    protected WaitRoom (CreateWaitRoomDto roomDto, String userName) {
         id = UUID.randomUUID().toString();
         roomName = roomDto.getRoomName();
         hostId = roomDto.getUserId();
+        hostName = userName;
         limitMembers = roomDto.getLimitMembers();
         createdAt = now();
         modifiedAt = now();
         members.add(hostId);
     }
 
-    public static WaitRoom of(CreateWaitRoomDto createWaitRoomDto) {
-        return new WaitRoom(createWaitRoomDto);
+    public static WaitRoom of(CreateWaitRoomDto createWaitRoomDto, String userName) {
+        return new WaitRoom(createWaitRoomDto, userName);
     }
 
     /**

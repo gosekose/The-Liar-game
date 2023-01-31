@@ -1,6 +1,7 @@
 package liar.waitservice.common.authentication;
 
 import jakarta.persistence.*;
+import liar.waitservice.other.Member;
 import lombok.*;
 
 import static jakarta.persistence.EnumType.STRING;

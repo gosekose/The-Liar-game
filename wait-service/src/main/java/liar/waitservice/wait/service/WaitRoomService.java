@@ -4,20 +4,24 @@ import liar.waitservice.exception.exception.NotExistsRoomIdException;
 import liar.waitservice.wait.controller.dto.CreateWaitRoomDto;
 import liar.waitservice.wait.controller.dto.JoinStatusWaitRoomDto;
 import liar.waitservice.wait.domain.WaitRoom;
-import liar.waitservice.wait.repository.WaitRoomRepository;
+import liar.waitservice.wait.repository.WaitRoomRedisRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
-@Transactional(readOnly = true)
+@Transactional
 @RequiredArgsConstructor
 public class WaitRoomService {
 
-    private final WaitRoomRepository waitRoomRepository;
+    private final WaitRoomRedisRepository waitRoomRedisRepository;
 
-    public void saveWaitRoom(CreateWaitRoomDto createWaitRoomDto) {
-        waitRoomRepository.save(WaitRoom.of(createWaitRoomDto));
+    public WaitRoom findRoomId(String roomId) {
+        return waitRoomRedisRepository.findById(roomId).orElseThrow(NotExistsRoomIdException::new);
+    }
+
+    public void saveWaitRoom(CreateWaitRoomDto createWaitRoomDto, String userNAme) {
+        waitRoomRedisRepository.save(WaitRoom.of(createWaitRoomDto, userNAme));
     }
 
     /**
@@ -43,7 +47,7 @@ public class WaitRoomService {
         WaitRoom waitRoom = findById(join.getRoomId());
 
         if (isHost(waitRoom, join.getUserId())) {
-            waitRoomRepository.delete(waitRoom);
+            waitRoomRedisRepository.delete(waitRoom);
         };
     }
 
@@ -52,6 +56,6 @@ public class WaitRoomService {
     }
 
     private WaitRoom findById(String roomId) {
-        return  waitRoomRepository.findById(roomId).orElseThrow(NotExistsRoomIdException::new);
+        return  waitRoomRedisRepository.findById(roomId).orElseThrow(NotExistsRoomIdException::new);
     }
 }
