@@ -19,7 +19,7 @@ public class WaitRoomNameSearchService implements SearchService {
     private final WaitRoomService waitRoomService;
 
     @Override
-    public List searchWaitRoomCondition(Object request) {
+    public List searchWaitRoomCond(Object request) {
         return waitRoomNameService.findByIdForSearch((String) request).getRoomIds()
                 .stream().map(waitRoomService::findRoomId)
                 .map(WaitRoomViewsDto::new).collect(Collectors.toList());

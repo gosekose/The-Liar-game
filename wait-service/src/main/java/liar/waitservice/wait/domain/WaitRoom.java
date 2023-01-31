@@ -62,11 +62,17 @@ public class WaitRoom implements Serializable {
     /**
      * 대기방에 있는 유저 나가기
      */
-    public void leaveMembers(String userId) {
+    public boolean leaveMember(String userId) {
         if (!isHost(userId)) {
+            int size = members.size();
             members.remove(userId);
-            modifiedAt = now();
+
+            if (size != members.size()) {
+                modifiedAt = now();
+                return true;
+            }
         }
+        return false;
     }
 
     /**

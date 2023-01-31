@@ -9,4 +9,4 @@ eureka:
 
 
 greeting:
-  message: member-service
+  message: wait-service
