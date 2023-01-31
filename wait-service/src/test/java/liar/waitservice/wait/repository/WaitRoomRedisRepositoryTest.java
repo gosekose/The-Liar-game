@@ -16,27 +16,28 @@ import java.util.stream.Collectors;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-class WaitRoomRepositoryTest {
+class WaitRoomRedisRepositoryTest {
 
-    @Autowired WaitRoomRepository waitRoomRepository;
+    @Autowired
+    WaitRoomRedisRepository waitRoomRedisRepository;
     private WaitRoom waitRoom;
 
     @BeforeEach
     void init() {
         CreateWaitRoomDto roomDto = new CreateWaitRoomDto("kose", "koseTest1", 5);
-        waitRoom = WaitRoom.of(roomDto);
+        waitRoom = WaitRoom.of(roomDto, "kose");
     }
 
     @AfterEach
     void tearDown() {
-        waitRoomRepository.deleteAll();
+        waitRoomRedisRepository.deleteAll();
     }
 
     @Test
     @DisplayName("Redis에 createWaitRoom 요청이 오면, 저장되어야 한다.")
     public void saveWaitRoom() throws Exception {
         //given
-        waitRoomRepository.save(waitRoom);
+        waitRoomRedisRepository.save(waitRoom);
 
         //when
         WaitRoom findWaitRoom = findById(waitRoom.getId());
@@ -52,14 +53,14 @@ class WaitRoomRepositoryTest {
     @DisplayName("대기방에 입장 요청이 오면, 인원을 추가하여 값을 변경하여 저장 해야 한다.")
     public void joinMembers() throws Exception {
         //given
-        waitRoomRepository.save(waitRoom);
+        waitRoomRedisRepository.save(waitRoom);
         WaitRoom findRoom = findById(waitRoom.getId());
 
         //when
         findRoom.joinMembers("kose2");
         findRoom.joinMembers("kose3");
         findRoom.joinMembers("kose4");
-        waitRoomRepository.save(findRoom);
+        waitRoomRedisRepository.save(findRoom);
         WaitRoom result = findById(findRoom.getId());
 
         //then
@@ -75,18 +76,18 @@ class WaitRoomRepositoryTest {
     @DisplayName("대기방에 있던 유저가 퇴장하면, 인원 변동되어 저장해야 한다.")
     public void leaveMembers() throws Exception {
         //given
-        waitRoomRepository.save(waitRoom);
+        waitRoomRedisRepository.save(waitRoom);
         WaitRoom findRoom = findById(waitRoom.getId());
         findRoom.joinMembers("kose2");
         findRoom.joinMembers("kose3");
         findRoom.joinMembers("kose4");
-        waitRoomRepository.save(findRoom);
+        waitRoomRedisRepository.save(findRoom);
 
         //when
         WaitRoom room = findById(waitRoom.getId());
         room.leaveMembers("kose2");
         room.leaveMembers("kose4");
-        WaitRoom result = waitRoomRepository.save(room);
+        WaitRoom result = waitRoomRedisRepository.save(room);
 
         //then
         assertThat(result.getRoomName()).isEqualTo("koseTest1");
@@ -100,17 +101,17 @@ class WaitRoomRepositoryTest {
     @DisplayName("대기방에 유저가 만석이 되면, 인원 입장이 불가하다")
     public void joinMembersDisable() throws Exception {
         //given
-        waitRoomRepository.save(waitRoom);
+        waitRoomRedisRepository.save(waitRoom);
         WaitRoom findRoom = findById(waitRoom.getId());
         findRoom.joinMembers("kose2");
         findRoom.joinMembers("kose3");
         findRoom.joinMembers("kose4");
         findRoom.joinMembers("kose5");
-        waitRoomRepository.save(findRoom);
+        waitRoomRedisRepository.save(findRoom);
 
         //when
         boolean isJoinMember = findRoom.joinMembers("kose6");
-        waitRoomRepository.save(findRoom);
+        waitRoomRedisRepository.save(findRoom);
         WaitRoom result = findById(waitRoom.getId());
 
         //then
@@ -126,16 +127,16 @@ class WaitRoomRepositoryTest {
     @DisplayName("호스트가 대기방을 나가면, 방이 종료된다.")
     public void leaveHost() throws Exception {
         //given
-        waitRoomRepository.save(waitRoom);
+        waitRoomRedisRepository.save(waitRoom);
         WaitRoom findRoom = findById(waitRoom.getId());
         findRoom.joinMembers("kose2");
         findRoom.joinMembers("kose3");
         findRoom.joinMembers("kose4");
         findRoom.joinMembers("kose5");
-        WaitRoom result = waitRoomRepository.save(findRoom);
+        WaitRoom result = waitRoomRedisRepository.save(findRoom);
 
         //when
-        waitRoomRepository.delete(result);
+        waitRoomRedisRepository.delete(result);
 
         //then
         Assertions.assertThatThrownBy(() -> findById(result.getId()))
@@ -143,7 +144,7 @@ class WaitRoomRepositoryTest {
     }
 
     private WaitRoom findById(String id) {
-        return waitRoomRepository.findById(waitRoom.getId()).orElseThrow(NotExistsRoomIdException::new);
+        return waitRoomRedisRepository.findById(waitRoom.getId()).orElseThrow(NotExistsRoomIdException::new);
     }
 
 }

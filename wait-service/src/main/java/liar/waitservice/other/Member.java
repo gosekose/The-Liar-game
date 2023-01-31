@@ -1,4 +1,4 @@
-package liar.waitservice.common.authentication;
+package liar.waitservice.other;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -17,4 +17,5 @@ public class Member {
     @Column(name = "member_id")
     private Long id;
     private String userId;
+    private String username;
 }
