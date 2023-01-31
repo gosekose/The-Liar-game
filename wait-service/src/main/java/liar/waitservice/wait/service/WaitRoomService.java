@@ -1,27 +1,35 @@
 package liar.waitservice.wait.service;
 
 import liar.waitservice.exception.exception.NotExistsRoomIdException;
+import liar.waitservice.other.MemberService;
+import liar.waitservice.other.dao.MemberNameOnly;
 import liar.waitservice.wait.controller.dto.CreateWaitRoomDto;
 import liar.waitservice.wait.controller.dto.JoinStatusWaitRoomDto;
 import liar.waitservice.wait.domain.WaitRoom;
 import liar.waitservice.wait.repository.WaitRoomRedisRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-@Service
+@Slf4j
+@Component
 @Transactional
 @RequiredArgsConstructor
 public class WaitRoomService {
 
     private final WaitRoomRedisRepository waitRoomRedisRepository;
+    private final MemberService memberService;
 
     public WaitRoom findRoomId(String roomId) {
         return waitRoomRedisRepository.findById(roomId).orElseThrow(NotExistsRoomIdException::new);
     }
 
-    public void saveWaitRoom(CreateWaitRoomDto createWaitRoomDto, String userNAme) {
-        waitRoomRedisRepository.save(WaitRoom.of(createWaitRoomDto, userNAme));
+
+    public String saveWaitRoom(CreateWaitRoomDto createWaitRoomDto) {
+        MemberNameOnly username = memberService.findUsernameById(createWaitRoomDto.getUserId());
+        WaitRoom waitRoom = waitRoomRedisRepository.save(WaitRoom.of(createWaitRoomDto, username.getUsername()));
+        return waitRoom.getId();
     }
 
     /**
@@ -29,26 +37,40 @@ public class WaitRoomService {
      */
     public boolean addMembers(JoinStatusWaitRoomDto joinStatusWaitRoomDto) {
         WaitRoom waitRoom = findById(joinStatusWaitRoomDto.getRoomId());
-        return waitRoom.joinMembers(joinStatusWaitRoomDto.getUserId());
+        if (isEnableJoinMembers(joinStatusWaitRoomDto, waitRoom)) {
+            waitRoomRedisRepository.save(waitRoom);
+            return true;
+        }
+        return false;
     }
 
     /**
      * 호스트가 아닌 다른 유저 대기방 나가기
      */
-    public void leaveMembers(JoinStatusWaitRoomDto joinStatusWaitRoomDto) {
+    public boolean leaveMember(JoinStatusWaitRoomDto joinStatusWaitRoomDto) {
         WaitRoom waitRoom = findById(joinStatusWaitRoomDto.getRoomId());
-        waitRoom.leaveMembers(joinStatusWaitRoomDto.getUserId());
+        if (isLeaveMember(joinStatusWaitRoomDto, waitRoom)) {
+            waitRoomRedisRepository.save(waitRoom);
+            return true;
+        }
+        return false;
+    }
+
+    private static boolean isLeaveMember(JoinStatusWaitRoomDto joinStatusWaitRoomDto, WaitRoom waitRoom) {
+        return waitRoom.leaveMember(joinStatusWaitRoomDto.getUserId());
     }
 
     /**
      * 대기방 탈퇴 요청이 호스트라면, 대기방 전체 삭제
      */
-    public void leaveWaitRoomByHost(JoinStatusWaitRoomDto join) {
+    public boolean deleteWaitRoomByHost(JoinStatusWaitRoomDto join) {
         WaitRoom waitRoom = findById(join.getRoomId());
 
         if (isHost(waitRoom, join.getUserId())) {
             waitRoomRedisRepository.delete(waitRoom);
+            return true;
         };
+        return false;
     }
 
     private static boolean isHost(WaitRoom waitRoom, String userId) {
@@ -56,6 +78,10 @@ public class WaitRoomService {
     }
 
     private WaitRoom findById(String roomId) {
-        return  waitRoomRedisRepository.findById(roomId).orElseThrow(NotExistsRoomIdException::new);
+        return waitRoomRedisRepository.findById(roomId).orElseThrow(NotExistsRoomIdException::new);
+    }
+
+    private static boolean isEnableJoinMembers(JoinStatusWaitRoomDto joinStatusWaitRoomDto, WaitRoom waitRoom) {
+        return waitRoom.joinMembers(joinStatusWaitRoomDto.getUserId());
     }
 }

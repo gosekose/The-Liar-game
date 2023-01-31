@@ -85,8 +85,8 @@ class WaitRoomRedisRepositoryTest {
 
         //when
         WaitRoom room = findById(waitRoom.getId());
-        room.leaveMembers("kose2");
-        room.leaveMembers("kose4");
+        room.leaveMember("kose2");
+        room.leaveMember("kose4");
         WaitRoom result = waitRoomRedisRepository.save(room);
 
         //then

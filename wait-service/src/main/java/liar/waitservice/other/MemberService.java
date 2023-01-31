@@ -1,6 +1,7 @@
 package liar.waitservice.other;
 
 import liar.waitservice.other.dao.MemberIdOnly;
+import liar.waitservice.other.dao.MemberNameOnly;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,6 +17,10 @@ public class MemberService {
 
     public List<MemberIdOnly> findByUsername(String username) {
         return memberRepository.findProjectionByUsername(username);
+    }
+
+    public MemberNameOnly findUsernameById(String userId) {
+        return memberRepository.findProjectionByUserId(userId);
     }
 
 }

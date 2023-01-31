@@ -2,27 +2,38 @@ package liar.waitservice.common.config;
 
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.PersistenceContext;
+import jakarta.persistence.PersistenceUnit;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.CacheManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.redis.cache.RedisCacheConfiguration;
+import org.springframework.data.redis.cache.RedisCacheManager;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.repository.configuration.EnableRedisRepositories;
+import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
 import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
+import org.springframework.web.client.RestTemplate;
 
 import java.sql.SQLException;
+import java.time.Duration;
+
+import static org.springframework.data.redis.cache.RedisCacheConfiguration.defaultCacheConfig;
+import static org.springframework.data.redis.cache.RedisCacheManager.RedisCacheManagerBuilder.fromConnectionFactory;
+import static org.springframework.data.redis.serializer.RedisSerializationContext.SerializationPair.fromSerializer;
 
 @Configuration
 //@EnableTransactionManagement
 @EnableRedisRepositories
 public class RedisConfig {
 
-    @PersistenceContext
+    @PersistenceUnit
     EntityManagerFactory managerFactory;
 
     @Value("${spring.data.redis.host}")
@@ -36,18 +47,35 @@ public class RedisConfig {
         return new LettuceConnectionFactory(host, port);
     }
 
+//    @Bean
+//    public RedisTemplate<?, ?> redisTemplate() {
+//        RedisTemplate<byte[], byte[]> redisTemplate = new RedisTemplate<>();
+////        StringRedisTemplate redisTemplate = new StringRedisTemplate();
+//        redisTemplate.setConnectionFactory(redisConnectionFactory());
+//        redisTemplate.setEnableTransactionSupport(true);
+//        return redisTemplate;
+//    }
     @Bean
-    public RedisTemplate<?, ?> redisTemplate() {
-        RedisTemplate<byte[], byte[]> redisTemplate = new RedisTemplate<>();
-//        StringRedisTemplate redisTemplate = new StringRedisTemplate();
-        redisTemplate.setConnectionFactory(redisConnectionFactory());
-        redisTemplate.setEnableTransactionSupport(true);
-        return redisTemplate;
+    public RestTemplate getRestTemplate() {
+        return new RestTemplate();
     }
+
 
     @Bean
     public PlatformTransactionManager transactionManager() throws SQLException {
         return new JpaTransactionManager(managerFactory);
     }
+
+    @SuppressWarnings("deprecation")
+    @Bean
+    public CacheManager cacheManager() {
+        RedisCacheManager.RedisCacheManagerBuilder builder = fromConnectionFactory(redisConnectionFactory());
+        RedisCacheConfiguration configuration = defaultCacheConfig()
+                .serializeValuesWith(fromSerializer(new GenericJackson2JsonRedisSerializer()))
+                .entryTtl(Duration.ofMinutes(30));
+        builder.cacheDefaults(configuration);
+        return builder.build();
+    }
+
 
 }

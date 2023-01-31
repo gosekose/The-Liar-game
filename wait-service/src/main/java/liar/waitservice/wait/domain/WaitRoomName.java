@@ -4,14 +4,14 @@ import jakarta.persistence.Id;
 import lombok.*;
 import org.springframework.data.redis.core.RedisHash;
 
+import java.io.Serializable;
 import java.util.LinkedList;
 import java.util.List;
 
 @Getter
-@RequiredArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @RedisHash("waitRoomName")
-public class WaitRoomName {
+public class WaitRoomName implements Serializable {
 
     @Id
     private String id;

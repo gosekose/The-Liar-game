@@ -3,6 +3,7 @@ package liar.waitservice.wait.service.search;
 import liar.waitservice.other.MemberService;
 import liar.waitservice.wait.service.OnlineHostService;
 import liar.waitservice.wait.service.WaitRoomService;
+import liar.waitservice.wait.service.search.dto.WaitRoomViewsDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,9 +21,11 @@ public class OnlineHostSearchService implements SearchService {
     private final MemberService memberService;
 
     @Override
-    public List searchWaitRoomCondition(Object request) {
+    public List searchWaitRoomCond(Object request) {
         return memberService.findByUsername((String) request)
                 .stream().map(f -> onlineHostService.findByHostIdForSearch(f.getUserId()))
-                .map(f -> waitRoomService.findRoomId(f.getWaitRoomId())).collect(Collectors.toList());
+                .map(f -> waitRoomService.findRoomId(f.getWaitRoomId()))
+                .map(WaitRoomViewsDto::new)
+                .collect(Collectors.toList());
     }
 }

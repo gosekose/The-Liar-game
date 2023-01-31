@@ -7,7 +7,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Arrays;
-import java.util.LinkedList;
 import java.util.List;
 
 @Service
@@ -18,7 +17,7 @@ public class WaitRoomSearchService implements SearchService {
     private final WaitRoomService waitRoomService;
 
     @Override
-    public List searchWaitRoomCondition(Object request) {
+    public List searchWaitRoomCond(Object request) {
         WaitRoom waitRoom = waitRoomService.findRoomId((String) request);
         return Arrays.asList(waitRoom);
     }

@@ -11,6 +11,5 @@ import java.util.List;
 public interface MemberRepository extends JpaRepository<Member, Long> {
     MemberNameOnly findProjectionByUserId(String userId);
 
-
     List<MemberIdOnly> findProjectionByUsername(String userName);
 }
