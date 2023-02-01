@@ -6,9 +6,14 @@ import liar.waitservice.other.dao.MemberNameOnly;
 import liar.waitservice.wait.controller.dto.CreateWaitRoomDto;
 import liar.waitservice.wait.controller.dto.JoinStatusWaitRoomDto;
 import liar.waitservice.wait.domain.WaitRoom;
+import liar.waitservice.wait.domain.WaitRoomName;
 import liar.waitservice.wait.repository.WaitRoomRedisRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DataAccessException;
+import org.springframework.data.redis.core.RedisOperations;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.SessionCallback;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,6 +25,7 @@ public class WaitRoomService {
 
     private final WaitRoomRedisRepository waitRoomRedisRepository;
     private final MemberService memberService;
+    private final RedisTemplate redisTemplate;
 
     public WaitRoom findRoomId(String roomId) {
         return waitRoomRedisRepository.findById(roomId).orElseThrow(NotExistsRoomIdException::new);
@@ -36,12 +42,30 @@ public class WaitRoomService {
      * 호스트가 아닌 다른 유저 대기방 요청 승인
      */
     public boolean addMembers(JoinStatusWaitRoomDto joinStatusWaitRoomDto) {
-        WaitRoom waitRoom = findById(joinStatusWaitRoomDto.getRoomId());
-        if (isEnableJoinMembers(joinStatusWaitRoomDto, waitRoom)) {
-            waitRoomRedisRepository.save(waitRoom);
-            return true;
-        }
-        return false;
+
+//        WaitRoom waitRoom = findById(joinStatusWaitRoomDto.getRoomId());
+//        if (isEnableJoinMembers(joinStatusWaitRoomDto, waitRoom)) {
+//            waitRoomRedisRepository.save(waitRoom);
+//            return true;
+//        }
+//        return false;
+//
+
+        Object execute = redisTemplate.execute(new SessionCallback() {
+            @Override
+            public Object execute(RedisOperations operations) throws DataAccessException {
+                operations.multi();
+                WaitRoom waitRoom = (WaitRoom) operations.opsForValue().get(joinStatusWaitRoomDto.getRoomId());
+                if (isEnableJoinMembers(joinStatusWaitRoomDto, waitRoom)) {
+                    operations.opsForValue().set(waitRoom.getId(), waitRoom);
+                }
+                operations.exec();
+                return true;
+            }
+        });
+
+        return (boolean) execute;
+
     }
 
     /**

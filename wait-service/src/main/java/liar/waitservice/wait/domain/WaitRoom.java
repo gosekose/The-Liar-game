@@ -1,5 +1,9 @@
 package liar.waitservice.wait.domain;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import liar.waitservice.wait.controller.dto.CreateWaitRoomDto;
 import lombok.*;
 import org.springframework.data.annotation.Id;
@@ -14,10 +18,10 @@ import java.util.UUID;
 import static java.time.LocalDateTime.now;
 
 @Getter
-@RedisHash("waitRoom")
+@RedisHash("WaitRoom")
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class WaitRoom implements Serializable {
+public class WaitRoom extends BaseEntity implements Serializable {
 
     @Id
     private String id;
@@ -28,7 +32,12 @@ public class WaitRoom implements Serializable {
     private int limitMembers;
     private List<String> members = new LinkedList<>();
 
+    @JsonSerialize(using = LocalDateTimeSerializer.class)
+    @JsonDeserialize(using = LocalDateTimeDeserializer.class)
     private LocalDateTime createdAt;
+
+    @JsonSerialize(using = LocalDateTimeSerializer.class)
+    @JsonDeserialize(using = LocalDateTimeDeserializer.class)
     private LocalDateTime modifiedAt;
 
     protected WaitRoom (CreateWaitRoomDto roomDto, String userName) {

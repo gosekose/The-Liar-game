@@ -15,6 +15,7 @@ public class MapperConfig {
     public ObjectMapper objectMapper() {
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
+//        objectMapper.re
         return objectMapper;
     }
 
