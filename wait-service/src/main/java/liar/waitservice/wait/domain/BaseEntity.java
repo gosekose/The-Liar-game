@@ -4,8 +4,8 @@ import jakarta.persistence.Id;
 import lombok.Getter;
 
 @Getter
-public class BaseEntity {
+public class BaseEntity<T> {
 
     @Id
-    private String id;
+    private T id;
 }

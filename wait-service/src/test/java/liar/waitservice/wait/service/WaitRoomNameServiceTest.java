@@ -25,7 +25,7 @@ class WaitRoomNameServiceTest {
 
     }
 
-//    @Test
+//    @Test123
 //    @DisplayName("webRoomName은 transaction 처리가 되어 현재 저장된 값이 없다면 저장되어야 한다.")
 //    public void () throws Exception {
 //        //given

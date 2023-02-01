@@ -1,6 +1,5 @@
 package liar.waitservice.wait.service.search;
 
-import liar.waitservice.wait.service.WaitRoomNameService;
 import liar.waitservice.wait.service.WaitRoomService;
 import liar.waitservice.wait.service.search.dto.WaitRoomViewsDto;
 import lombok.RequiredArgsConstructor;
@@ -11,17 +10,17 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
-@RequiredArgsConstructor
 @Transactional
-public class WaitRoomNameSearchService implements SearchService {
+@RequiredArgsConstructor
+public class HostNameSearchService implements SearchService<WaitRoomViewsDto, String> {
 
-    private final WaitRoomNameService waitRoomNameService;
     private final WaitRoomService waitRoomService;
 
     @Override
-    public List searchWaitRoomCond(Object request) {
-        return waitRoomNameService.findByIdForSearch((String) request).getRoomIds()
-                .stream().map(waitRoomService::findRoomId)
-                .map(WaitRoomViewsDto::new).collect(Collectors.toList());
+    public List<WaitRoomViewsDto> searchWaitRoomByCond(String request) {
+        return waitRoomService.findWaitRoomByHostName(request)
+                .stream()
+                .map(WaitRoomViewsDto::new)
+                .collect(Collectors.toList());
     }
 }

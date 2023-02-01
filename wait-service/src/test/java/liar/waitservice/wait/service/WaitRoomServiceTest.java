@@ -6,13 +6,13 @@
 //import liar.waitservice.wait.controller.dto.JoinStatusWaitRoomDto;
 //import liar.waitservice.wait.domain.WaitRoom;
 //import liar.waitservice.wait.domain.WaitRoomName;
-//import liar.waitservice.wait.repository.CrudCustomRepositoryImpl;
+//import liar.waitservice.wait.repository.CrudValueCustomRepositoryImpl;
 //import liar.waitservice.wait.repository.WaitRoomRedisRepository;
 //import org.assertj.core.api.Assertions;
 //import org.junit.jupiter.api.AfterEach;
 //import org.junit.jupiter.api.BeforeEach;
 //import org.junit.jupiter.api.DisplayName;
-//import org.junit.jupiter.api.Test;
+//import org.junit.jupiter.api.Test123;
 //import org.springframework.beans.factory.annotation.Autowired;
 //import org.springframework.boot.test.context.SpringBootTest;
 //import org.springframework.dao.DataAccessException;
@@ -37,7 +37,7 @@
 //    WaitRoomService waitRoomService;
 //
 //    @Autowired
-//    CrudCustomRepositoryImpl<WaitRoom> crudCustomRepository;
+//    CrudValueCustomRepositoryImpl<WaitRoom> crudCustomRepository;
 //
 //    @Autowired
 //    RedisTemplate redisTemplate;
@@ -58,7 +58,7 @@
 ////        waitRoomRedisRepository.deleteAll();
 ////    }
 //
-//    @Test
+//    @Test123
 //    @DisplayName("memberService에서 userName을 가져온 후 waitRoom을 생성하여 redis에 저장")
 //    public void saveWaitRoom() throws Exception {
 //        //given
@@ -71,7 +71,7 @@
 //        assertThat(roomId).isEqualTo(waitRoom.getId());
 //    }
 //
-//    @Test
+//    @Test123
 //    @DisplayName("대기방에 입장 요청이 오면, 만석이 될 때 까지 waitRoom의 members에 저장한다.")
 //    public void addMembersSuccess() throws Exception {
 //        //given
@@ -122,7 +122,7 @@
 ////        assertThat(findRoom.getMembers().get(3)).isEqualTo("2");
 //    }
 //
-//    @Test
+//    @Test123
 //    @DisplayName("대기방에 입장 요청을 했을 때, 만석인 경우 저장하지 않고 false를 리턴한다.")
 //    public void addMembersFalseBecauseFullMembers() throws Exception {
 //        //given
@@ -145,7 +145,7 @@
 //        assertThat(findRoom.getMembers().get(3)).isEqualTo("2");
 //    }
 //
-//    @Test
+//    @Test123
 //    @DisplayName("대기방에서 퇴장하면 값을 제거한 후 저장해야 한다.")
 //    public void leaveMemberTrue() throws Exception {
 //        //given
@@ -169,7 +169,7 @@
 //        assertThat(findRoom.getMembers().size()).isEqualTo(4);
 //    }
 //
-//    @Test
+//    @Test123
 //    @DisplayName("대기방에 존재하는 호스트나 유저아이디가 아닌 경우 leaveMember는 false를 출력한다.")
 //    public void leaveMemberFalseBecauseNotCondition() throws Exception {
 //        //given
@@ -193,7 +193,7 @@
 //        assertThat(findRoom.getMembers().size()).isEqualTo(7);
 //    }
 //
-//    @Test
+//    @Test123
 //    @DisplayName("대기방 호스트가 퇴장하면, 방은 제거된다.")
 //    public void deleteWaitRoomTrue() throws Exception {
 //        //given
@@ -208,7 +208,7 @@
 //                .isInstanceOf(NotExistsRoomIdException.class);
 //    }
 //
-//    @Test
+//    @Test123
 //    @DisplayName("대기방의 호스트가 아닌 요청은, 방이 제거되지 않는다")
 //    public void deleteWaitRoomFalseBecauseNotHostId() throws Exception {
 //        //given

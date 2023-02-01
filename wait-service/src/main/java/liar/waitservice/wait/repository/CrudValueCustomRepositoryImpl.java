@@ -11,7 +11,7 @@ import java.util.LinkedHashMap;
 
 @Component
 @RequiredArgsConstructor
-public class CrudCustomRepositoryImpl<T extends BaseEntity, R> implements CrudCustomRepository<T, R> {
+public class CrudValueCustomRepositoryImpl<T extends BaseEntity, R> implements CrudValueCustomRepository<T, R> {
 
     private final RedisTemplate<String, Object> redisTemplate;
     private final ObjectMapper objectMapper;
