@@ -5,8 +5,15 @@ import liar.waitservice.wait.domain.WaitRoom;
 import liar.waitservice.wait.domain.WaitRoomName;
 import liar.waitservice.wait.repository.WaitRoomNameRedisRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataAccessException;
+import org.springframework.data.redis.core.RedisOperations;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.SessionCallback;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.concurrent.CompletableFuture;
 
 @Service
 @Transactional
@@ -14,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class WaitRoomNameService {
 
     private final WaitRoomNameRedisRepository waitRoomNameRedisRepository;
+    private final RedisTemplate redisTemplate;
 
     public WaitRoomName findByIdForSearch(String roomName) {
         return waitRoomNameRedisRepository.findById(roomName).orElseThrow(NotExistsRoomIdException::new);
@@ -28,13 +36,23 @@ public class WaitRoomNameService {
      * 이미 저장된 waitRoomName이 있다면, linkedList에 추가하고, 없다면 새로 생성하여 저장
      */
     public void save(WaitRoom waitRoom) {
-        WaitRoomName waitRoomName = findByIdForSave(waitRoom.getRoomName());
 
-        if (waitRoomName == null) {
-            waitRoomNameRedisRepository.save(new WaitRoomName(waitRoom));
-        } else {
-            waitRoomName.addWaitRoomIds(waitRoom.getId());
-            waitRoomNameRedisRepository.save(waitRoomName);
-        }
+        redisTemplate.execute(new SessionCallback() {
+            @Override
+            public Object execute(RedisOperations operations) throws DataAccessException {
+
+                operations.multi();
+                WaitRoomName waitRoomName = findByIdForSave(waitRoom.getRoomName());
+
+                if (waitRoomName == null) {
+                    waitRoomNameRedisRepository.save(new WaitRoomName(waitRoom));
+                } else {
+                    waitRoomName.addWaitRoomIds(waitRoom.getId());
+                    waitRoomNameRedisRepository.save(waitRoomName);
+                }
+                return operations.exec();
+            }
+        });
     }
+
 }
