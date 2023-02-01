@@ -8,6 +8,7 @@ import liar.waitservice.wait.controller.dto.CreateWaitRoomDto;
 import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.redis.core.RedisHash;
+import org.springframework.data.redis.core.index.Indexed;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
@@ -25,8 +26,14 @@ public class WaitRoom extends BaseEntity implements Serializable {
 
     @Id
     private String id;
+
+    @Indexed
     private String roomName;
+
+    @Indexed
     private String hostId;
+
+    @Indexed
     private String hostName;
 
     private int limitMembers;

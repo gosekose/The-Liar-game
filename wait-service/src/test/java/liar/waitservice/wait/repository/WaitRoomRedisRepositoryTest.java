@@ -11,6 +11,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -28,10 +30,10 @@ class WaitRoomRedisRepositoryTest {
         waitRoom = WaitRoom.of(roomDto, "kose");
     }
 
-    @AfterEach
-    void tearDown() {
-        waitRoomRedisRepository.deleteAll();
-    }
+//    @AfterEach
+//    void tearDown() {
+//        waitRoomRedisRepository.deleteAll();
+//    }
 
     @Test
     @DisplayName("Redis에 createWaitRoom 요청이 오면, 저장되어야 한다.")
@@ -55,6 +57,10 @@ class WaitRoomRedisRepositoryTest {
         //given
         waitRoomRedisRepository.save(waitRoom);
         WaitRoom findRoom = findById(waitRoom.getId());
+
+        CreateWaitRoomDto roomDto = new CreateWaitRoomDto("kosett", "koseTest1", 5);
+        WaitRoom waitRoom1 = WaitRoom.of(roomDto, "kosettt");
+        waitRoomRedisRepository.save(waitRoom1);
 
         //when
         findRoom.joinMembers("kose2");
@@ -142,6 +148,34 @@ class WaitRoomRedisRepositoryTest {
         Assertions.assertThatThrownBy(() -> findById(result.getId()))
                 .isInstanceOf(NotExistsRoomIdException.class);
     }
+
+    @Test
+    @DisplayName("hostName(인덱스)로 Room정보 가져오기")
+    public void getWaitRoomByHostName() throws Exception {
+        //given
+        WaitRoom savedWaitRoom = waitRoomRedisRepository.save(waitRoom);
+
+        //when
+        List<WaitRoom> findAll = waitRoomRedisRepository.findAllByHostName(waitRoom.getHostName());
+
+        //then
+        assertThat(findAll.get(0).getId()).isEqualTo(waitRoom.getId());
+
+    }
+
+    @Test
+    @DisplayName("roomName(인덱스)로 Room 찾기")
+    public void getWaitRoomByRoomName() throws Exception {
+        //given
+        WaitRoom saveWaitRoom = waitRoomRedisRepository.save(waitRoom);
+
+        //when
+        List<WaitRoom> findAll = waitRoomRedisRepository.findAllByRoomName(waitRoom.getRoomName());
+
+        //then
+        assertThat(findAll.get(0).getId()).isEqualTo(waitRoom.getId());
+    }
+
 
     private WaitRoom findById(String id) {
         return waitRoomRedisRepository.findById(waitRoom.getId()).orElseThrow(NotExistsRoomIdException::new);

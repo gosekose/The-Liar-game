@@ -1,6 +1,5 @@
 package liar.waitservice.wait.controller.dto;
 
-import liar.waitservice.wait.domain.CodeEnum;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
