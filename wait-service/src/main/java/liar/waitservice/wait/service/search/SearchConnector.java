@@ -17,7 +17,7 @@ public class SearchConnector {
     private final HostNameSearchService hostNameSearchService;
 
     public List<WaitRoomViewsDto> searchWaitRoomCondition(SearchDto dto) {
-        return connectSearchService(dto).searchWaitRoomByCond(dto.getRequest());
+        return connectSearchService(dto).searchWaitRoomByCond(dto.getBody());
     }
 
     private SearchService connectSearchService(SearchDto dto) {

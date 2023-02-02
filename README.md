@@ -51,4 +51,3 @@ IDE: Intellij
 5. wait-server 전용 redis를 구성하였습니다. [commit 8d87036](https://github.com/gosekose/The-Liar-game/commit/8d8703624b712c9c0b24dd8ebf678337f3af6cd0) 
 6. waitRoom 검색 조건에 따른 redis 검색 전략을 구성하기 위한 Connection 인터페이스 설계를 구현하였습니다. [commit 6f5a6ea](https://github.com/gosekose/The-Liar-game/commit/6f5a6eaf9918e9de71b1542973242fe65c089675)
 7. waitRoom의 joinPolicy 정책을 인터페이스화하여 WaitRoomService에 의존성 주입하였습니다. [commit 81a063f](https://github.com/gosekose/The-Liar-game/commit/81a063fb2a65a62be0922dc0395c2ed602662fa0) 
-
