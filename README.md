@@ -49,3 +49,5 @@ IDE: Intellij
 3. 비즈니스 서비스에 공통으로 존재한 JWT 검증을 Gateway Authentication(jwt) 필터로 처리하였습니다. [commit 9ea97d6](https://github.com/gosekose/The-Liar-game/commit/9ea97d65f0e98c86874d66356ec42adb45186f13)
 4. Config-server를 추가하여 yml 공통 정보를 깃에서 관리하고 암호화 하였습니다. [commit 4a95537b](https://github.com/gosekose/The-Liar-game/commit/4a95537b2d269227e0ebe9ea3964ec8946202694)
 5. wait-server 전용 redis를 구성하였습니다. [commit 8d87036](https://github.com/gosekose/The-Liar-game/commit/8d8703624b712c9c0b24dd8ebf678337f3af6cd0) 
+6. waitRoom 검색 조건에 따른 redis 검색 전략을 구성하기 위한 인터페이스 설계를 구현하였습니다. [commit 6f5a6ea](https://github.com/gosekose/The-Liar-game/commit/6f5a6eaf9918e9de71b1542973242fe65c089675)
+7. waitRoom의 joinPolicy 정책을 인터페이스화하여 service에 의존성 주입하여 사용하는 살계를 구현하였습니다. [commit 81a063f](https://github.com/gosekose/The-Liar-game/commit/81a063fb2a65a62be0922dc0395c2ed602662fa0) 
