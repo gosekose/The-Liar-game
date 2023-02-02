@@ -11,4 +11,6 @@ public interface WaitRoomRedisRepository extends CrudRepository<WaitRoom, String
     List<WaitRoom> findAllByRoomName(String roomName);
 
     Optional<WaitRoom> findWaitRoomByHostId(String hostId);
+    WaitRoom findByHostId(String hostId);
+    WaitRoom findWaitRoomById(String roomId);
 }
