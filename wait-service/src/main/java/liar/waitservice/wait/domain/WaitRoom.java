@@ -37,6 +37,7 @@ public class WaitRoom extends BaseEntity implements Serializable {
     private String hostName;
 
     private int limitMembers;
+
     private List<String> members = new LinkedList<>();
 
     @JsonSerialize(using = LocalDateTimeSerializer.class)
