@@ -1,6 +1,7 @@
 package liar.waitservice.wait.domain;
 
 import jakarta.persistence.Id;
+import liar.waitservice.wait.controller.dto.JoinStatusWaitRoomDto;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -28,4 +29,5 @@ public class JoinMember implements Serializable {
     public static JoinMember of(WaitRoom waitRoom) {
         return new JoinMember(waitRoom.getHostId(), waitRoom.getId());
     }
+    public static JoinMember of(JoinStatusWaitRoomDto joinDto) { return new JoinMember(joinDto.getUserId(), joinDto.getRoomId());}
 }

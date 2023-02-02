@@ -8,6 +8,8 @@ import liar.waitservice.wait.repository.WaitRoomRedisRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+
 @Component
 @RequiredArgsConstructor
 public class WaitRoomOnlyOneJoinPolicyService implements WaitRoomJoinPolicyService {
@@ -37,14 +39,24 @@ public class WaitRoomOnlyOneJoinPolicyService implements WaitRoomJoinPolicyServi
 
     /**
      * user는 동시에 두개 이상의 방을 접속할 수 없다.
+     * 이미 다른 곳의 호스트가 다른 방에 입장 요청을 하면, 이전에 있던 방의 유저들의 join을 제거하고 소유하고 있는 방을 나간다.
      */
     private void joinOnlyOneRoomPerMemberAtTheSameTime(String userId) {
-        JoinMember joinMember = joinMemberRedisRepository.findJoinMembersById(userId);
+        JoinMember joinMember = joinMemberRedisRepository.findById(userId).get();
+
         if (joinMember != null) {
             WaitRoom waitRoom = waitRoomRedisRepository.findById(joinMember.getRoomId()).orElseThrow(NotExistsRoomIdException::new);
-            waitRoom.leaveMember(userId);
-            waitRoomRedisRepository.save(waitRoom);
-            joinMemberRedisRepository.delete(joinMember);
+
+            if (waitRoom.isHost(joinMember.getId())) {
+                waitRoom.getMembers().stream().forEach(j -> joinMemberRedisRepository.delete(JoinMember.of(j, waitRoom.getId())));
+                waitRoomRedisRepository.delete(waitRoom);
+
+            } else {
+                waitRoom.leaveMember(userId);
+                waitRoomRedisRepository.save(waitRoom);
+                joinMemberRedisRepository.delete(joinMember);
+            }
         }
     }
+
 }
