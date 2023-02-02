@@ -11,6 +11,7 @@ import lombok.NoArgsConstructor;
 public class WaitRoomViewsDto {
 
     private String roomId;
+    private String roomName;
     private String hostId;
     private String hostName;
     private int limitsMembers;
@@ -18,6 +19,7 @@ public class WaitRoomViewsDto {
 
     public WaitRoomViewsDto(WaitRoom waitRoom) {
         this.roomId = waitRoom.getId();
+        this.roomName = waitRoom.getRoomName();
         this.hostId = waitRoom.getHostId();
         this.hostName = waitRoom.getHostName();
         this.limitsMembers = waitRoom.getLimitMembers();

@@ -33,7 +33,7 @@ public class WaitRoomOnlyOneJoinPolicyService implements WaitRoomJoinPolicyServi
     private void createAndManageOnlyOneRoomPerHostAtTheSameTime(String hostId) {
         WaitRoom waitRoom = waitRoomRedisRepository.findByHostId(hostId);
         if (waitRoom != null) {
-            waitRoomRedisRepository.delete(waitRoom);
+            deleteWaitRoomAndAllJoinMemberStatusLeave(waitRoom);
         }
     }
 
@@ -48,8 +48,7 @@ public class WaitRoomOnlyOneJoinPolicyService implements WaitRoomJoinPolicyServi
             WaitRoom waitRoom = waitRoomRedisRepository.findById(joinMember.getRoomId()).orElseThrow(NotExistsRoomIdException::new);
 
             if (waitRoom.isHost(joinMember.getId())) {
-                waitRoom.getMembers().stream().forEach(j -> joinMemberRedisRepository.delete(JoinMember.of(j, waitRoom.getId())));
-                waitRoomRedisRepository.delete(waitRoom);
+                deleteWaitRoomAndAllJoinMemberStatusLeave(waitRoom);
 
             } else {
                 waitRoom.leaveMember(userId);
@@ -57,6 +56,10 @@ public class WaitRoomOnlyOneJoinPolicyService implements WaitRoomJoinPolicyServi
                 joinMemberRedisRepository.delete(joinMember);
             }
         }
+    }
+    private void deleteWaitRoomAndAllJoinMemberStatusLeave(WaitRoom waitRoom) {
+        waitRoom.getMembers().stream().forEach(j -> joinMemberRedisRepository.delete(JoinMember.of(j, waitRoom.getId())));
+        waitRoomRedisRepository.delete(waitRoom);
     }
 
 }

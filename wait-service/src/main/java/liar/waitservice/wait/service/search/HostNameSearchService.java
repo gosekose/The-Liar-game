@@ -17,8 +17,8 @@ public class HostNameSearchService implements SearchService<WaitRoomViewsDto, St
     private final WaitRoomService waitRoomService;
 
     @Override
-    public List<WaitRoomViewsDto> searchWaitRoomByCond(String request) {
-        return waitRoomService.findWaitRoomByHostName(request)
+    public List<WaitRoomViewsDto> searchWaitRoomByCond(String body) {
+        return waitRoomService.findWaitRoomByHostName(body)
                 .stream()
                 .map(WaitRoomViewsDto::new)
                 .collect(Collectors.toList());

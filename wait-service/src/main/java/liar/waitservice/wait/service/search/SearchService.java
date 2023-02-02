@@ -6,5 +6,5 @@ import java.util.List;
 
 @Component
 public interface SearchService<T, R> {
-    List<T> searchWaitRoomByCond(R request);
+    List<T> searchWaitRoomByCond(R body);
 }
