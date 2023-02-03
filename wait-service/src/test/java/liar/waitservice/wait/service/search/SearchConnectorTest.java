@@ -1,12 +1,12 @@
 package liar.waitservice.wait.service.search;
 
 import liar.waitservice.wait.controller.dto.CreateWaitRoomDto;
-import liar.waitservice.wait.controller.dto.SearchDto;
+import liar.waitservice.wait.controller.dto.SearchWaitRoomDto;
 import liar.waitservice.wait.domain.JoinMember;
-import liar.waitservice.wait.domain.SearchType;
+import liar.waitservice.wait.domain.utils.SearchType;
 import liar.waitservice.wait.domain.WaitRoom;
-import liar.waitservice.wait.repository.JoinMemberRedisRepository;
-import liar.waitservice.wait.repository.WaitRoomRedisRepository;
+import liar.waitservice.wait.repository.redis.JoinMemberRedisRepository;
+import liar.waitservice.wait.repository.redis.WaitRoomRedisRepository;
 import liar.waitservice.wait.service.search.dto.WaitRoomViewsDto;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -18,7 +18,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class SearchConnectorTest {
@@ -58,7 +57,7 @@ class SearchConnectorTest {
         }
 
         //when
-        List<WaitRoomViewsDto> waitRoomViewsDtos = searchConnector.searchWaitRoomCondition(new SearchDto("koseUsername", SearchType.HOSTNAME.getTypeName()));
+        List<WaitRoomViewsDto> waitRoomViewsDtos = searchConnector.searchWaitRoomCondition(new SearchWaitRoomDto("koseUsername", SearchType.HOSTNAME.getTypeName()));
 
         //then
         assertThat(waitRoomViewsDtos.size()).isEqualTo(11);
@@ -79,7 +78,7 @@ class SearchConnectorTest {
         }
 
         //when
-        List<WaitRoomViewsDto> waitRoomViewsDtos = searchConnector.searchWaitRoomCondition(new SearchDto("koseRoomName", SearchType.WAITROOMNAME.getTypeName()));
+        List<WaitRoomViewsDto> waitRoomViewsDtos = searchConnector.searchWaitRoomCondition(new SearchWaitRoomDto("koseRoomName", SearchType.WAITROOMNAME.getTypeName()));
 
         //then
         assertThat(waitRoomViewsDtos.size()).isEqualTo(11);
@@ -102,7 +101,7 @@ class SearchConnectorTest {
         }
 
         //when
-        List<WaitRoomViewsDto> waitRoomViewsDtos = searchConnector.searchWaitRoomCondition(new SearchDto(waitRoom.getId(), SearchType.WAITROOMID.name()));
+        List<WaitRoomViewsDto> waitRoomViewsDtos = searchConnector.searchWaitRoomCondition(new SearchWaitRoomDto(waitRoom.getId(), SearchType.WAITROOMID.name()));
 
         //then
         assertThat(waitRoomViewsDtos.size()).isEqualTo(1);

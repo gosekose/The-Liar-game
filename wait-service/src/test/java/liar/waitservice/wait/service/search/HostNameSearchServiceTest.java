@@ -3,8 +3,8 @@ package liar.waitservice.wait.service.search;
 import liar.waitservice.wait.controller.dto.CreateWaitRoomDto;
 import liar.waitservice.wait.domain.JoinMember;
 import liar.waitservice.wait.domain.WaitRoom;
-import liar.waitservice.wait.repository.JoinMemberRedisRepository;
-import liar.waitservice.wait.repository.WaitRoomRedisRepository;
+import liar.waitservice.wait.repository.redis.JoinMemberRedisRepository;
+import liar.waitservice.wait.repository.redis.WaitRoomRedisRepository;
 import liar.waitservice.wait.service.search.dto.WaitRoomViewsDto;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -16,7 +16,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class HostNameSearchServiceTest {

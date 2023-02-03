@@ -8,4 +8,6 @@ public interface WaitRoomJoinPolicyService {
     void createWaitRoomPolicy(String hostId);
     void joinWaitRoomPolicy(String userId);
 
+    boolean isPlayingGameStatus(String userId);
+
 }

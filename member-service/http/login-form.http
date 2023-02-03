@@ -19,6 +19,7 @@ Connection: keep-alive
         client.log(client.global.get("accessToken"));
         client.log(client.global.get("refreshToken"));
         client.log(client.global.get("userId"));
+
     });
 %}
 

@@ -6,12 +6,12 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Getter
-@AllArgsConstructor
 @NoArgsConstructor
-public class SearchDto<T>{
+@AllArgsConstructor
+public class SearchWaitRoomDto {
 
     @NotNull
-    private T body;
+    private String body;
 
     @NotNull
     private String searchType;

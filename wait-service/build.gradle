@@ -2,6 +2,7 @@ plugins {
     id 'java'
     id 'org.springframework.boot' version '3.0.2'
     id 'io.spring.dependency-management' version '1.1.0'
+    id "org.asciidoctor.jvm.convert" version "3.3.2" // restDocs
 }
 
 group = 'liar'
@@ -12,6 +13,7 @@ configurations {
     compileOnly {
         extendsFrom annotationProcessor
     }
+    asciidoctorExt // restdocs
 }
 
 repositories {
@@ -20,6 +22,8 @@ repositories {
 }
 
 ext {
+    snippetsDir = file('build/generated-snippets') // restdocs
+    asciidocVersion = "2.0.6.RELEASE" // restdocs
     set('springCloudVersion', "2022.0.1")
 }
 
@@ -42,7 +46,7 @@ dependencies {
     implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
 
     //mockito
-    testImplementation 'org.mockito:mockito-core:4.11.0'
+    testImplementation 'org.mockito:mockito-inline'
     testImplementation 'org.mockito:mockito-junit-jupiter:4.11.0'
 
     //xss
@@ -63,6 +67,11 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
     implementation 'org.springframework.cloud:spring-cloud-starter-bus-amqp'
 
+    // restdocs
+    asciidoctorExt "org.springframework.restdocs:spring-restdocs-asciidoctor:$asciidocVersion"
+    testImplementation "org.springframework.restdocs:spring-restdocs-mockmvc:$asciidocVersion"
+
+
     compileOnly 'org.projectlombok:lombok'
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
     runtimeOnly 'com.h2database:h2'
@@ -80,3 +89,42 @@ dependencyManagement {
 tasks.named('test') {
     useJUnitPlatform()
 }
+
+// <-- restdocs start-->
+
+test {
+    outputs.dir snippetsDir
+    useJUnitPlatform()
+}
+
+asciidoctor {
+    inputs.dir snippetsDir
+    configurations 'asciidoctorExt'
+    dependsOn test
+}
+
+bootJar {
+    dependsOn asciidoctor
+    from ("${asciidoctor.outputDir}/html5") {
+        into 'static/docs'
+    }
+}
+
+bootJar {
+    dependsOn asciidoctor
+
+    copy {
+        from asciidoctor.outputDir
+        into "src/main/resources/static/docs"
+    }
+}
+
+jar {
+    enabled = false
+}
+
+tasks.withType(JavaCompile) {
+    options.release = 17
+}
+
+// <-- restdocs end-->
