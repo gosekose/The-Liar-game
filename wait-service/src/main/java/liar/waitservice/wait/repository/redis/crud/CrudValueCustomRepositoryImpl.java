@@ -1,7 +1,7 @@
-package liar.waitservice.wait.repository;
+package liar.waitservice.wait.repository.redis.crud;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import liar.waitservice.wait.domain.BaseEntity;
+import liar.waitservice.wait.domain.utils.BaseRedisTemplateEntity;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -11,7 +11,7 @@ import java.util.LinkedHashMap;
 
 @Component
 @RequiredArgsConstructor
-public class CrudValueCustomRepositoryImpl<T extends BaseEntity, R> implements CrudValueCustomRepository<T, R> {
+public class CrudValueCustomRepositoryImpl<T extends BaseRedisTemplateEntity, R> implements CrudValueCustomRepository<T, R> {
 
     private final RedisTemplate<String, Object> redisTemplate;
     private final ObjectMapper objectMapper;

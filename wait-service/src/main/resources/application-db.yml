@@ -7,7 +7,7 @@ spring:
     spring.jpa.database-platform: org.hibernate.dialect.H2Dialect
     show-sql: true
 #    hibernate:
-#      ddl-auto: create
+#      ddl-auto: update
     properties:
       hibernate:
         default_batch_fetch_size: 100

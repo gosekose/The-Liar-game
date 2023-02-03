@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import liar.waitservice.wait.controller.dto.CreateWaitRoomDto;
+import liar.waitservice.wait.domain.utils.BaseRedisTemplateEntity;
 import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.redis.core.RedisHash;
@@ -22,7 +23,7 @@ import static java.time.LocalDateTime.now;
 @RedisHash("WaitRoom")
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class WaitRoom extends BaseEntity implements Serializable {
+public class WaitRoom extends BaseRedisTemplateEntity implements Serializable {
 
     @Id
     private String id;

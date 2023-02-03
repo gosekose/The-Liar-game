@@ -1,4 +1,4 @@
-package liar.waitservice.wait.repository;
+package liar.waitservice.wait.repository.redis;
 
 import liar.waitservice.wait.domain.JoinMember;
 import org.springframework.data.repository.CrudRepository;

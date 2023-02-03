@@ -1,4 +1,4 @@
-package liar.waitservice.wait.domain;
+package liar.waitservice.wait.domain.utils;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

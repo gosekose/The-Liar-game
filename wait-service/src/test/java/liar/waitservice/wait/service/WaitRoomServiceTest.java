@@ -3,10 +3,9 @@ package liar.waitservice.wait.service;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import liar.waitservice.exception.exception.NotExistsRoomIdException;
 import liar.waitservice.wait.controller.dto.CreateWaitRoomDto;
-import liar.waitservice.wait.controller.dto.JoinStatusWaitRoomDto;
+import liar.waitservice.wait.controller.dto.RequestWaitRoomDto;
 import liar.waitservice.wait.domain.WaitRoom;
-import liar.waitservice.wait.repository.WaitRoomRedisRepository;
-import org.junit.jupiter.api.AfterEach;
+import liar.waitservice.wait.repository.redis.WaitRoomRedisRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -46,6 +45,23 @@ class WaitRoomServiceTest {
 //    }
 
     @Test
+    @DisplayName("test")
+    public void test() throws Exception {
+        //given
+
+        for (int i = 0; i < 15; i++) {
+            waitRoomRedisRepository.save(
+                    WaitRoom.of(new CreateWaitRoomDto(
+                            "user" + i, "koseRoomName", 7), "koseUsername"));
+        }
+        //when
+
+        //then
+
+    }
+
+
+    @Test
     @DisplayName("memberService에서 userName을 가져온 후 waitRoom을 생성하여 redis에 저장")
     public void saveWaitRoom() throws Exception {
         //given
@@ -70,7 +86,7 @@ class WaitRoomServiceTest {
 
         //when
         for (int i = 0; i < limitMembers - 1; i++) {
-            results[i] = waitRoomService.addMembers(new JoinStatusWaitRoomDto(String.valueOf(i), roomId));
+            results[i] = waitRoomService.addMembers(new RequestWaitRoomDto(String.valueOf(i), roomId));
         }
         WaitRoom findOne = waitRoomService.findWaitRoomId(roomId);
 
@@ -91,9 +107,9 @@ class WaitRoomServiceTest {
 
         //when
         for (int i = 0; i < 6; i++) {
-            results[i] = waitRoomService.addMembers(new JoinStatusWaitRoomDto(String.valueOf(i), roomId));
+            results[i] = waitRoomService.addMembers(new RequestWaitRoomDto(String.valueOf(i), roomId));
         }
-        boolean isSavedMembers = waitRoomService.addMembers(new JoinStatusWaitRoomDto("7", roomId));
+        boolean isSavedMembers = waitRoomService.addMembers(new RequestWaitRoomDto("7", roomId));
         WaitRoom findRoom = waitRoomService.findWaitRoomId(roomId);
 
         //then
@@ -112,12 +128,12 @@ class WaitRoomServiceTest {
         boolean[] results = new boolean[6];
         String roomId = waitRoomService.saveWaitRoom(waitRoomDto);
         for (int i = 0; i < 6; i++) {
-            waitRoomService.addMembers(new JoinStatusWaitRoomDto(String.valueOf(i), roomId));
+            waitRoomService.addMembers(new RequestWaitRoomDto(String.valueOf(i), roomId));
         }
 
         //when
         for (int i = 0; i < 3; i++) {
-            results[i] = waitRoomService.leaveMember(new JoinStatusWaitRoomDto(String.valueOf(i), roomId));
+            results[i] = waitRoomService.leaveMember(new RequestWaitRoomDto(String.valueOf(i), roomId));
         }
         WaitRoom findRoom = waitRoomService.findWaitRoomId(roomId);
 
@@ -136,14 +152,14 @@ class WaitRoomServiceTest {
         boolean[] results = new boolean[4];
         String roomId = waitRoomService.saveWaitRoom(waitRoomDto);
         for (int i = 3; i < 9; i++) {
-            waitRoomService.addMembers(new JoinStatusWaitRoomDto(String.valueOf(i), roomId));
+            waitRoomService.addMembers(new RequestWaitRoomDto(String.valueOf(i), roomId));
         }
 
         //when
         for (int i = 0; i < 3; i++) {
-            results[i] = waitRoomService.leaveMember(new JoinStatusWaitRoomDto(String.valueOf(i), roomId));
+            results[i] = waitRoomService.leaveMember(new RequestWaitRoomDto(String.valueOf(i), roomId));
         }
-        results[3] = waitRoomService.leaveMember(new JoinStatusWaitRoomDto(hostId, roomId));
+        results[3] = waitRoomService.leaveMember(new RequestWaitRoomDto(hostId, roomId));
         WaitRoom findRoom = waitRoomService.findWaitRoomId(roomId);
 
         //then
@@ -160,7 +176,7 @@ class WaitRoomServiceTest {
         String roomId = waitRoomService.saveWaitRoom(waitRoomDto);
 
         //when
-        boolean result = waitRoomService.deleteWaitRoomByHost(new JoinStatusWaitRoomDto(hostId, roomId));
+        boolean result = waitRoomService.deleteWaitRoomByHost(new RequestWaitRoomDto(hostId, roomId));
 
         //then
         assertThat(result).isTrue();
@@ -175,7 +191,7 @@ class WaitRoomServiceTest {
         String roomId = waitRoomService.saveWaitRoom(waitRoomDto);
 
         //when
-        boolean result = waitRoomService.deleteWaitRoomByHost(new JoinStatusWaitRoomDto("1", roomId));
+        boolean result = waitRoomService.deleteWaitRoomByHost(new RequestWaitRoomDto("1", roomId));
 
         //then
         assertThat(result).isFalse();

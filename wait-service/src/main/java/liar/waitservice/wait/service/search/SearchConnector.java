@@ -1,7 +1,7 @@
 package liar.waitservice.wait.service.search;
 
 import jakarta.ws.rs.NotFoundException;
-import liar.waitservice.wait.controller.dto.SearchDto;
+import liar.waitservice.wait.controller.dto.SearchWaitRoomDto;
 import liar.waitservice.wait.service.search.dto.WaitRoomViewsDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -16,11 +16,11 @@ public class SearchConnector {
     private final RoomNameSearchService roomNameSearchService;
     private final HostNameSearchService hostNameSearchService;
 
-    public List<WaitRoomViewsDto> searchWaitRoomCondition(SearchDto dto) {
+    public List<WaitRoomViewsDto> searchWaitRoomCondition(SearchWaitRoomDto dto) {
         return connectSearchService(dto).searchWaitRoomByCond(dto.getBody());
     }
 
-    private SearchService connectSearchService(SearchDto dto) {
+    private SearchService connectSearchService(SearchWaitRoomDto dto) {
         switch (dto.upperSearchType()) {
 
             case "WAITROOMID":

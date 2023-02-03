@@ -1,0 +1,20 @@
+### 1. waitRoom 검색
+
+POST {{baseUrl}}/search/waitroom
+Content-Type: application/json
+Accept: */*
+Connection: keep-alive
+Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxNTliNDljZC03OGQyLTRiMmQtOGFhMi01Yjk4NmI2MjMyNTEiLCJhdXRoIjpbIlJPTEVfQURNSU4iXSwiaWF0IjoxNjc1NDIzNDc1LCJleHAiOjE2NzU0NDUwNzV9.H9mLnrDz2qtRkw3eZdUrFaZZJvMIbaqxmFkXh8Z3sYT6cVUXglaO0AUIw-JHSxiyBa6mhJDtJh_wnmiW-HAkfA
+RefreshToken: eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxNTliNDljZC03OGQyLTRiMmQtOGFhMi01Yjk4NmI2MjMyNTEiLCJhdXRoIjpbIlJPTEVfQURNSU4iXSwiaWF0IjoxNjc1NDIzNDc1LCJleHAiOjE2NzYwMjgyNzV9.4qh-SmjZ4yR69dGCU_V5PSUZZQ-2S70Wr0DunxhKVVsihh8gbk2X3GOmZ3ld46j7IvufX8bfM2ee7xtzeJg-dg
+userId: 159b49cd-78d2-4b2d-8aa2-5b986b623251
+
+{
+  "body": "koseRoomName",
+  "searchType": "WAITROOMNAME"
+}
+
+> {%
+    client.test("폼 로그인 회원 가입 성공, 토큰 클라이언트 저장", function() {
+        client.assert(response.status === 200, "Response status is OK");
+    });
+%}

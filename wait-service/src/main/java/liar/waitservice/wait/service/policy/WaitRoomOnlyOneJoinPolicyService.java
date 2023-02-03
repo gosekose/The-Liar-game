@@ -3,19 +3,26 @@ package liar.waitservice.wait.service.policy;
 import liar.waitservice.exception.exception.NotExistsRoomIdException;
 import liar.waitservice.wait.domain.JoinMember;
 import liar.waitservice.wait.domain.WaitRoom;
-import liar.waitservice.wait.repository.JoinMemberRedisRepository;
-import liar.waitservice.wait.repository.WaitRoomRedisRepository;
+import liar.waitservice.wait.domain.WaitRoomComplete;
+import liar.waitservice.wait.domain.utils.WaitRoomStatus;
+import liar.waitservice.wait.repository.rdbms.WaitRoomCompleteRepository;
+import liar.waitservice.wait.repository.redis.JoinMemberRedisRepository;
+import liar.waitservice.wait.repository.redis.WaitRoomRedisRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Component
+@Transactional
 @RequiredArgsConstructor
 public class WaitRoomOnlyOneJoinPolicyService implements WaitRoomJoinPolicyService {
 
     private final WaitRoomRedisRepository waitRoomRedisRepository;
     private final JoinMemberRedisRepository joinMemberRedisRepository;
+    private final WaitRoomCompleteRepository waitRoomCompleteRepository;
 
     @Override
     public void createWaitRoomPolicy(String hostId) {
@@ -25,6 +32,18 @@ public class WaitRoomOnlyOneJoinPolicyService implements WaitRoomJoinPolicyServi
     @Override
     public void joinWaitRoomPolicy(String userId) {
         joinOnlyOneRoomPerMemberAtTheSameTime(userId);
+    }
+
+    @Override
+    public boolean isPlayingGameStatus(String userId) {
+        List<WaitRoomComplete> waitRoomCompletes = waitRoomCompleteRepository.findByHostId(userId)
+                .stream().filter(f -> f.getWaitRoomStatus().equals(WaitRoomStatus.PLAYING))
+                .collect(Collectors.toList());
+
+        if (waitRoomCompletes.isEmpty()) {
+            return true;
+        }
+        return false;
     }
 
     /**

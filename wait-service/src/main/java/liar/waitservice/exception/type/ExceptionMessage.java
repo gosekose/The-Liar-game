@@ -9,4 +9,6 @@ public class ExceptionMessage {
     public static final String INTERNAL_SERVER_ERROR = "일시적인 서버 에러입니다.";
     public static final String WAITROOM_NOT_FOUND = "존재하지 않는 대기방입니다.";
 
+    public static final String HOST_ID_NOT_EQUAL = "요청한 정보가 일치하지 않습니다.";
+
 }
