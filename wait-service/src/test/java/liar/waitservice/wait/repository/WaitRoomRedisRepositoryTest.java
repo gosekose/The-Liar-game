@@ -5,11 +5,14 @@ import liar.waitservice.wait.controller.dto.CreateWaitRoomDto;
 import liar.waitservice.wait.domain.WaitRoom;
 import liar.waitservice.wait.repository.redis.WaitRoomRedisRepository;
 import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Slice;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -29,10 +32,10 @@ class WaitRoomRedisRepositoryTest {
         waitRoom = WaitRoom.of(roomDto, "kose");
     }
 
-//    @AfterEach
-//    void tearDown() {
-//        waitRoomRedisRepository.deleteAll();
-//    }
+    @AfterEach
+    void tearDown() {
+        waitRoomRedisRepository.deleteAll();
+    }
 
     @Test
     @DisplayName("Redis에 createWaitRoom 요청이 오면, 저장되어야 한다.")
@@ -173,6 +176,36 @@ class WaitRoomRedisRepositoryTest {
 
         //then
         assertThat(findAll.get(0).getId()).isEqualTo(waitRoom.getId());
+    }
+
+    @Test
+    @DisplayName("test")
+    public void test() throws Exception {
+        //given
+        for (int i = 0; i < 30; i++) {
+            waitRoomRedisRepository.save(
+                    WaitRoom.of(new CreateWaitRoomDto(
+                            "user" + i, "koseRoomName", 7), "koseUsername"));
+        }
+
+        //when
+        Slice<WaitRoom> koseRoomName = waitRoomRedisRepository.findWaitRoomByRoomName("koseRoomName", PageRequest.of(0, 10));
+
+        //then
+        for (WaitRoom room : koseRoomName.getContent()) {
+            System.out.println("room = " + room.getId());
+        }
+
+        assertThat(koseRoomName.getSize()).isEqualTo(10);
+
+        Slice<WaitRoom> koseRoomName1 = waitRoomRedisRepository.findWaitRoomByRoomName("koseRoomName", PageRequest.of(1, 10));
+
+        //then
+        for (WaitRoom room : koseRoomName1.getContent()) {
+            System.out.println("room = " + room.getId());
+        }
+
+        assertThat(koseRoomName.getSize()).isEqualTo(11);
     }
 
 

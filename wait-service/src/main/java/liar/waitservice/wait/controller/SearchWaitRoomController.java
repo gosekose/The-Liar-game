@@ -2,6 +2,7 @@ package liar.waitservice.wait.controller;
 
 import jakarta.validation.Valid;
 import liar.waitservice.wait.controller.dto.SearchWaitRoomDto;
+import liar.waitservice.wait.controller.dto.SearchWaitRoomSliceDto;
 import liar.waitservice.wait.controller.dto.message.SendSuccessBody;
 import liar.waitservice.wait.service.search.SearchConnector;
 import lombok.RequiredArgsConstructor;
@@ -23,4 +24,8 @@ public class SearchWaitRoomController {
         return ResponseEntity.ok().body(SendSuccessBody.of(connector.searchWaitRoomCondition(dto)));
     }
 
+    @PostMapping("/waitroom-slice")
+    public ResponseEntity searchWaitRoomsSlice(@Valid @RequestBody SearchWaitRoomSliceDto dto) {
+        return ResponseEntity.ok().body(SendSuccessBody.of(connector.searchWaitRoomSliceCondition(dto)));
+    }
 }
