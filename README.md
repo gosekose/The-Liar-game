@@ -43,6 +43,33 @@ IDE: Intellij
 
 ![](../header.png)
 
+
+## 단위/기능 테스트 실행 (ubuntu)
+단위/기능 테스트를 진행할 때는 rdbms(dev: h2) 와 redis, rabbitmq, config.server를 반드시 실행시켜주어야 합니다. 
+
+member-service 실행시 
+```
+./h2.sh
+java -jar config-server.jar
+java -jar eureka-server.jar
+java -jar gateway-server.jar
+
+systemctl start rabbitmq-server
+redis-server --port 6379
+redis-server --port 6380
+redis-cli -h 127.0.0.1 -p 6380
+```
+
+wait-service 실행시 
+```
+./h2.sh
+java -jar config-server.jar
+systemctl start rabbitmq-server
+redis-server --port 6379
+redis-server --port 6380
+redis-cli -h 127.0.0.1 -p 6380
+```
+
 ## 활동 주요 로그 (커밋 로그) 
 1. eureka, gateway를 추가하고 도메인 서버와 연결하였습니다. [commit ac614b5](https://github.com/gosekose/The-Liar-game/pull/15/commits/ac614b5bf38ad77511e2da8e798c469a4b5c2393)
 2. SpringRestDocs를 활용하여 API 명세를 구성하였습니다. [commit 2bc4096](https://github.com/gosekose/The-Liar-game/commit/2bc409635debee55b638cd233381b7965eaa7aff)
