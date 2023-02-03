@@ -15,8 +15,12 @@
 ```
 운영체제: ubuntu20.04
 Spring: springboot 3.0.2
-java: java 17
-Gradle: grable 7
+Java: openjdk 17.0.5
+Mysql: 8.0.32
+Redis: 6.0.16
+Rabbitmq: 3.11.7
+Erlang: 25.2.1
+Gradle: 7.6
 IDE: Intellij
 ```
 ![](../header.png)
