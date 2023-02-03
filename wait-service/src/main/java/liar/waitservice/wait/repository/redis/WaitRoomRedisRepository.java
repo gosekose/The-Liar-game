@@ -1,6 +1,8 @@
 package liar.waitservice.wait.repository.redis;
 
 import liar.waitservice.wait.domain.WaitRoom;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.data.repository.CrudRepository;
 
 import java.util.List;
@@ -12,4 +14,9 @@ public interface WaitRoomRedisRepository extends CrudRepository<WaitRoom, String
 
     Optional<WaitRoom> findWaitRoomByHostId(String hostId);
     WaitRoom findByHostId(String hostId);
+
+    Slice<WaitRoom> findWaitRoomByRoomName(String roomName, Pageable pageable);
+    Slice<WaitRoom> findWaitRoomByHostName(String hostName, Pageable pageable);
+    Slice<WaitRoom> findWaitRoomById(String hostName, Pageable pageable);
+
 }

@@ -4,6 +4,8 @@ import liar.waitservice.wait.domain.WaitRoom;
 import liar.waitservice.wait.service.WaitRoomService;
 import liar.waitservice.wait.service.search.dto.WaitRoomViewsDto;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,5 +26,8 @@ public class RoomIdSearchService implements SearchService<WaitRoomViewsDto, Stri
         return Arrays.asList(waitRoom).stream().map(WaitRoomViewsDto::new).collect(Collectors.toList());
     }
 
-
+    @Override
+    public Slice<WaitRoomViewsDto> searchWaitRoomByCond(String body, Pageable pageable) {
+        return waitRoomService.findWaitRoomByRoomId(body, pageable).map(WaitRoomViewsDto::new);
+    }
 }
