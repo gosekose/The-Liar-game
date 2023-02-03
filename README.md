@@ -15,8 +15,12 @@
 ```
 운영체제: ubuntu20.04
 Spring: springboot 3.0.2
-java: java 17
-Gradle: grable 7
+Java: openjdk 17.0.5
+Mysql: 8.0.32
+Redis: 6.0.16
+Rabbitmq: 3.11.7
+Erlang: 25.2.1
+Gradle: 7.6
 IDE: Intellij
 ```
 ![](../header.png)
@@ -43,6 +47,33 @@ IDE: Intellij
 
 ![](../header.png)
 
+
+## 단위/기능 테스트 실행 (ubuntu)
+단위/기능 테스트를 진행할 때는 rdbms(dev: h2) 와 redis, rabbitmq, config.server를 반드시 실행시켜주어야 합니다. 
+
+member-service 실행시 
+```
+./h2.sh
+java -jar config-server.jar
+java -jar eureka-server.jar
+java -jar gateway-server.jar
+
+systemctl start rabbitmq-server
+redis-server --port 6379
+redis-server --port 6380
+redis-cli -h 127.0.0.1 -p 6380
+```
+
+wait-service 실행시 
+```
+./h2.sh
+java -jar config-server.jar
+systemctl start rabbitmq-server
+redis-server --port 6379
+redis-server --port 6380
+redis-cli -h 127.0.0.1 -p 6380
+```
+
 ## 활동 주요 로그 (커밋 로그) 
 1. eureka, gateway를 추가하고 도메인 서버와 연결하였습니다. [commit ac614b5](https://github.com/gosekose/The-Liar-game/pull/15/commits/ac614b5bf38ad77511e2da8e798c469a4b5c2393)
 2. SpringRestDocs를 활용하여 API 명세를 구성하였습니다. [commit 2bc4096](https://github.com/gosekose/The-Liar-game/commit/2bc409635debee55b638cd233381b7965eaa7aff)
@@ -51,3 +82,4 @@ IDE: Intellij
 5. wait-server 전용 redis를 구성하였습니다. [commit 8d87036](https://github.com/gosekose/The-Liar-game/commit/8d8703624b712c9c0b24dd8ebf678337f3af6cd0) 
 6. waitRoom 검색 조건에 따른 redis 검색 전략을 구성하기 위한 Connection 인터페이스 설계를 구현하였습니다. [commit 6f5a6ea](https://github.com/gosekose/The-Liar-game/commit/6f5a6eaf9918e9de71b1542973242fe65c089675)
 7. waitRoom의 joinPolicy 정책을 인터페이스화하여 WaitRoomService에 의존성 주입하였습니다. [commit 81a063f](https://github.com/gosekose/The-Liar-game/commit/81a063fb2a65a62be0922dc0395c2ed602662fa0) 
+
