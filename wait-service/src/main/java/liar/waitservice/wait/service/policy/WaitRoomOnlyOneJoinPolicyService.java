@@ -61,9 +61,11 @@ public class WaitRoomOnlyOneJoinPolicyService implements WaitRoomJoinPolicyServi
      * 이미 다른 곳의 호스트가 다른 방에 입장 요청을 하면, 이전에 있던 방의 유저들의 join을 제거하고 소유하고 있는 방을 나간다.
      */
     private void joinOnlyOneRoomPerMemberAtTheSameTime(String userId) {
-        JoinMember joinMember = joinMemberRedisRepository.findById(userId).get();
+
+        JoinMember joinMember = joinMemberRedisRepository.findById(userId).orElse(null);
 
         if (joinMember != null) {
+
             WaitRoom waitRoom = waitRoomRedisRepository.findById(joinMember.getRoomId()).orElseThrow(NotExistsRoomIdException::new);
 
             if (waitRoom.isHost(joinMember.getId())) {

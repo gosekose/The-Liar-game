@@ -3,7 +3,7 @@ package liar.waitservice.wait.controller;
 import jakarta.validation.Valid;
 import liar.waitservice.wait.controller.dto.UpdateWaitRoomStatusDto;
 import liar.waitservice.wait.controller.dto.RequestWaitRoomDto;
-import liar.waitservice.wait.service.start.GameStatusRequestService;
+import liar.waitservice.wait.service.start.UpdateWaitRoomStatusService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -16,17 +16,17 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class UpdateWaitRoomStatusController {
 
-    private final GameStatusRequestService gameStatusRequestService;
+    private final UpdateWaitRoomStatusService updateWaitRoomStatusService;
 
-    @PostMapping("/start")
+    @PostMapping("/start/game")
     public ResponseEntity saveCache(@Valid @RequestBody RequestWaitRoomDto saveRequest) {
-        gameStatusRequestService.saveWaitRoomInfoAtDb(saveRequest);
+        updateWaitRoomStatusService.saveWaitRoomInfoAtDb(saveRequest);
         return ResponseEntity.ok().build();
     }
 
-    @PostMapping("/end")
+    @PostMapping("/end/game")
     public ResponseEntity deleteCache(@Valid @RequestBody UpdateWaitRoomStatusDto message) {
-        gameStatusRequestService.deleteWaitRoomInfoAtCache(message);
+        updateWaitRoomStatusService.deleteWaitRoomInfoAtCache(message);
         return ResponseEntity.ok().build();
     }
 

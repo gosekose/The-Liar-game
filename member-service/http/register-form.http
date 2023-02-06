@@ -17,6 +17,7 @@ Connection: keep-alive
     });
 %}
 
+
 ### 2. 회원가입 폼 실패 (비밀번호 10자 미만)
 POST {{baseUrl}}/register
 Content-Type: application/json
@@ -50,5 +51,121 @@ Connection: keep-alive
 > {%
     client.test("이미 존재하는 계정은 회원가입 불가", function() {
         client.assert(response.status === 409, "Response status is CONFLICT");
+    });
+%}
+
+### 4. 회원가입 추가
+
+POST {{baseUrl}}/register
+Content-Type: application/json
+Accept: */*
+Connection: keep-alive
+
+{
+  "username": "gosekose1",
+  "email": "gosekose1@naver.com",
+  "password": "kose123456"
+}
+
+> {%
+    client.test("회원 가입 요청은 패스워드가 10자 이상 가능", function() {
+        client.assert(response.status === 200, "Response status is OK");
+    });
+%}
+
+
+### 5. 회원가입 추가
+POST {{baseUrl}}/register
+Content-Type: application/json
+Accept: */*
+Connection: keep-alive
+
+{
+  "username": "gosekose2",
+  "email": "gosekose2@naver.com",
+  "password": "kose123456"
+}
+
+> {%
+    client.test("회원 가입 요청은 패스워드가 10자 이상 가능", function() {
+        client.assert(response.status === 200, "Response status is OK");
+    });
+%}
+
+
+
+### 6. 회원가입 추가
+
+POST {{baseUrl}}/register
+Content-Type: application/json
+Accept: */*
+Connection: keep-alive
+
+{
+  "username": "gosekose3",
+  "email": "gosekose3@naver.com",
+  "password": "kose123456"
+}
+
+> {%
+    client.test("회원 가입 요청은 패스워드가 10자 이상 가능", function() {
+        client.assert(response.status === 200, "Response status is OK");
+    });
+%}
+
+### 7. 회원가입 추가
+
+POST {{baseUrl}}/register
+Content-Type: application/json
+Accept: */*
+Connection: keep-alive
+
+{
+  "username": "gosekose4",
+  "email": "gosekose4@naver.com",
+  "password": "kose123456"
+}
+
+> {%
+    client.test("회원 가입 요청은 패스워드가 10자 이상 가능", function() {
+        client.assert(response.status === 200, "Response status is OK");
+    });
+%}
+
+### 8. 회원가입 추가
+
+POST {{baseUrl}}/register
+Content-Type: application/json
+Accept: */*
+Connection: keep-alive
+
+{
+  "username": "gosekose5",
+  "email": "gosekose5@naver.com",
+  "password": "kose123456"
+}
+
+> {%
+    client.test("회원 가입 요청은 패스워드가 10자 이상 가능", function() {
+        client.assert(response.status === 200, "Response status is OK");
+    });
+%}
+
+### 9. 회원가입 추가
+
+POST {{baseUrl}}/register
+Content-Type: application/json
+Accept: */*
+Connection: keep-alive
+
+{
+  "username": "gosekose6",
+  "email": "gosekose6@naver.com",
+  "password": "kose123456"
+}
+
+> {%
+    client.test("회원 가입 요청은 패스워드가 10자 이상 가능", function() {
+        client.assert(response.status === 200, "Response status is OK");
     });
 %}

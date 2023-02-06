@@ -30,33 +30,11 @@ import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.docu
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.*;
 import static org.springframework.restdocs.payload.JsonFieldType.*;
 import static org.springframework.restdocs.payload.PayloadDocumentation.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@SpringBootTest
-@AutoConfigureMockMvc
-@AutoConfigureRestDocs(uriScheme = "https", uriHost = "docs.api.com", uriPort = 443)
-@Transactional
-@ExtendWith(RestDocumentationExtension.class)
-class SearchWaitRoomControllerDocsTest {
-
-//    @Mock SearchWaitRoomController controller;
-    private MockMvc mockMvc;
-
-    @Autowired
-    WaitRoomRedisRepository waitRoomRedisRepository;
-
-    @BeforeEach
-    public void init(WebApplicationContext webApplicationContext, RestDocumentationContextProvider restDocumentation) {
-        this.mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext)
-                .apply(documentationConfiguration(restDocumentation))
-                .build();
-    }
-
-    @AfterEach
-    public void tearDown() {
-        waitRoomRedisRepository.deleteAll();
-    }
+class SearchWaitRoomControllerDocsTest extends CommonController {
 
     @Test
     @DisplayName("roomName으로 WaitRoom 검색")
@@ -71,7 +49,7 @@ class SearchWaitRoomControllerDocsTest {
 
         //when
         ResultActions result = mockMvc.perform(
-                post("/wait-service/search/waitroom")
+                get("/wait-service/waitroom/search")
                         .accept(APPLICATION_JSON)
                         .contentType(APPLICATION_JSON)
                         .content(new Gson().toJson(searchWaitRoomDto))
@@ -114,7 +92,7 @@ class SearchWaitRoomControllerDocsTest {
 
         //when
         ResultActions result = mockMvc.perform(
-                post("/wait-service/search/waitroom-slice")
+                get("/wait-service/waitroom-slice/search")
                         .accept(APPLICATION_JSON)
                         .contentType(APPLICATION_JSON)
                         .content(new Gson().toJson(searchWaitRoomDto))

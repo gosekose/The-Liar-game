@@ -7,13 +7,15 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Getter
-@AllArgsConstructor
 @NoArgsConstructor
-public class SendSuccessBody<T> {
+public class SendSuccessBody<T> extends SendSuccess {
 
-    public String code;
-    public String message;
     public T body;
+
+    public SendSuccessBody(String code, String message, T body) {
+        super(code, message);
+        this.body = body;
+    }
 
     public static <T> SendSuccessBody of(String code, String message, T body) {
         return new SendSuccessBody(code, message, body);

@@ -7,24 +7,21 @@ import liar.waitservice.wait.controller.dto.message.SendSuccessBody;
 import liar.waitservice.wait.service.search.SearchConnector;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/wait-service/search")
+@RequestMapping("/wait-service")
 @RequiredArgsConstructor
 public class SearchWaitRoomController {
 
     private final SearchConnector connector;
 
-    @PostMapping("/waitroom")
+    @GetMapping("/waitroom/search")
     public ResponseEntity searchWaitRooms(@Valid @RequestBody SearchWaitRoomDto dto) {
         return ResponseEntity.ok().body(SendSuccessBody.of(connector.searchWaitRoomCondition(dto)));
     }
 
-    @PostMapping("/waitroom-slice")
+    @GetMapping("/waitroom-slice/search")
     public ResponseEntity searchWaitRoomsSlice(@Valid @RequestBody SearchWaitRoomSliceDto dto) {
         return ResponseEntity.ok().body(SendSuccessBody.of(connector.searchWaitRoomSliceCondition(dto)));
     }

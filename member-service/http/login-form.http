@@ -40,3 +40,155 @@ Connection: keep-alive
         client.assert(response.status === 404, "Response status is NOTFOUND");
     });
 %}
+
+### 3. 폼 로그인 성공
+
+POST {{baseUrl}}/login
+Content-Type: application/json
+Accept: */*
+Connection: keep-alive
+
+{
+  "email": "gosekose1@naver.com",
+  "password": "kose123456"
+}
+
+> {%
+    client.test("폼 로그인 회원 가입 성공, 토큰 클라이언트 저장", function() {
+        client.assert(response.status === 200, "Response status is OK");
+        client.global.set("accessToken", response.body.accessToken);
+        client.global.set("refreshToken", response.body.refreshToken);
+        client.global.set("userId", response.body.userId);
+        client.log(client.global.get("accessToken"));
+        client.log(client.global.get("refreshToken"));
+        client.log(client.global.get("userId"));
+
+    });
+%}
+
+### 4. 폼 로그인 성공
+
+POST {{baseUrl}}/login
+Content-Type: application/json
+Accept: */*
+Connection: keep-alive
+
+{
+  "email": "gosekose2@naver.com",
+  "password": "kose123456"
+}
+
+> {%
+    client.test("폼 로그인 회원 가입 성공, 토큰 클라이언트 저장", function() {
+        client.assert(response.status === 200, "Response status is OK");
+        client.global.set("accessToken", response.body.accessToken);
+        client.global.set("refreshToken", response.body.refreshToken);
+        client.global.set("userId", response.body.userId);
+        client.log(client.global.get("accessToken"));
+        client.log(client.global.get("refreshToken"));
+        client.log(client.global.get("userId"));
+
+    });
+%}
+
+### 5. 폼 로그인 성공
+
+POST {{baseUrl}}/login
+Content-Type: application/json
+Accept: */*
+Connection: keep-alive
+
+{
+  "email": "gosekose3@naver.com",
+  "password": "kose123456"
+}
+
+> {%
+    client.test("폼 로그인 회원 가입 성공, 토큰 클라이언트 저장", function() {
+        client.assert(response.status === 200, "Response status is OK");
+        client.global.set("accessToken", response.body.accessToken);
+        client.global.set("refreshToken", response.body.refreshToken);
+        client.global.set("userId", response.body.userId);
+        client.log(client.global.get("accessToken"));
+        client.log(client.global.get("refreshToken"));
+        client.log(client.global.get("userId"));
+
+    });
+%}
+
+### 6. 폼 로그인 성공
+
+POST {{baseUrl}}/login
+Content-Type: application/json
+Accept: */*
+Connection: keep-alive
+
+{
+  "email": "gosekose4@naver.com",
+  "password": "kose123456"
+}
+
+> {%
+    client.test("폼 로그인 회원 가입 성공, 토큰 클라이언트 저장", function() {
+        client.assert(response.status === 200, "Response status is OK");
+        client.global.set("accessToken", response.body.accessToken);
+        client.global.set("refreshToken", response.body.refreshToken);
+        client.global.set("userId", response.body.userId);
+        client.log(client.global.get("accessToken"));
+        client.log(client.global.get("refreshToken"));
+        client.log(client.global.get("userId"));
+
+    });
+%}
+
+### 7. 폼 로그인 성공
+
+POST {{baseUrl}}/login
+Content-Type: application/json
+Accept: */*
+Connection: keep-alive
+
+{
+  "email": "gosekose5@naver.com",
+  "password": "kose123456"
+}
+
+> {%
+    client.test("폼 로그인 회원 가입 성공, 토큰 클라이언트 저장", function() {
+        client.assert(response.status === 200, "Response status is OK");
+        client.global.set("accessToken", response.body.accessToken);
+        client.global.set("refreshToken", response.body.refreshToken);
+        client.global.set("userId", response.body.userId);
+        client.log(client.global.get("accessToken"));
+        client.log(client.global.get("refreshToken"));
+        client.log(client.global.get("userId"));
+
+    });
+%}
+### 8. 폼 로그인 성공
+
+POST {{baseUrl}}/login
+Content-Type: application/json
+Accept: */*
+Connection: keep-alive
+
+{
+  "email": "gosekose6@naver.com",
+  "password": "kose123456"
+}
+
+> {%
+    client.test("폼 로그인 회원 가입 성공, 토큰 클라이언트 저장", function() {
+        client.assert(response.status === 200, "Response status is OK");
+        client.global.set("accessToken", response.body.accessToken);
+        client.global.set("refreshToken", response.body.refreshToken);
+        client.global.set("userId", response.body.userId);
+        client.log(client.global.get("accessToken"));
+        client.log(client.global.get("refreshToken"));
+        client.log(client.global.get("userId"));
+
+    });
+%}
+
+
+
