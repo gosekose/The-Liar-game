@@ -34,7 +34,7 @@ public class ExceptionControllerAdvice {
      */
     @ResponseStatus(UNAUTHORIZED)
     @ExceptionHandler
-    public ResponseEntity<ErrorDto> notExistsRefreshTokenHandler(NotExistsRefreshTokenException e) {
+    public ResponseEntity<ErrorDto> notExistsTokenHandler(NotExistsRefreshTokenException e) {
         return new ResponseEntity<>(new ErrorDto(e.getErrorCode(), e.getMessage()), UNAUTHORIZED);
     }
 
@@ -46,15 +46,6 @@ public class ExceptionControllerAdvice {
     @ExceptionHandler
     public ResponseEntity<ErrorDto> userNotFoundHandler(NotFoundUserException e) {
         return new ResponseEntity<>(new ErrorDto(e.getErrorCode(), e.getMessage()), NOT_FOUND);
-    }
-
-    /**
-     *  회원가입시 중복 이메일
-     */
-    @ResponseStatus(CONFLICT)
-    @ExceptionHandler
-    public ResponseEntity<ErrorDto> userEmailConflict(UserRegisterConflictException e) {
-        return new ResponseEntity<>(new ErrorDto(e.getErrorCode(), e.getMessage()), CONFLICT);
     }
 
     /**
