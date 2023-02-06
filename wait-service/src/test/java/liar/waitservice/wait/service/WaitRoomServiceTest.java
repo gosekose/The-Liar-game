@@ -1,7 +1,8 @@
 package liar.waitservice.wait.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import liar.waitservice.exception.exception.NotExistsRoomIdException;
+import liar.waitservice.exception.exception.NotFoundWaitRoomException;
+import liar.waitservice.wait.MemberDummyInfo;
 import liar.waitservice.wait.controller.dto.CreateWaitRoomDto;
 import liar.waitservice.wait.controller.dto.RequestWaitRoomDto;
 import liar.waitservice.wait.domain.WaitRoom;
@@ -17,7 +18,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-class WaitRoomServiceTest {
+class WaitRoomServiceTest extends MemberDummyInfo {
 
     @Autowired
     WaitRoomRedisRepository waitRoomRedisRepository;
@@ -31,8 +32,6 @@ class WaitRoomServiceTest {
     ObjectMapper objectMapper;
 
     CreateWaitRoomDto waitRoomDto;
-    String hostId = "159b49cd-78d2-4b2d-8aa2-5b986b623251";
-    String hostName = "kose";
 
     @BeforeEach
     public void init() {
@@ -181,7 +180,7 @@ class WaitRoomServiceTest {
         //then
         assertThat(result).isTrue();
         assertThatThrownBy(() -> waitRoomService.findWaitRoomId(roomId))
-                .isInstanceOf(NotExistsRoomIdException.class);
+                .isInstanceOf(NotFoundWaitRoomException.class);
     }
 
     @Test

@@ -1,10 +1,10 @@
 package liar.waitservice.wait.service.policy;
 
-import liar.waitservice.exception.exception.NotExistsRoomIdException;
+import liar.waitservice.exception.exception.NotFoundWaitRoomException;
 import liar.waitservice.wait.domain.JoinMember;
 import liar.waitservice.wait.domain.WaitRoom;
 import liar.waitservice.wait.domain.WaitRoomComplete;
-import liar.waitservice.wait.domain.utils.WaitRoomStatus;
+import liar.waitservice.wait.domain.utils.WaitRoomCompleteStatus;
 import liar.waitservice.wait.repository.rdbms.WaitRoomCompleteRepository;
 import liar.waitservice.wait.repository.redis.JoinMemberRedisRepository;
 import liar.waitservice.wait.repository.redis.WaitRoomRedisRepository;
@@ -37,7 +37,7 @@ public class WaitRoomOnlyOneJoinPolicyService implements WaitRoomJoinPolicyServi
     @Override
     public boolean isPlayingGameStatus(String userId) {
         List<WaitRoomComplete> waitRoomCompletes = waitRoomCompleteRepository.findByHostId(userId)
-                .stream().filter(f -> f.getWaitRoomStatus().equals(WaitRoomStatus.PLAYING))
+                .stream().filter(f -> f.getWaitRoomCompleteStatus().equals(WaitRoomCompleteStatus.PLAYING))
                 .collect(Collectors.toList());
 
         if (waitRoomCompletes.isEmpty()) {
@@ -66,7 +66,7 @@ public class WaitRoomOnlyOneJoinPolicyService implements WaitRoomJoinPolicyServi
 
         if (joinMember != null) {
 
-            WaitRoom waitRoom = waitRoomRedisRepository.findById(joinMember.getRoomId()).orElseThrow(NotExistsRoomIdException::new);
+            WaitRoom waitRoom = waitRoomRedisRepository.findById(joinMember.getRoomId()).orElseThrow(NotFoundWaitRoomException::new);
 
             if (waitRoom.isHost(joinMember.getId())) {
                 deleteWaitRoomAndAllJoinMemberStatusLeave(waitRoom);

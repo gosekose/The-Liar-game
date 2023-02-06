@@ -1,7 +1,7 @@
 package liar.waitservice.wait.service.policy;
 
-import jakarta.persistence.EntityManager;
-import liar.waitservice.exception.exception.NotExistsRoomIdException;
+import liar.waitservice.exception.exception.NotFoundWaitRoomException;
+import liar.waitservice.wait.MemberDummyInfo;
 import liar.waitservice.wait.controller.dto.CreateWaitRoomDto;
 import liar.waitservice.wait.domain.JoinMember;
 import liar.waitservice.wait.domain.WaitRoom;
@@ -20,7 +20,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @Transactional
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-class WaitRoomJoinPolicyServiceTest {
+class WaitRoomJoinPolicyServiceTest extends MemberDummyInfo {
 
     @Autowired
     WaitRoomOnlyOneJoinPolicyService waitRoomOnlyOneJoinPolicyService;
@@ -31,11 +31,7 @@ class WaitRoomJoinPolicyServiceTest {
     @Autowired
     JoinMemberRedisRepository joinMemberRedisRepository;
 
-    @Autowired
-    EntityManager em;
-
     WaitRoom savedWaitRoom;
-    String hostId = "159b49cd-78d2-4b2d-8aa2-5b986b623251";
     String hostName = "kose";
 
     @BeforeEach
@@ -82,12 +78,12 @@ class WaitRoomJoinPolicyServiceTest {
 
         //when
         waitRoomOnlyOneJoinPolicyService.joinWaitRoomPolicy(joinId);
-        WaitRoom changedWaitRoom1 = waitRoomRedisRepository.findById(savedWaitRoom.getId()).orElseThrow(NotExistsRoomIdException::new);
+        WaitRoom changedWaitRoom1 = waitRoomRedisRepository.findById(savedWaitRoom.getId()).orElseThrow(NotFoundWaitRoomException::new);
         waitRoom2.joinMembers(joinId);
         WaitRoom changedWaitRoom2 = waitRoomRedisRepository.save(waitRoom2);
         joinMemberRedisRepository.save(JoinMember.of(joinId, waitRoom2.getId()));
 
-        JoinMember joinMember = joinMemberRedisRepository.findById(joinId).orElseThrow(NotExistsRoomIdException::new);
+        JoinMember joinMember = joinMemberRedisRepository.findById(joinId).orElseThrow(NotFoundWaitRoomException::new);
 
         //then
         assertThat(changedWaitRoom1.getMembers().size()).isEqualTo(1);
@@ -112,8 +108,8 @@ class WaitRoomJoinPolicyServiceTest {
 
         //then
         assertThatThrownBy(() -> {
-            waitRoomRedisRepository.findById(savedWaitRoom.getId()).orElseThrow(NotExistsRoomIdException::new);
-        }).isInstanceOf(NotExistsRoomIdException.class);
+            waitRoomRedisRepository.findById(savedWaitRoom.getId()).orElseThrow(NotFoundWaitRoomException::new);
+        }).isInstanceOf(NotFoundWaitRoomException.class);
 
         assertThat(joinMemberRedisRepository.findById(hostId).get().getRoomId()).isEqualTo(waitRoom2.getId());
 
@@ -144,8 +140,8 @@ class WaitRoomJoinPolicyServiceTest {
 
         //then
         assertThatThrownBy(() -> {
-            waitRoomRedisRepository.findById(savedWaitRoom.getId()).orElseThrow(NotExistsRoomIdException::new);
-        }).isInstanceOf(NotExistsRoomIdException.class);
+            waitRoomRedisRepository.findById(savedWaitRoom.getId()).orElseThrow(NotFoundWaitRoomException::new);
+        }).isInstanceOf(NotFoundWaitRoomException.class);
 
         assertThat(joinMemberRedisRepository.findById(hostId).get().getRoomId()).isEqualTo(waitRoom2.getId());
 

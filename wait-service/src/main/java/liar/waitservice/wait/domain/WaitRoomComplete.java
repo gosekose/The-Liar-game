@@ -2,9 +2,8 @@ package liar.waitservice.wait.domain;
 
 import jakarta.persistence.*;
 import liar.waitservice.wait.domain.utils.BaseTimeEntity;
-import liar.waitservice.wait.domain.utils.WaitRoomStatus;
+import liar.waitservice.wait.domain.utils.WaitRoomCompleteStatus;
 import lombok.AccessLevel;
-import lombok.Generated;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -16,7 +15,7 @@ import static jakarta.persistence.EnumType.STRING;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class WaitRoomComplete extends BaseTimeEntity {
 
-    @Id @Generated
+    @Id @GeneratedValue
     @Column(name = "wait_room_complete_id")
     private Long id;
 
@@ -32,7 +31,7 @@ public class WaitRoomComplete extends BaseTimeEntity {
     private int limitMembers;
 
     @Enumerated(STRING)
-    private WaitRoomStatus waitRoomStatus;
+    private WaitRoomCompleteStatus waitRoomCompleteStatus;
 
     protected WaitRoomComplete(WaitRoom waitRoom) {
         this.waitRoomId = waitRoom.getId();
@@ -40,7 +39,7 @@ public class WaitRoomComplete extends BaseTimeEntity {
         this.hostId = waitRoom.getHostId();
         this.hostName = waitRoom.getHostName();
         this.limitMembers = waitRoom.getLimitMembers();
-        this.waitRoomStatus = WaitRoomStatus.PLAYING;
+        this.waitRoomCompleteStatus = WaitRoomCompleteStatus.PLAYING;
     }
 
     public static WaitRoomComplete of(WaitRoom waitRoom) {
@@ -48,6 +47,6 @@ public class WaitRoomComplete extends BaseTimeEntity {
     }
 
     public void updateWaitRoomStatusDueToEndGame() {
-        waitRoomStatus = WaitRoomStatus.END;
+        waitRoomCompleteStatus = WaitRoomCompleteStatus.END;
     }
 }

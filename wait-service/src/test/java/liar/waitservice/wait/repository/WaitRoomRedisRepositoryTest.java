@@ -1,11 +1,10 @@
 package liar.waitservice.wait.repository;
 
-import liar.waitservice.exception.exception.NotExistsRoomIdException;
+import liar.waitservice.exception.exception.NotFoundWaitRoomException;
 import liar.waitservice.wait.controller.dto.CreateWaitRoomDto;
 import liar.waitservice.wait.domain.WaitRoom;
 import liar.waitservice.wait.repository.redis.WaitRoomRedisRepository;
 import org.assertj.core.api.Assertions;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -148,7 +147,7 @@ class WaitRoomRedisRepositoryTest {
 
         //then
         Assertions.assertThatThrownBy(() -> findById(result.getId()))
-                .isInstanceOf(NotExistsRoomIdException.class);
+                .isInstanceOf(NotFoundWaitRoomException.class);
     }
 
     @Test
@@ -210,7 +209,7 @@ class WaitRoomRedisRepositoryTest {
 
 
     private WaitRoom findById(String id) {
-        return waitRoomRedisRepository.findById(waitRoom.getId()).orElseThrow(NotExistsRoomIdException::new);
+        return waitRoomRedisRepository.findById(waitRoom.getId()).orElseThrow(NotFoundWaitRoomException::new);
     }
 
 }

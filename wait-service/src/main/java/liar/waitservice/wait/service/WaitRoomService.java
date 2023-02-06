@@ -1,10 +1,10 @@
 package liar.waitservice.wait.service;
 
-import liar.waitservice.exception.exception.NotExistsRoomIdException;
+import liar.waitservice.exception.exception.NotFoundWaitRoomException;
 import liar.waitservice.other.MemberService;
 import liar.waitservice.other.dao.MemberNameOnly;
 import liar.waitservice.wait.controller.dto.CreateWaitRoomDto;
-import liar.waitservice.wait.controller.dto.UpdateWaitRoomStatusDto;
+import liar.waitservice.wait.controller.dto.PostProcessEndGameDto;
 import liar.waitservice.wait.controller.dto.RequestWaitRoomDto;
 import liar.waitservice.wait.domain.JoinMember;
 import liar.waitservice.wait.domain.WaitRoom;
@@ -35,11 +35,11 @@ public class WaitRoomService {
      * search start
      */
     public WaitRoom findWaitRoomId(String roomId) {
-        return waitRoomRedisRepository.findById(roomId).orElseThrow(NotExistsRoomIdException::new);
+        return waitRoomRedisRepository.findById(roomId).orElseThrow(NotFoundWaitRoomException::new);
     }
 
     public WaitRoom findWaitRoomByHostId(String hostId) {
-        return waitRoomRedisRepository.findWaitRoomByHostId(hostId).orElseThrow(NotExistsRoomIdException::new);
+        return waitRoomRedisRepository.findWaitRoomByHostId(hostId).orElseThrow(NotFoundWaitRoomException::new);
     }
 
     public List<WaitRoom> findWaitRoomByHostName(String hostName) {
@@ -100,7 +100,7 @@ public class WaitRoomService {
     public boolean leaveMember(RequestWaitRoomDto requestWaitRoomDto) {
         WaitRoom waitRoom = findById(requestWaitRoomDto.getRoomId());
         if (isLeaveMember(requestWaitRoomDto, waitRoom)) {
-            saveWaitRoomAndStatusLeave(requestWaitRoomDto, waitRoom);
+            deleteWaitRoomAndJoinMembers(requestWaitRoomDto, waitRoom);
             return true;
         }
         return false;
@@ -113,7 +113,7 @@ public class WaitRoomService {
         WaitRoom waitRoom = findById(request.getRoomId());
 
         if (isHost(waitRoom, request.getUserId())) {
-            saveWaitRoomAndStatusLeave(waitRoom);
+            deleteWaitRoomAndJoinMembers(waitRoom);
             return true;
         };
         return false;
@@ -122,10 +122,10 @@ public class WaitRoomService {
     /**
      * 게임이 성공적으로 종료된 경우, Redis에 저장된 waitRoom 제거
      */
-    public boolean deleteWaitRoomBySuccessGameEndMsg(UpdateWaitRoomStatusDto<String> message) {
+    public boolean deleteWaitRoomBySuccessGameEndMsg(PostProcessEndGameDto<String> message) {
         try{
             WaitRoom waitRoom = findById(message.getRoomId());
-            saveWaitRoomAndStatusLeave(waitRoom);
+            deleteWaitRoomAndJoinMembers(waitRoom);
             return true;
         } catch (Exception e) {
             return false;
@@ -143,7 +143,7 @@ public class WaitRoomService {
      * roomId로 waitRoomRedisRepository에서 waitRoom 가져오기
      */
     private WaitRoom findById(String roomId) {
-        return waitRoomRedisRepository.findById(roomId).orElseThrow(NotExistsRoomIdException::new);
+        return waitRoomRedisRepository.findById(roomId).orElseThrow(NotFoundWaitRoomException::new);
     }
 
     /**
@@ -184,7 +184,7 @@ public class WaitRoomService {
     /**
      * 유저기 방에 퇴장하면, 방에 제거된 인원을 저장하고 조인 상태 정보를 삭제한다.
      */
-    private void saveWaitRoomAndStatusLeave(RequestWaitRoomDto requestWaitRoomDto, WaitRoom waitRoom) {
+    private void deleteWaitRoomAndJoinMembers(RequestWaitRoomDto requestWaitRoomDto, WaitRoom waitRoom) {
         joinMemberRedisRepository.delete(JoinMember.of(requestWaitRoomDto));
         waitRoomRedisRepository.save(waitRoom);
     }
@@ -192,7 +192,7 @@ public class WaitRoomService {
     /**
      * 호스트가 방에 퇴장하면, 방에 저장된 모든 유저의 조인 상태 정보를 삭제하고 방을 제거한다.
      */
-    private void saveWaitRoomAndStatusLeave(WaitRoom waitRoom) {
+    private void deleteWaitRoomAndJoinMembers(WaitRoom waitRoom) {
         waitRoom.getMembers().stream().forEach(j -> joinMemberRedisRepository.delete(new JoinMember(j, waitRoom.getId())));
         waitRoomRedisRepository.delete(waitRoom);
     }
