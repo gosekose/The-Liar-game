@@ -1,4 +1,4 @@
-package liar.waitservice.common.authentication.aop;
+package liar.gameservice.common.authentication.aop;
 
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.annotation.Pointcut;
@@ -6,7 +6,7 @@ import org.aspectj.lang.annotation.Pointcut;
 @Slf4j
 public class Pointcuts {
 
-    @Pointcut("execution(* liar.waitservice.common.authentication..*.*(..))")
+    @Pointcut("execution(* liar.gameservice.common.authentication..*.*(..))")
     public void allAuthentication() {}
 
 
