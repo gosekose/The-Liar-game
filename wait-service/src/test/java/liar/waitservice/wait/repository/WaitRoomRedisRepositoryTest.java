@@ -32,10 +32,10 @@ class WaitRoomRedisRepositoryTest {
         waitRoom = WaitRoom.of(roomDto, "kose");
     }
 
-    @AfterEach
-    void tearDown() {
-        waitRoomRedisRepository.deleteAll();
-    }
+//    @AfterEach
+//    void tearDown() {
+//        waitRoomRedisRepository.deleteAll();
+//    }
 
     @Test
     @DisplayName("Redis에 createWaitRoom 요청이 오면, 저장되어야 한다.")

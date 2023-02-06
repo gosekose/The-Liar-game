@@ -73,7 +73,7 @@ public class WaitRoomService {
      * createWaitRoomDto로 waitRoom의 정보를 얻고, userId로 hostName 불러오기
      * waitRoom을 redis에 저장하고, joinMembers를 생성하여 저장한다.
      */
-    public String saveWaitRoom(CreateWaitRoomDto createWaitRoomDto) {
+    public String saveWaitRoomByHost(CreateWaitRoomDto createWaitRoomDto) {
         waitRoomJoinPolicyService.createWaitRoomPolicy(createWaitRoomDto.getUserId());
         MemberNameOnly username = memberService.findUsernameById(createWaitRoomDto.getUserId());
         WaitRoom waitRoom = saveWaitRoomAndStatusJoin(createWaitRoomDto, username);
@@ -109,10 +109,10 @@ public class WaitRoomService {
     /**
      * 대기방 탈퇴 요청이 호스트라면, 대기방에 참여한 인원의 join key를 삭제하고, 방의 정보 전체 삭제
      */
-    public boolean deleteWaitRoomByHost(RequestWaitRoomDto join) {
-        WaitRoom waitRoom = findById(join.getRoomId());
+    public boolean deleteWaitRoomByHost(RequestWaitRoomDto request) {
+        WaitRoom waitRoom = findById(request.getRoomId());
 
-        if (isHost(waitRoom, join.getUserId())) {
+        if (isHost(waitRoom, request.getUserId())) {
             saveWaitRoomAndStatusLeave(waitRoom);
             return true;
         };

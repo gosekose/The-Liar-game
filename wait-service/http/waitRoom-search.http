@@ -1,6 +1,6 @@
 ### 1. waitRoom 검색
 
-POST {{baseUrl}}/search/waitroom
+GET {{baseUrl}}/waitroom/search
 Content-Type: application/json
 Accept: */*
 Connection: keep-alive
@@ -20,7 +20,7 @@ userId: 159b49cd-78d2-4b2d-8aa2-5b986b623251
 %}
 
 ### 2. waitRoom 검색 (slice)
-POST {{baseUrl}}/search/waitroom-slice
+GET {{baseUrl}}/waitroom-slice/search
 Content-Type: application/json
 Accept: */*
 Connection: keep-alive

@@ -65,7 +65,7 @@ class WaitRoomServiceTest {
     @DisplayName("memberService에서 userName을 가져온 후 waitRoom을 생성하여 redis에 저장")
     public void saveWaitRoom() throws Exception {
         //given
-        String roomId = waitRoomService.saveWaitRoom(waitRoomDto);
+        String roomId = waitRoomService.saveWaitRoomByHost(waitRoomDto);
 
         //when
         WaitRoom waitRoom = waitRoomService.findWaitRoomId(roomId);
@@ -82,7 +82,7 @@ class WaitRoomServiceTest {
         boolean[] results = new boolean[limitMembers - 1];
 
         CreateWaitRoomDto createWaitRoomDto = new CreateWaitRoomDto(hostId, "game", limitMembers);
-        String roomId = waitRoomService.saveWaitRoom(createWaitRoomDto);
+        String roomId = waitRoomService.saveWaitRoomByHost(createWaitRoomDto);
 
         //when
         for (int i = 0; i < limitMembers - 1; i++) {
@@ -103,7 +103,7 @@ class WaitRoomServiceTest {
     public void addMembersFalseBecauseFullMembers() throws Exception {
         //given
         boolean[] results = new boolean[6];
-        String roomId = waitRoomService.saveWaitRoom(waitRoomDto);
+        String roomId = waitRoomService.saveWaitRoomByHost(waitRoomDto);
 
         //when
         for (int i = 0; i < 6; i++) {
@@ -126,7 +126,7 @@ class WaitRoomServiceTest {
     public void leaveMemberTrue() throws Exception {
         //given
         boolean[] results = new boolean[6];
-        String roomId = waitRoomService.saveWaitRoom(waitRoomDto);
+        String roomId = waitRoomService.saveWaitRoomByHost(waitRoomDto);
         for (int i = 0; i < 6; i++) {
             waitRoomService.addMembers(new RequestWaitRoomDto(String.valueOf(i), roomId));
         }
@@ -150,7 +150,7 @@ class WaitRoomServiceTest {
     public void leaveMemberFalseBecauseNotCondition() throws Exception {
         //given
         boolean[] results = new boolean[4];
-        String roomId = waitRoomService.saveWaitRoom(waitRoomDto);
+        String roomId = waitRoomService.saveWaitRoomByHost(waitRoomDto);
         for (int i = 3; i < 9; i++) {
             waitRoomService.addMembers(new RequestWaitRoomDto(String.valueOf(i), roomId));
         }
@@ -173,7 +173,7 @@ class WaitRoomServiceTest {
     @DisplayName("대기방 호스트가 퇴장하면, 방은 제거된다.")
     public void deleteWaitRoomTrue() throws Exception {
         //given
-        String roomId = waitRoomService.saveWaitRoom(waitRoomDto);
+        String roomId = waitRoomService.saveWaitRoomByHost(waitRoomDto);
 
         //when
         boolean result = waitRoomService.deleteWaitRoomByHost(new RequestWaitRoomDto(hostId, roomId));
@@ -188,7 +188,7 @@ class WaitRoomServiceTest {
     @DisplayName("대기방의 호스트가 아닌 요청은, 방이 제거되지 않는다")
     public void deleteWaitRoomFalseBecauseNotHostId() throws Exception {
         //given
-        String roomId = waitRoomService.saveWaitRoom(waitRoomDto);
+        String roomId = waitRoomService.saveWaitRoomByHost(waitRoomDto);
 
         //when
         boolean result = waitRoomService.deleteWaitRoomByHost(new RequestWaitRoomDto("1", roomId));

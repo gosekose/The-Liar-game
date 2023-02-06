@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
-public class GameStatusRequestServiceImpl implements GameStatusRequestService<RequestWaitRoomDto, UpdateWaitRoomStatusDto<String>> {
+public class UpdateWaitRoomStatusServiceImpl implements UpdateWaitRoomStatusService<RequestWaitRoomDto, UpdateWaitRoomStatusDto<String>> {
 
     private final WaitRoomCompleteService waitRoomCompleteService;
     private final WaitRoomService waitRoomService;

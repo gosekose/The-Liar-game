@@ -1,5 +1,6 @@
 package liar.waitservice.wait.service.policy;
 
+import jakarta.persistence.EntityManager;
 import liar.waitservice.exception.exception.NotExistsRoomIdException;
 import liar.waitservice.wait.controller.dto.CreateWaitRoomDto;
 import liar.waitservice.wait.domain.JoinMember;
@@ -12,10 +13,12 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.transaction.annotation.Transactional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+@Transactional
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class WaitRoomJoinPolicyServiceTest {
 
@@ -27,6 +30,9 @@ class WaitRoomJoinPolicyServiceTest {
 
     @Autowired
     JoinMemberRedisRepository joinMemberRedisRepository;
+
+    @Autowired
+    EntityManager em;
 
     WaitRoom savedWaitRoom;
     String hostId = "159b49cd-78d2-4b2d-8aa2-5b986b623251";
@@ -67,13 +73,12 @@ class WaitRoomJoinPolicyServiceTest {
         String joinId = "join-user1";
 
         WaitRoom waitRoom2 = WaitRoom.of(new CreateWaitRoomDto("kose1", "game2", 7), "kose");
+        waitRoomRedisRepository.save(waitRoom2); // waitRoom2 redis 저장
+        joinMemberRedisRepository.save(JoinMember.of(waitRoom2)); // waitRoom2의 호스트 joinMemberRedis 저장
 
-        waitRoomRedisRepository.save(waitRoom2);
-        joinMemberRedisRepository.save(JoinMember.of(waitRoom2));
-
-        savedWaitRoom.joinMembers(joinId);
-        waitRoomRedisRepository.save(savedWaitRoom);
-        joinMemberRedisRepository.save(JoinMember.of(joinId, savedWaitRoom.getId()));
+        savedWaitRoom.joinMembers(joinId); // waitRoom에 joinId 저장
+        waitRoomRedisRepository.save(savedWaitRoom); // waitRoom을 redis에 저장
+        joinMemberRedisRepository.save(JoinMember.of(joinId, savedWaitRoom.getId())); // waitRoom에 가입한 joinId 정보 joinMemberRedis에 저장
 
         //when
         waitRoomOnlyOneJoinPolicyService.joinWaitRoomPolicy(joinId);

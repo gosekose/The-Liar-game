@@ -38,4 +38,6 @@ class RedisTemplateTest {
         redisTemplate.opsForHash().put(waitRoom.getId(), waitRoom.getId(), waitRoom);
     }
 
+
+
 }
