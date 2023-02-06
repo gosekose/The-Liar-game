@@ -29,7 +29,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @Transactional
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-class UpdateWaitRoomCompleteStatusServiceImplTest extends MemberDummyInfo {
+class DoProcessStartAndEndGameServiceImplTest extends MemberDummyInfo {
 
     @Autowired
     WaitRoomCompleteRepository waitRoomCompleteRepository;
