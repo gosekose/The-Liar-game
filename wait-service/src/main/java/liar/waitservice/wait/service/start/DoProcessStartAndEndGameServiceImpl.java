@@ -1,7 +1,8 @@
 package liar.waitservice.wait.service.start;
 
 import liar.waitservice.exception.exception.NotEqualHostIdException;
-import liar.waitservice.wait.controller.dto.UpdateWaitRoomStatusDto;
+import liar.waitservice.exception.exception.NotSatisfiedMinJoinMembers;
+import liar.waitservice.wait.controller.dto.PostProcessEndGameDto;
 import liar.waitservice.wait.controller.dto.RequestWaitRoomDto;
 import liar.waitservice.wait.domain.WaitRoom;
 import liar.waitservice.wait.service.WaitRoomCompleteService;
@@ -11,20 +12,21 @@ import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
-public class UpdateWaitRoomStatusServiceImpl implements UpdateWaitRoomStatusService<RequestWaitRoomDto, UpdateWaitRoomStatusDto<String>> {
+public class DoProcessStartAndEndGameServiceImpl implements DoProcessStartAndEndGameService<RequestWaitRoomDto, PostProcessEndGameDto<String>> {
 
     private final WaitRoomCompleteService waitRoomCompleteService;
     private final WaitRoomService waitRoomService;
 
     @Override
-    public void saveWaitRoomInfoAtDb(RequestWaitRoomDto saveRequest) {
+    public void doPreProcessBeforeGameStart(RequestWaitRoomDto saveRequest) {
         WaitRoom waitRoom = waitRoomService.findWaitRoomId(saveRequest.getRoomId());
-        isHost(waitRoom, saveRequest.getUserId());
-        waitRoomCompleteService.save(waitRoom);
+        if (isValidated(waitRoom, saveRequest.getUserId())) {
+            waitRoomCompleteService.save(waitRoom);
+        }
     }
 
     @Override
-    public void deleteWaitRoomInfoAtCache(UpdateWaitRoomStatusDto<String> request) {
+    public void doPostProcessAfterGameEnd(PostProcessEndGameDto<String> request) {
         waitRoomCompleteService.updateWaitRoomCompleteStatusEnd(request.getRoomId());
         waitRoomService.deleteWaitRoomBySuccessGameEndMsg(request);
     }
@@ -34,5 +36,19 @@ public class UpdateWaitRoomStatusServiceImpl implements UpdateWaitRoomStatusServ
             return true;
         }
         throw new NotEqualHostIdException();
+    }
+
+    private boolean isMinJoinMembers(WaitRoom waitRoom) {
+        if (waitRoom.getMembers().size() >= 3 ) {
+            return true;
+        }
+        throw new NotSatisfiedMinJoinMembers();
+    }
+
+    private boolean isValidated(WaitRoom waitRoom, String userId) {
+        if (isHost(waitRoom, userId) && isMinJoinMembers(waitRoom)) {
+            return true;
+        }
+        return false;
     }
 }

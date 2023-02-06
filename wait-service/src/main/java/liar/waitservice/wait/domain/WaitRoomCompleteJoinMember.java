@@ -3,16 +3,15 @@ package liar.waitservice.wait.domain;
 import jakarta.persistence.*;
 import liar.waitservice.wait.domain.utils.BaseTimeEntity;
 import lombok.AccessLevel;
-import lombok.Generated;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class WaitRoomJoinMember extends BaseTimeEntity {
+public class WaitRoomCompleteJoinMember extends BaseTimeEntity {
 
-    @Id @Generated
+    @Id @GeneratedValue
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -21,13 +20,13 @@ public class WaitRoomJoinMember extends BaseTimeEntity {
 
     private String userId;
 
-    protected WaitRoomJoinMember(WaitRoomComplete waitRoomComplete, String userId) {
+    protected WaitRoomCompleteJoinMember(WaitRoomComplete waitRoomComplete, String userId) {
         this.waitRoomComplete = waitRoomComplete;
         this.userId = userId;
     }
 
-    public static WaitRoomJoinMember of(WaitRoomComplete waitRoomComplete, String userId) {
-        return new WaitRoomJoinMember(waitRoomComplete, userId);
+    public static WaitRoomCompleteJoinMember of(WaitRoomComplete waitRoomComplete, String userId) {
+        return new WaitRoomCompleteJoinMember(waitRoomComplete, userId);
     }
 
 

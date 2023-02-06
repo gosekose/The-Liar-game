@@ -1,13 +1,12 @@
 package liar.waitservice.wait.controller;
 
 import com.google.gson.Gson;
-import liar.waitservice.exception.exception.NotExistsRoomIdException;
+import liar.waitservice.exception.exception.NotFoundWaitRoomException;
 import liar.waitservice.wait.controller.dto.CreateWaitRoomDto;
 import liar.waitservice.wait.controller.dto.RequestWaitRoomDto;
 import liar.waitservice.wait.domain.JoinMember;
 import liar.waitservice.wait.domain.WaitRoom;
 import liar.waitservice.wait.repository.redis.JoinMemberRedisRepository;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,11 +16,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.*;
-import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
 import static org.springframework.restdocs.payload.JsonFieldType.*;
 import static org.springframework.restdocs.payload.PayloadDocumentation.*;
-import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -179,7 +175,7 @@ class CrudWaitRoomControllerDocsTest extends CommonController {
                                 fieldWithPath("leaveStatus").type(BOOLEAN).description("퇴장 상태")
                         )));
 
-        assertThat(waitRoomRedisRepository.findById(waitRoom.getId()).orElseThrow(NotExistsRoomIdException::new).getMembers().size()).isEqualTo(1);
+        assertThat(waitRoomRedisRepository.findById(waitRoom.getId()).orElseThrow(NotFoundWaitRoomException::new).getMembers().size()).isEqualTo(1);
         assertThat(joinMemberRedisRepository.findById(devUser1Id).orElse(null)).isNull();
     }
 }
