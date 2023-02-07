@@ -2,23 +2,20 @@ package liar.gameservice.other;
 
 import liar.gameservice.MemberDummyInfo;
 import liar.gameservice.exception.exception.NotFoundUserException;
-import liar.gameservice.other.dao.MemberIdOnly;
-import liar.gameservice.other.dao.MemberNameOnly;
-import org.assertj.core.api.Assertions;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
+import liar.gameservice.other.member.dao.MemberIdOnly;
+import liar.gameservice.other.member.dao.MemberNameOnly;
+import liar.gameservice.other.member.MemberRepository;
+import liar.gameservice.other.member.MemberService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 class MemberServiceTest extends MemberDummyInfo {

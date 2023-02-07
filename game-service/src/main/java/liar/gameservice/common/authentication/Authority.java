@@ -1,7 +1,7 @@
 package liar.gameservice.common.authentication;
 
 import jakarta.persistence.*;
-import liar.gameservice.other.Member;
+import liar.gameservice.other.member.Member;
 import lombok.*;
 
 import static jakarta.persistence.EnumType.STRING;
