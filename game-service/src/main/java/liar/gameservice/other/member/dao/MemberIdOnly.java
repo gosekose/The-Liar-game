@@ -1,4 +1,4 @@
-package liar.gameservice.other.dao;
+package liar.gameservice.other.member.dao;
 
 public interface MemberIdOnly {
     String getUserId();

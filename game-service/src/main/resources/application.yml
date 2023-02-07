@@ -20,7 +20,7 @@ spring:
 
 
 server:
-  port: 8082
+  port: 8079
 
 management:
   endpoints:

@@ -1,15 +1,13 @@
-package liar.gameservice.other;
+package liar.gameservice.other.member;
 
 import liar.gameservice.exception.exception.NotFoundUserException;
-import liar.gameservice.other.dao.MemberIdOnly;
-import liar.gameservice.other.dao.MemberNameOnly;
+import liar.gameservice.other.member.dao.MemberIdOnly;
+import liar.gameservice.other.member.dao.MemberNameOnly;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor

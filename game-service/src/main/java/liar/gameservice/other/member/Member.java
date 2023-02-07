@@ -1,4 +1,4 @@
-package liar.gameservice.other;
+package liar.gameservice.other.member;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

@@ -27,7 +27,10 @@ IDE: Intellij
 
 ## 업데이트 내역
 
-* 0.0.1 도메인 개발 중 입니다.
+* 0.0.1 기본 infra 구축 
+* 0.0.2 gateway-server, member-service 인증/인가 처리 구현
+* 0.0.3 wait-service 도메인 개발 완료, docs 발행
+* 0.0.4 game-service 도메인 개발 중 입니다. (webflux)
 
 ![](../header.png)
 ## 정보
@@ -37,8 +40,8 @@ IDE: Intellij
 |Infra|gateway-server|8000|SpringCloud|
 |Infra|config-server|8888|https://github.com/gosekose/The-Liar-game-config|
 |Infra|rabitMq-server|5672|SpringCloud|
-|Business|member-server|8080|SpringRESTful|
-|Business|wait-server|8081|SpringRESTful|
+|Business|member-server|8080|SpringRestful|
+|Business|wait-server|8081|SpringRestful|
 |Business|game-server|8082|SpringWebflux|
 |DB|authentication-server|6379|gateway, member-server 토큰 인증 서버|
 |DB|wait-redis-server|6380|wait-server 전용|
