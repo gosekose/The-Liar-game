@@ -1,7 +1,5 @@
 package liar.gameservice.common.config;
 
-import liar.gameservice.common.token.domain.TokenProviderImpl;
-import liar.gameservice.common.token.filter.AuthenticationGiveFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -11,7 +9,6 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.filter.CorsFilter;
 
 @Configuration
@@ -21,7 +18,6 @@ import org.springframework.web.filter.CorsFilter;
 public class SecurityConfig {
 
     private final CorsFilter corsFilter;
-    private final TokenProviderImpl tokenProviderImpl;
     private static final String[] webServiceWhiteList = {
             "/static/**", "/static/js/**", "/static/images/**",
             "/static/css/**", "/static/scss/**", "/static/docs/**",
@@ -58,22 +54,12 @@ public class SecurityConfig {
 //                .authorizeHttpRequests((requests) -> requests
 //                        .requestMatchers("/wait-service/**"))
                 .authorizeHttpRequests()
-                .anyRequest().authenticated()
-                .and()
-
-                .formLogin().disable()
-
-                // SecurityConfig FilterChain
-                .addFilterBefore(corsFilter, UsernamePasswordAuthenticationFilter.class)
-//                .addFilterBefore(jwtFilter(), UsernamePasswordAuthenticationFilter.class)
-                .addFilterBefore(authenticationGiveFilter(), UsernamePasswordAuthenticationFilter.class);
+                .anyRequest().authenticated();
 
 
         return http.build();
 
     }
 
-    @Bean
-    public AuthenticationGiveFilter authenticationGiveFilter() { return new AuthenticationGiveFilter(tokenProviderImpl);}
 }
 

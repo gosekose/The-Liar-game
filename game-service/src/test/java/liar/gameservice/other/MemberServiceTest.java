@@ -18,7 +18,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @SpringBootTest
-class MemberServiceTest extends MemberDummyInfo {
+class 
+emberServiceTest extends MemberDummyInfo {
 
     @Autowired
     MemberRepository memberRepository;

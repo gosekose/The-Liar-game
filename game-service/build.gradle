@@ -43,7 +43,7 @@ dependencies {
     //json
     implementation 'com.google.code.gson:gson:2.10.1'
     implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
-    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+//    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 
     //mockito
     testImplementation 'org.mockito:mockito-inline'
@@ -69,8 +69,11 @@ dependencies {
     asciidoctorExt "org.springframework.restdocs:spring-restdocs-asciidoctor"
     testImplementation "org.springframework.restdocs:spring-restdocs-mockmvc"
 
-    // blockhouse
-    implementation "io.projectreactor.tools:blockhound"
+//    // blockhouse
+//    implementation "io.projectreactor.tools:blockhound"
+
+    //RSocket
+    implementation "org.springframework.boot:spring-boot-starter-rsocket"
 
     compileOnly 'org.projectlombok:lombok'
     developmentOnly 'org.springframework.boot:spring-boot-devtools'

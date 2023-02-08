@@ -6,7 +6,7 @@
 
 
 ## 구조도
-![image](https://user-images.githubusercontent.com/88478829/215472607-31bb8f28-7151-4e7b-aee3-375b464b506b.png)
+![image](https://user-images.githubusercontent.com/88478829/217520008-4a5dfed7-4f20-40a7-9555-6a6d45767658.png)
 
 ![](../header.png)
 
@@ -40,9 +40,10 @@ IDE: Intellij
 |Infra|gateway-server|8000|SpringCloud|
 |Infra|config-server|8888|https://github.com/gosekose/The-Liar-game-config|
 |Infra|rabitMq-server|5672|SpringCloud|
-|Business|member-server|8080|SpringRestful|
-|Business|wait-server|8081|SpringRestful|
-|Business|game-server|8082|SpringWebflux|
+|Business|member-server|8080|SpringMvc|
+|Business|wait-server|8081|SpringMvc|
+|Business|game-server|8079|SpringWebflux|
+|Business|result-server|8078|SpringMvc|
 |DB|authentication-server|6379|gateway, member-server 토큰 인증 서버|
 |DB|wait-redis-server|6380|wait-server 전용|
 |DB|game-redis-server|6381|game-server 전용|
