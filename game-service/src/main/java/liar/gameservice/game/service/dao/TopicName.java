@@ -1,5 +1,5 @@
 package liar.gameservice.game.service.dao;
 
-public interface DictionaryNameOnly {
+public interface TopicName {
     String getName();
 }

@@ -12,7 +12,7 @@ import java.io.Serializable;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @RedisHash("JoinMember")
-public class JoinMember implements Serializable {
+public class JoinMember {
 
     @Id
     private String id;

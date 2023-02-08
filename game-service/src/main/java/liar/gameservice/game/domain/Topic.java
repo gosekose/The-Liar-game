@@ -1,5 +1,6 @@
 package liar.gameservice.game.domain;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
@@ -10,11 +11,12 @@ import lombok.NoArgsConstructor;
 
 @Entity
 @Getter
-@AllArgsConstructor(access = AccessLevel.PROTECTED)
-@NoArgsConstructor
-public class Dictionary extends BaseTimeEntity {
+@AllArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+public class Topic extends BaseTimeEntity {
 
     @Id @GeneratedValue
+    @Column(name = "topic_id")
     private Long id;
     private String name;
 

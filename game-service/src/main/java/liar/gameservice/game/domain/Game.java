@@ -10,8 +10,8 @@ import static jakarta.persistence.FetchType.LAZY;
 
 @Entity
 @Getter
-@AllArgsConstructor(access = AccessLevel.PROTECTED)
-@NoArgsConstructor
+@AllArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Game extends BaseTimeEntity {
 
     @Id @GeneratedValue
@@ -20,6 +20,6 @@ public class Game extends BaseTimeEntity {
 
     @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "dictionary_id")
-    private Dictionary dictionary;
+    private Topic topic;
 
 }
