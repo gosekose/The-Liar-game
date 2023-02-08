@@ -1,12 +1,13 @@
 package liar.gameservice.game.domain;
 
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.Id;
 import org.springframework.data.redis.core.RedisHash;
+
+import java.util.UUID;
 
 @Getter
 @RedisHash(value = "JoinMember")
@@ -14,8 +15,8 @@ import org.springframework.data.redis.core.RedisHash;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class JoinMember {
 
-    @Id @GeneratedValue
-    private Long id;
+    @Id
+    private String id;
 
     private String roomId;
     private Player player;
@@ -27,6 +28,7 @@ public class JoinMember {
     }
 
     public JoinMember(String roomId, Player player, String topic) {
+        this.id = UUID.randomUUID().toString();
         this.roomId = roomId;
         this.player = player;
         this.topic = topic;

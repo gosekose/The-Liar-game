@@ -14,10 +14,6 @@ import reactor.core.publisher.Mono;
 @RequestMapping("/game-service/game")
 public class SetRoleController {
 
-    private final HttpEntityUtil httpEntityUtil;
-    private final WebClientUtil webClientUtil;
-    private final WebClient webClient;
-
     @PostMapping(value = "/game-service/game/{roomId}/role", consumes = MediaType.APPLICATION_JSON_VALUE)
     public Mono<ResponseEntity<String>> setRole(
             @PathVariable(name = "roomId") String roomId,
