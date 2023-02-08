@@ -23,7 +23,7 @@ import static java.time.LocalDateTime.now;
 @RedisHash("WaitRoom")
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class WaitRoom extends BaseRedisTemplateEntity implements Serializable {
+public class WaitRoom extends BaseRedisTemplateEntity {
 
     @Id
     private String id;
