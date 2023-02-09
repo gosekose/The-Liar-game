@@ -10,27 +10,20 @@ import org.springframework.data.redis.core.RedisHash;
 import java.util.UUID;
 
 @Getter
-@RedisHash(value = "JoinMember")
+@RedisHash(value = "JoinPlayer")
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class JoinMember {
+public class JoinPlayer {
 
     @Id
     private String id;
 
     private String roomId;
     private Player player;
-    private String topic;
 
-    static class Player {
-        private String userId;
-        private GameRole gameRole;
-    }
-
-    public JoinMember(String roomId, Player player, String topic) {
+    public JoinPlayer(String roomId, Player player) {
         this.id = UUID.randomUUID().toString();
         this.roomId = roomId;
         this.player = player;
-        this.topic = topic;
     }
 }
