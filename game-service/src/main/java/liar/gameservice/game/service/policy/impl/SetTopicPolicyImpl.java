@@ -6,6 +6,9 @@ import liar.gameservice.game.service.policy.interfaces.SetTopicPolicy;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import reactor.core.publisher.Mono;
+
+import java.util.Objects;
 
 @Component
 @RequiredArgsConstructor
@@ -17,13 +20,11 @@ public class SetTopicPolicyImpl implements SetTopicPolicy {
     private long range;
 
     @Override
-    public Topic setTopic() {
-
-        Topic topic;
-        long topicId = generatorId();
-        while ((topic = repository.get(topicId, Topic.class)) == null) topicId = generatorId();
-
-        return topic;
+    public Mono<Topic> setTopic() {
+        return Mono.just(generatorId())
+                .flatMap(topicId -> repository.get(topicId, Topic.class))
+                .filter(Objects::nonNull)
+                .switchIfEmpty(setTopic());
     }
 
     private long generatorId() {
