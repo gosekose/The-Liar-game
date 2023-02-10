@@ -13,7 +13,7 @@ import java.util.UUID;
 @RedisHash(value = "JoinPlayer")
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class JoinPlayer extends BaseRedisTemplateEntity<String> {
+public class JoinPlayer {
 
     @Id
     private String id;

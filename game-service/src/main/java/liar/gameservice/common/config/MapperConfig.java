@@ -21,9 +21,7 @@ public class MapperConfig {
 
 
     @Bean
-    public MappingJackson2HttpMessageConverter mappingJackson2HttpMessageConverter() {
-        ObjectMapper mapper = new ObjectMapper();
-        mapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
+    public MappingJackson2HttpMessageConverter mappingJackson2HttpMessageConverter(ObjectMapper mapper) {
         MappingJackson2HttpMessageConverter converter = new MappingJackson2HttpMessageConverter(mapper);
         return converter;
     }

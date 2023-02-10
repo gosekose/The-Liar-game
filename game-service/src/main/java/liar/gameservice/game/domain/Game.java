@@ -14,7 +14,7 @@ import java.util.UUID;
 @RedisHash(value = "Game")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Game extends BaseRedisTemplateEntity<String> {
+public class Game {
 
     @Id
     private String id;
