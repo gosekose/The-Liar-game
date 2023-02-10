@@ -22,7 +22,7 @@ public class JoinPlayer {
     private Player player;
 
     public JoinPlayer(String roomId, Player player) {
-        this.id = roomId + player;
+        this.id = roomId + player.getUserId();
         this.roomId = roomId;
         this.player = player;
     }

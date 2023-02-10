@@ -1,0 +1,27 @@
+spring:
+  application:
+    name: game-service
+  rabbitmq:
+    host: 127.0.0.1
+    port: 5672
+    username: guest
+    password: guest
+
+  profiles:
+    include:
+      - db
+      - aspect
+      - cloud
+      - oauth
+      - kafka
+      - redis
+
+
+server:
+  port: 8081
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: refresh, health, beans, httptrace, busrefresh

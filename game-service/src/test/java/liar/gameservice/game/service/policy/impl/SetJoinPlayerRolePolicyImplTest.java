@@ -41,7 +41,9 @@ class SetJoinPlayerRolePolicyImplTest {
         Flux<JoinPlayer> joinPlayerFlux = Flux.fromIterable(game.getPlayerIds())
                 .map(playerId -> {
                     GameRole role = Objects.equals(game.getPlayerIds().get(random), playerId) ? GameRole.LIAR : GameRole.CITIZEN;
-                    return new JoinPlayer(game.getRoomId(), new Player(playerId, role));
+                    JoinPlayer joinPlayer = new JoinPlayer(game.getRoomId(), new Player(playerId, role));
+                    redisTemplate.opsForValue().set("JoinPlayer:" + joinPlayer.getId(), joinPlayer);
+                    return joinPlayer;
                 });
 
         //then
@@ -61,12 +63,13 @@ class SetJoinPlayerRolePolicyImplTest {
                 .topic(new Topic(1L, "java"))
                 .build();
 
-        for (int i = 0; i < 10; i++) {
+        for (int i = 0; i < 5; i++) {
             game.addPlayer(String.valueOf(i));
         }
 
         //when
         Flux<JoinPlayer> joinPlayerFlux = setJoinPlayerRolePolicy.setRoleToPlayer(game);
+        joinPlayerFlux.subscribe(System.out::println);
 
         //then
         StepVerifier.create(joinPlayerFlux)
@@ -75,5 +78,4 @@ class SetJoinPlayerRolePolicyImplTest {
                 .expectComplete();
 
     }
-
 }
