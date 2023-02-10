@@ -19,7 +19,7 @@ class SetJoinPlayerRolePolicyImplTest {
     SetJoinPlayerRolePolicy setJoinPlayerRolePolicy;
 
     @Autowired
-    ReactiveRedisTemplate redisTemplate;
+    ReactiveRedisTemplate<String, JoinPlayer> redisTemplate;
 
     @Test
     @DisplayName("setRoleToPlayer 절차 지향 코드 테스트")
