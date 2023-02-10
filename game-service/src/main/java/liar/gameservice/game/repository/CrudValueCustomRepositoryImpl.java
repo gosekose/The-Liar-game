@@ -1,11 +1,14 @@
 package liar.gameservice.game.repository;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import liar.gameservice.exception.exception.EntityNotFoundException;
 import liar.gameservice.game.domain.BaseRedisTemplateEntity;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
-import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.ReactiveRedisTemplate;
+import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Component;
+import reactor.core.publisher.Mono;
 
 import java.util.LinkedHashMap;
 
@@ -13,40 +16,41 @@ import java.util.LinkedHashMap;
 @RequiredArgsConstructor
 public class CrudValueCustomRepositoryImpl<T extends BaseRedisTemplateEntity, R> implements CrudValueCustomRepository<T, R> {
 
-    private final RedisTemplate<String, Object> redisTemplate;
+    private final ReactiveRedisTemplate<String, Object> redisTemplate;
     private final ObjectMapper objectMapper;
 
     @Override
-    public void set(T value) {
+    public Mono<Void> set(T value) {
         String key = getKeyByValue(value);
-        redisTemplate.opsForValue().set(key, value);
+        return redisTemplate.opsForValue().set(key, value).then();
     }
 
     @Override
-    public void delete(R id, Class<T> clazz) {
+    public Mono<Boolean> delete(R id, Class<T> clazz) {
         String key = getKeyByClass(id, clazz);
-        redisTemplate.delete(key);
+        return redisTemplate.delete(key)
+                .map(deleteCount -> deleteCount > 0);
     }
 
     @Override
-    public T get(R id, Class<T> clazz) {
+    public Mono<T> get(R id, Class<T> clazz) {
         String key = getKeyByClass(id, clazz);
-        Object o = redisTemplate.opsForValue().get(key);
-
-        if(o != null) {
-            if(o instanceof LinkedHashMap){
-                return (T) objectMapper.convertValue(o, clazz);
-            }else{
-                return (T) clazz.cast(o);
-            }
-        }
-        return null;
+        return redisTemplate.opsForValue().get(key)
+                .map(o -> {
+                    if (o instanceof LinkedHashMap<?,?>) {
+                        return objectMapper.convertValue(o, clazz);
+                    } else {
+                        return clazz.cast(o);
+                    }
+                })
+                .defaultIfEmpty(null);
     }
 
     @Override
-    public boolean isExists(R id, Class<T> clazz) {
+    public Mono<Boolean> isExists(R id, Class<T> clazz) {
         String key = getKeyByClass(id, clazz);
-        return redisTemplate.hasKey(key);
+        return redisTemplate.hasKey(key)
+                .onErrorReturn(false);
     }
 
     @NotNull
