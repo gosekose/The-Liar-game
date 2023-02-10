@@ -30,7 +30,7 @@ IDE: Intellij
 * 0.0.1 기본 infra 구축 
 * 0.0.2 gateway-server, member-service 인증/인가 처리 구현
 * 0.0.3 wait-service 도메인 개발 완료, docs 발행
-* 0.0.4 game-service 도메인 개발 중 입니다. (webflux)
+* 0.0.4 game-service 도메인 개발 중 입니다. (mvc)
 
 ![](../header.png)
 ## 정보
@@ -42,7 +42,7 @@ IDE: Intellij
 |Infra|rabitMq-server|5672|SpringCloud|
 |Business|member-server|8080|SpringMvc|
 |Business|wait-server|8081|SpringMvc|
-|Business|game-server|8079|SpringWebflux|
+|Business|game-server|8079|SpringMvc -> 추후 Webflux 리펙토링|
 |Business|result-server|8078|SpringMvc|
 |DB|authentication-server|6379|gateway, member-server 토큰 인증 서버|
 |DB|wait-redis-server|6380|wait-server 전용|

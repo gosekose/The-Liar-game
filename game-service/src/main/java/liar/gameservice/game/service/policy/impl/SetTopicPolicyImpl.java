@@ -24,7 +24,7 @@ public class SetTopicPolicyImpl implements SetTopicPolicy {
         return Mono.just(generatorId())
                 .flatMap(topicId -> reactiveRedisTemplate.opsForValue().get("Topic:" + topicId))
                 .filter(Objects::nonNull)
-                .switchIfEmpty(setTopic());
+                .switchIfEmpty(Mono.just(new Topic(1000L, "soccer")));
     }
 
     private long generatorId() {

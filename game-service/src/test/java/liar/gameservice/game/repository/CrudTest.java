@@ -8,10 +8,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.redis.core.ReactiveRedisTemplate;
 import reactor.core.publisher.Mono;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 @SpringBootTest
-class CrudValueCustomRepositoryImplTest {
+class CrudTest {
 
    @Autowired
    ReactiveRedisTemplate<String, Topic> redisTemplate;
