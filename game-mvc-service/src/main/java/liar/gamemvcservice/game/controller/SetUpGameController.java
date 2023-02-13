@@ -7,6 +7,7 @@ import liar.gamemvcservice.game.controller.dto.GameUserInfoDto;
 import liar.gamemvcservice.game.controller.dto.SetUpGameDto;
 import liar.gamemvcservice.game.controller.dto.message.SendSuccessBody;
 import liar.gamemvcservice.game.domain.Player;
+import liar.gamemvcservice.game.domain.Topic;
 import liar.gamemvcservice.game.service.GameService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -42,7 +43,7 @@ public class SetUpGameController {
                                      HttpServletRequest request) {
 
         validateRequestUserEqualHeaderUser(userId, dto, request);
-        return ResponseEntity.ok().body(SendSuccessBody.of(gameService.checkTopic(dto)));
+        return ResponseEntity.ok().body(SendSuccessBody.of(gameService.checkTopic(dto).getTopicName()));
     }
 
     private static void validateRequestUserEqualHeaderUser(String userId, GameUserInfoDto dto,
