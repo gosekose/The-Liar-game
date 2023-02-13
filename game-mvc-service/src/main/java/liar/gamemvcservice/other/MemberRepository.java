@@ -1,7 +1,7 @@
 package liar.gamemvcservice.other;
 
-import liar.waitservice.other.dao.MemberIdOnly;
-import liar.waitservice.other.dao.MemberNameOnly;
+import liar.gamemvcservice.other.dao.MemberIdOnly;
+import liar.gamemvcservice.other.dao.MemberNameOnly;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

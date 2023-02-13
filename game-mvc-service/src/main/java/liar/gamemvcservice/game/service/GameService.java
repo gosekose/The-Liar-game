@@ -1,8 +1,10 @@
 package liar.gamemvcservice.game.service;
 
-import liar.gamemvcservice.game.controller.dto.CheckUserRoleDto;
+import liar.gamemvcservice.exception.exception.NotFoundGameException;
+import liar.gamemvcservice.game.controller.dto.GameUserInfoDto;
 import liar.gamemvcservice.game.controller.dto.SetUpGameDto;
 import liar.gamemvcservice.game.domain.Game;
+import liar.gamemvcservice.game.domain.GameRole;
 import liar.gamemvcservice.game.domain.Player;
 import liar.gamemvcservice.game.domain.Topic;
 import liar.gamemvcservice.game.repository.GameRepository;
@@ -27,8 +29,19 @@ public class GameService {
         return gameRepository.save(setUpTopicGame).getId();
     }
 
-    public Player checkPlayerRole(CheckUserRoleDto dto) {
+    public Player checkPlayerRole(GameUserInfoDto dto) {
         return playerPolicy.checkPlayerInfo(dto.getGameId(), dto.getUserId());
+    }
+
+    public Topic checkTopic(GameUserInfoDto dto) {
+        Player player = playerPolicy.checkPlayerInfo(dto.getGameId(), dto.getUserId());
+
+        if (player.getGameRole() == GameRole.CITIZEN) {
+            Game game = gameRepository.findById(dto.getGameId()).orElseThrow(NotFoundGameException::new);
+            return game.getTopic();
+        }
+
+        return null;
     }
 
 }

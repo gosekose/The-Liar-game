@@ -3,9 +3,9 @@ package liar.gamemvcservice.exception.exception;
 import liar.gamemvcservice.exception.type.ExceptionCode;
 import liar.gamemvcservice.exception.type.ExceptionMessage;
 
-public class NotEqualUserIdException extends CommonException {
+public class NotFoundGameException extends CommonException {
 
-    public NotEqualUserIdException() {
-        super(ExceptionCode.UNAUTHORIZED, ExceptionMessage.NOT_FOUND);
+    public NotFoundGameException() {
+        super(ExceptionCode.NOT_FOUND, ExceptionMessage.NOT_FOUND);
     }
 }

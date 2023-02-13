@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class CheckUserRoleDto {
+public class GameUserInfoDto {
     private String gameId;
     private String userId;
 }
