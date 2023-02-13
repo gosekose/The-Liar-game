@@ -22,4 +22,9 @@ public class Topic {
     public Topic(String topicName) {
         this.topicName = topicName;
     }
+
+    public Topic(Long id, String topicName) {
+        this.id = id;
+        this.topicName = topicName;
+    }
 }
