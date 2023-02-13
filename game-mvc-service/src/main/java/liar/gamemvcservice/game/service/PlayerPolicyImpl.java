@@ -8,10 +8,13 @@ import liar.gamemvcservice.game.domain.JoinPlayer;
 import liar.gamemvcservice.game.domain.Player;
 import liar.gamemvcservice.game.repository.JoinPlayerRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
+@Component
 @RequiredArgsConstructor
 @Transactional
 public class PlayerPolicyImpl implements PlayerPolicy {
@@ -22,16 +25,16 @@ public class PlayerPolicyImpl implements PlayerPolicy {
     public void setUpPlayerRole(Game game) {
 
         int randomIdx = (int) (Math.random() * game.getPlayerIds().size());
-        String userId = game.getPlayerIds().get(randomIdx);
+        String liarId = game.getPlayerIds().get(randomIdx);
 
-        if (userId == null) {
+        if (liarId == null) {
             throw new NotFoundException();
         }
 
         game.getPlayerIds().stream()
                 .forEach(
-                        f -> {
-                            if (f.equals(userId)) {
+                        userId -> {
+                            if (userId.equals(liarId)) {
                                 joinPlayerRepository.save(new JoinPlayer(game.getId(),
                                         new Player(userId, GameRole.LIAR)));
                             } else {

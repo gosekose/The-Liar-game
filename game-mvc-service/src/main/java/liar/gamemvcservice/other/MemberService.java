@@ -1,7 +1,7 @@
 package liar.gamemvcservice.other;
 
-import liar.waitservice.other.dao.MemberIdOnly;
-import liar.waitservice.other.dao.MemberNameOnly;
+import liar.gamemvcservice.other.dao.MemberIdOnly;
+import liar.gamemvcservice.other.dao.MemberNameOnly;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
