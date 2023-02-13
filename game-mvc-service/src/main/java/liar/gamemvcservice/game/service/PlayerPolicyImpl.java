@@ -1,6 +1,7 @@
 package liar.gamemvcservice.game.service;
 
 import jakarta.ws.rs.NotFoundException;
+import liar.gamemvcservice.exception.exception.NotFoundGameException;
 import liar.gamemvcservice.exception.exception.NotFoundUserException;
 import liar.gamemvcservice.game.domain.Game;
 import liar.gamemvcservice.game.domain.GameRole;
@@ -28,7 +29,7 @@ public class PlayerPolicyImpl implements PlayerPolicy {
         String liarId = game.getPlayerIds().get(randomIdx);
 
         if (liarId == null) {
-            throw new NotFoundException();
+            throw new NotFoundUserException();
         }
 
         game.getPlayerIds().stream()
@@ -48,6 +49,10 @@ public class PlayerPolicyImpl implements PlayerPolicy {
     @Override
     public Player checkPlayerInfo(String gameId, String userId) {
         List<JoinPlayer> joinPlayers = joinPlayerRepository.findByGameId(gameId);
+
+        if (joinPlayers.isEmpty()) {
+            throw new NotFoundGameException();
+        }
 
         return joinPlayers.stream()
                 .filter(f -> f.getPlayer().getUserId().equals(userId))
