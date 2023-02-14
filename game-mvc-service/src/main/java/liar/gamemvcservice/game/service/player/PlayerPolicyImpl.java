@@ -1,6 +1,5 @@
-package liar.gamemvcservice.game.service;
+package liar.gamemvcservice.game.service.player;
 
-import jakarta.ws.rs.NotFoundException;
 import liar.gamemvcservice.exception.exception.NotFoundGameException;
 import liar.gamemvcservice.exception.exception.NotFoundUserException;
 import liar.gamemvcservice.game.domain.Game;
@@ -10,7 +9,6 @@ import liar.gamemvcservice.game.domain.Player;
 import liar.gamemvcservice.game.repository.JoinPlayerRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;

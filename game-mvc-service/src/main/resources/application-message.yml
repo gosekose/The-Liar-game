@@ -1,0 +1,4 @@
+game:
+  turn:
+    exchange: game_turn_exchange
+    routingKey: game_turn_queue

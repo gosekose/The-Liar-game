@@ -1,4 +1,4 @@
-package liar.gamemvcservice.game.service;
+package liar.gamemvcservice.game.service.player;
 
 import liar.gamemvcservice.game.domain.Game;
 import liar.gamemvcservice.game.domain.Player;

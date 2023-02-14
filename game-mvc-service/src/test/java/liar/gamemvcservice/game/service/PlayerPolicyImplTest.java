@@ -7,6 +7,7 @@ import liar.gamemvcservice.game.domain.GameRole;
 import liar.gamemvcservice.game.domain.JoinPlayer;
 import liar.gamemvcservice.game.domain.Player;
 import liar.gamemvcservice.game.repository.JoinPlayerRepository;
+import liar.gamemvcservice.game.service.player.PlayerPolicyImpl;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;

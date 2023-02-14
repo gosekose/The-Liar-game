@@ -3,11 +3,14 @@ package liar.gamemvcservice.game.service;
 import liar.gamemvcservice.exception.exception.NotFoundGameException;
 import liar.gamemvcservice.game.controller.dto.GameUserInfoDto;
 import liar.gamemvcservice.game.controller.dto.SetUpGameDto;
-import liar.gamemvcservice.game.domain.Game;
-import liar.gamemvcservice.game.domain.GameRole;
-import liar.gamemvcservice.game.domain.Player;
-import liar.gamemvcservice.game.domain.Topic;
+import liar.gamemvcservice.game.controller.dto.SetUpGameTurnDto;
+import liar.gamemvcservice.game.domain.*;
 import liar.gamemvcservice.game.repository.GameRepository;
+import liar.gamemvcservice.game.repository.GameTurnRepository;
+import liar.gamemvcservice.game.service.dto.GameTurnResponse;
+import liar.gamemvcservice.game.service.player.PlayerPolicy;
+import liar.gamemvcservice.game.service.topic.TopicPolicy;
+import liar.gamemvcservice.game.service.turn.PlayerTurnPolicy;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,6 +23,8 @@ public class GameService {
     private final GameRepository gameRepository;
     private final TopicPolicy topicPolicy;
     private final PlayerPolicy playerPolicy;
+    private final PlayerTurnPolicy playerTurnPolicy;
+    private final GameTurnRepository gameTurnRepository;
 
     public String save(SetUpGameDto dto) {
         Game notSetUpTopicGame = Game.of(dto);
@@ -42,6 +47,11 @@ public class GameService {
         }
 
         return null;
+    }
+
+    public GameTurnResponse setUpTurn(SetUpGameTurnDto dto) {
+        Game game = gameRepository.findById(dto.getGameId()).orElseThrow(NotFoundGameException::new);
+        return GameTurnResponse.of(playerTurnPolicy.setUpTurn(game));
     }
 
 }
