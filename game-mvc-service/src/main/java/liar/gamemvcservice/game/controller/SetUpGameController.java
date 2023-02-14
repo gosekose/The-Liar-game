@@ -5,12 +5,13 @@ import jakarta.validation.Valid;
 import liar.gamemvcservice.exception.exception.NotEqualUserIdException;
 import liar.gamemvcservice.game.controller.dto.GameUserInfoDto;
 import liar.gamemvcservice.game.controller.dto.SetUpGameDto;
+import liar.gamemvcservice.game.controller.dto.SetUpGameTurnDto;
 import liar.gamemvcservice.game.controller.dto.message.SendSuccessBody;
-import liar.gamemvcservice.game.domain.Player;
-import liar.gamemvcservice.game.domain.Topic;
 import liar.gamemvcservice.game.service.GameService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -53,4 +54,5 @@ public class SetUpGameController {
             throw new NotEqualUserIdException();
         }
     }
+
 }

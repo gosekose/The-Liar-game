@@ -2,7 +2,7 @@ package liar.gamemvcservice.game.service;
 
 import liar.gamemvcservice.game.domain.Topic;
 import liar.gamemvcservice.game.repository.TopicRepository;
-import org.assertj.core.api.Assertions;
+import liar.gamemvcservice.game.service.topic.TopicPolicyImpl;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,7 +10,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @Transactional

@@ -8,6 +8,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.data.redis.core.RedisHash;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
@@ -41,4 +42,8 @@ public class Game {
         return this;
     }
 
+    public List<String> shufflePlayer() {
+        Collections.shuffle(playerIds);
+        return this.getPlayerIds();
+    }
 }

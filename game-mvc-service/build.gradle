@@ -63,6 +63,8 @@ dependencies {
     //AMQP
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
     implementation 'org.springframework.cloud:spring-cloud-starter-bus-amqp'
+    implementation 'org.springframework.boot:spring-boot-starter-amqp'
+    testImplementation 'org.springframework.amqp:spring-rabbit-test'
 
     // restdocs
     asciidoctorExt "org.springframework.restdocs:spring-restdocs-asciidoctor"
