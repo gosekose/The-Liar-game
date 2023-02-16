@@ -38,7 +38,7 @@ public class GameTurn {
      * 사용자의 턴이 맞다면, nowTurn++하고, gameTurn을 출력한다.
      * 맞지 않다면, NotUserTurnException을 호출한다.
      */
-    public GameTurn updateTurnCnt(String requestId) {
+    public GameTurn updateTurnCntWhenPlayerTurnIsValidated(String requestId) {
         if (isPlayerTurn(requestId)) {
            this.nowTurn++;
            return this;
@@ -64,6 +64,13 @@ public class GameTurn {
             return true;
         }
         return false;
+    }
+
+    /**
+     * 플레이어의 다음 턴을 알리는 메소드
+     */
+    public String notifyNextTurnUserId() {
+        return playerTurn.get(nowTurn % playerTurn.size());
     }
 }
 
