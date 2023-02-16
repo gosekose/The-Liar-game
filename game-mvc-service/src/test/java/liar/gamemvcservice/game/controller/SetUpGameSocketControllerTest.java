@@ -30,7 +30,7 @@ import static org.springframework.restdocs.request.RequestDocumentation.pathPara
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 
-class SetUpGameControllerTest extends CommonController {
+class SetUpGameSocketControllerTest extends CommonController {
 
     @Autowired
     GameService gameService;
@@ -88,7 +88,7 @@ class SetUpGameControllerTest extends CommonController {
 
         //when
         ResultActions result = mockMvc.perform(
-                get("/game-service/game/{userId}", gameUserInfoDto.getUserId())
+                get("/game-service/game/{userId}/role", gameUserInfoDto.getUserId())
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(new Gson().toJson(gameUserInfoDto))
