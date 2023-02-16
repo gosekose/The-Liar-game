@@ -50,7 +50,7 @@ public class SetUpGameController {
                                         HttpServletRequest request) {
 
         validateRequestUserEqualHeaderUser(userId, dto, request);
-        return null;
+        return ResponseEntity.ok().body(SendSuccessBody.of(gameService.setUpTurn(dto.getGameId())));
     }
 
     private static void validateRequestUserEqualHeaderUser(String userId, GameUserInfoDto dto,

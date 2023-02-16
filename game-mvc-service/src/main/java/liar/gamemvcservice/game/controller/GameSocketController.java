@@ -1,7 +1,8 @@
 package liar.gamemvcservice.game.controller;
 
 import liar.gamemvcservice.exception.exception.NotEqualUserIdException;
-import liar.gamemvcservice.exception.exception.NotFoundUserException;
+import liar.gamemvcservice.game.controller.dto.ChatMessage;
+import liar.gamemvcservice.game.controller.dto.ChatMessageResponse;
 import liar.gamemvcservice.game.service.GameService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
@@ -11,9 +12,6 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
@@ -29,7 +27,10 @@ public class GameSocketController {
                                ChatMessage message) {
 
         isMatchUserIdAndRequestMessageUserId(headerAccessor, message);
-        template.convertAndSend("/topic/" + gameId, message);
+        String nextTurnUserId = gameService
+                .updatePlayerTurnAndNotifyNextTurnWhenPlayerTurnIsValidated(gameId, message.getCharMessage());
+
+        template.convertAndSend("/topic/" + gameId, ChatMessageResponse.of(message, nextTurnUserId));
     }
 
     private boolean isMatchUserIdAndRequestMessageUserId(SimpMessageHeaderAccessor headerAccessor, ChatMessage message) {

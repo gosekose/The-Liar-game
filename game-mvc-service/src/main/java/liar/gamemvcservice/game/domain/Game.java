@@ -24,6 +24,7 @@ public class Game {
     private String gameName;
     private List<String> playerIds;
     private Topic topic;
+    private int totalTurn;
 
     protected Game (SetUpGameDto setUpGameDto) {
         this.id = UUID.randomUUID().toString();

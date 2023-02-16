@@ -25,8 +25,8 @@ public class GameService {
     private final TopicPolicy topicPolicy;
     private final PlayerPolicy playerPolicy;
     private final PlayerTurnPolicy playerTurnPolicy;
-    private final GameTurnRepository gameTurnRepository;
     private final JoinPlayerRepository joinPlayerRepository;
+    private final GameTurnRepository gameTurnRepository;
 
     public String save(SetUpGameDto dto) {
         Game notSetUpTopicGame = Game.of(dto);
@@ -74,10 +74,17 @@ public class GameService {
                 .orElseThrow(NotFoundGameException::new);
     }
 
-//    public GameTurn setUpTurn(String gameId) {
-//        Game game = gameRepository.findById(gameId).orElseThrow(NotFoundGameException::new);
-//        GameTurn gameTurn = playerTurnPolicy.setUpTurn(game);
-//
-//    }
+    public List<String> setUpTurn(String gameId) {
+        Game game = findGameById(gameId);
+        GameTurn gameTurn = playerTurnPolicy.setUpTurn(game);
+        return gameTurn.getPlayerTurn();
+    }
+
+    public String updatePlayerTurnAndNotifyNextTurnWhenPlayerTurnIsValidated(String gameId, String userId) {
+        GameTurn gameTurn = playerTurnPolicy
+                .updatePlayerTurnWhenPlayerTurnIsValidated(gameTurnRepository.findGameTurnByGameId(gameId), userId);
+        gameTurnRepository.save(gameTurn);
+        return gameTurn.notifyNextTurnUserId();
+    }
 
 }
