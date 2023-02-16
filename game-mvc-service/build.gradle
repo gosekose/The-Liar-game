@@ -35,6 +35,8 @@ dependencies {
 
     implementation 'org.springframework.boot:spring-boot-starter-websocket'
 
+    implementation 'org.redisson:redisson-spring-boot-starter:3.17.7'
+
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-websocket'
     implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-client'

@@ -27,7 +27,7 @@ public class SetUpGameController {
     }
 
     @GetMapping("/{userId}/role")
-    public ResponseEntity checkUserRole(@PathVariable("userId") String userId,
+    public ResponseEntity checkUserRole(@PathVariable String userId,
                                         @Valid @RequestBody GameUserInfoDto dto,
                                         HttpServletRequest request) {
 
@@ -36,12 +36,21 @@ public class SetUpGameController {
     }
 
     @GetMapping("/{userId}/topic")
-    public ResponseEntity checkTopic(@PathVariable("userId") String userId,
+    public ResponseEntity checkTopic(@PathVariable String userId,
                                      @Valid @RequestBody GameUserInfoDto dto,
                                      HttpServletRequest request) {
 
         validateRequestUserEqualHeaderUser(userId, dto, request);
         return ResponseEntity.ok().body(SendSuccessBody.of(gameService.checkTopic(dto).getTopicName()));
+    }
+
+    @PostMapping("/{userId}/turn")
+    public ResponseEntity getPlayerTurn(@PathVariable String userId,
+                                        @Valid @RequestBody GameUserInfoDto dto,
+                                        HttpServletRequest request) {
+
+        validateRequestUserEqualHeaderUser(userId, dto, request);
+        return null;
     }
 
     private static void validateRequestUserEqualHeaderUser(String userId, GameUserInfoDto dto,

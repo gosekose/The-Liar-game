@@ -1,8 +1,8 @@
 package liar.gamemvcservice.game.controller;
 
 import liar.gamemvcservice.game.MemberDummyInfo;
-import liar.gamemvcservice.game.repository.GameRepository;
-import liar.gamemvcservice.game.repository.JoinPlayerRepository;
+import liar.gamemvcservice.game.repository.redis.GameRepository;
+import liar.gamemvcservice.game.repository.redis.JoinPlayerRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -6,7 +6,7 @@ import liar.gamemvcservice.game.domain.Game;
 import liar.gamemvcservice.game.domain.GameRole;
 import liar.gamemvcservice.game.domain.JoinPlayer;
 import liar.gamemvcservice.game.domain.Player;
-import liar.gamemvcservice.game.repository.JoinPlayerRepository;
+import liar.gamemvcservice.game.repository.redis.JoinPlayerRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;

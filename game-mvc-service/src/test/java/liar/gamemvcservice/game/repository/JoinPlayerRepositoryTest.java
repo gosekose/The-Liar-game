@@ -3,7 +3,7 @@ package liar.gamemvcservice.game.repository;
 import liar.gamemvcservice.game.domain.GameRole;
 import liar.gamemvcservice.game.domain.JoinPlayer;
 import liar.gamemvcservice.game.domain.Player;
-import org.assertj.core.api.Assertions;
+import liar.gamemvcservice.game.repository.redis.JoinPlayerRepository;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -13,7 +13,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 class JoinPlayerRepositoryTest {
