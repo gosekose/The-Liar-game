@@ -5,8 +5,8 @@ import liar.gamemvcservice.exception.exception.NotFoundUserException;
 import liar.gamemvcservice.game.controller.dto.GameUserInfoDto;
 import liar.gamemvcservice.game.controller.dto.SetUpGameDto;
 import liar.gamemvcservice.game.domain.*;
-import liar.gamemvcservice.game.repository.GameRepository;
-import liar.gamemvcservice.game.repository.JoinPlayerRepository;
+import liar.gamemvcservice.game.repository.redis.GameRepository;
+import liar.gamemvcservice.game.repository.redis.JoinPlayerRepository;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
@@ -21,7 +21,6 @@ import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @Transactional

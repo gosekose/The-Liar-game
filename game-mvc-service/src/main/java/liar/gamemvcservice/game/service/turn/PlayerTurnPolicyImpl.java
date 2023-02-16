@@ -1,10 +1,10 @@
 package liar.gamemvcservice.game.service.turn;
 
-import com.sun.jdi.request.DuplicateRequestException;
 import liar.gamemvcservice.game.domain.Game;
 import liar.gamemvcservice.game.domain.GameTurn;
-import liar.gamemvcservice.game.repository.GameTurnRepository;
+import liar.gamemvcservice.game.repository.redis.GameTurnRepository;
 import lombok.RequiredArgsConstructor;
+import org.redisson.api.RedissonClient;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -13,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class PlayerTurnPolicyImpl implements PlayerTurnPolicy {
 
+    private final RedissonClient redissonClient;
     private final GameTurnRepository gameTurnRepository;
 
     @Override
@@ -21,15 +22,25 @@ public class PlayerTurnPolicyImpl implements PlayerTurnPolicy {
             GameTurn gameTurn = new GameTurn(game.getId(), game.shufflePlayer());
             return gameTurnRepository.save(gameTurn);
         }
-        throw new DuplicateRequestException();
+        return gameTurnRepository.findGameTurnByGameId(game.getId());
     }
 
     @Override
-    public boolean isFirstSetUpTurn(Game game) {
+    public GameTurn updatePlayerTurn(GameTurn gameTurn, String userId) {
+        return gameTurn.updateTurnCnt(userId);
+    }
+
+    @Override
+    public GameTurn timeOut(GameTurn gameTurn) {
+        return gameTurn.updateTurnCntByTimeOut();
+    }
+
+    private boolean isFirstSetUpTurn(Game game) {
         GameTurn gameTurn = gameTurnRepository.findGameTurnByGameId(game.getId());
         if (gameTurn == null) {
             return true;
         }
         return false;
     }
+
 }

@@ -3,12 +3,10 @@ package liar.gamemvcservice.game.service;
 import liar.gamemvcservice.exception.exception.NotFoundGameException;
 import liar.gamemvcservice.game.controller.dto.GameUserInfoDto;
 import liar.gamemvcservice.game.controller.dto.SetUpGameDto;
-import liar.gamemvcservice.game.controller.dto.SetUpGameTurnDto;
 import liar.gamemvcservice.game.domain.*;
-import liar.gamemvcservice.game.repository.GameRepository;
-import liar.gamemvcservice.game.repository.GameTurnRepository;
-import liar.gamemvcservice.game.repository.JoinPlayerRepository;
-import liar.gamemvcservice.game.service.dto.GameTurnResponse;
+import liar.gamemvcservice.game.repository.redis.GameRepository;
+import liar.gamemvcservice.game.repository.redis.GameTurnRepository;
+import liar.gamemvcservice.game.repository.redis.JoinPlayerRepository;
 import liar.gamemvcservice.game.service.player.PlayerPolicy;
 import liar.gamemvcservice.game.service.topic.TopicPolicy;
 import liar.gamemvcservice.game.service.turn.PlayerTurnPolicy;
@@ -53,11 +51,6 @@ public class GameService {
         return null;
     }
 
-    public GameTurnResponse setUpTurn(SetUpGameTurnDto dto) {
-        Game game = findGameById(dto.getGameId());
-        return GameTurnResponse.of(playerTurnPolicy.setUpTurn(game));
-    }
-
     public Game findGameById(String gameId) {
         return gameRepository.findById(gameId).orElseThrow(NotFoundGameException::new);
     }
@@ -72,5 +65,19 @@ public class GameService {
         }
         throw new NotFoundGameException();
     }
+
+    public JoinPlayer findJoinMemberOfRequestGame(String gameId, String userId) {
+        return findJoinPlayersByGameId(gameId)
+                .stream()
+                .filter(player -> player.getId().equals(userId))
+                .findFirst()
+                .orElseThrow(NotFoundGameException::new);
+    }
+
+//    public GameTurn setUpTurn(String gameId) {
+//        Game game = gameRepository.findById(gameId).orElseThrow(NotFoundGameException::new);
+//        GameTurn gameTurn = playerTurnPolicy.setUpTurn(game);
+//
+//    }
 
 }

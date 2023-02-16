@@ -1,6 +1,7 @@
 package liar.gamemvcservice.game.domain;
 
 import jakarta.persistence.Id;
+import liar.gamemvcservice.exception.exception.NotUserTurnException;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -33,21 +34,36 @@ public class GameTurn {
         this.nowTurn = 0;
     }
 
-    public boolean isPlayerTurn(String requestId) {
+    /**
+     * 사용자의 턴이 맞다면, nowTurn++하고, gameTurn을 출력한다.
+     * 맞지 않다면, NotUserTurnException을 호출한다.
+     */
+    public GameTurn updateTurnCnt(String requestId) {
+        if (isPlayerTurn(requestId)) {
+           this.nowTurn++;
+           return this;
+        }
+        throw new NotUserTurnException();
+    }
+
+    /**
+     * 사용자가 시간안에 요청을 하지않으면, 타임아웃이 실행된다.
+     */
+    public GameTurn updateTurnCntByTimeOut() {
+        this.nowTurn++;
+        return this;
+    }
+
+    /**
+     * 플레이어의 턴이 맞는지 확인하는 메소드
+     */
+    private boolean isPlayerTurn(String requestId) {
         int idx = nowTurn % playerTurn.size();
 
         if (playerTurn.get(idx).equals(requestId)) {
             return true;
         }
         return false;
-    }
-
-    public GameTurn updateTurnCnt(String requestId) {
-        if (isPlayerTurn(requestId)) {
-           this.nowTurn++;
-           return this;
-        }
-        return this;
     }
 }
 

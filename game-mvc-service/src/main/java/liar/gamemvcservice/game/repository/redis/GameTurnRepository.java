@@ -1,4 +1,4 @@
-package liar.gamemvcservice.game.repository;
+package liar.gamemvcservice.game.repository.redis;
 
 import liar.gamemvcservice.game.domain.GameTurn;
 import org.springframework.data.repository.CrudRepository;
