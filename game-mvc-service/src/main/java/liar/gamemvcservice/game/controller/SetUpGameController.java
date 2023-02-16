@@ -5,13 +5,10 @@ import jakarta.validation.Valid;
 import liar.gamemvcservice.exception.exception.NotEqualUserIdException;
 import liar.gamemvcservice.game.controller.dto.GameUserInfoDto;
 import liar.gamemvcservice.game.controller.dto.SetUpGameDto;
-import liar.gamemvcservice.game.controller.dto.SetUpGameTurnDto;
 import liar.gamemvcservice.game.controller.dto.message.SendSuccessBody;
 import liar.gamemvcservice.game.service.GameService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.messaging.handler.annotation.MessageMapping;
-import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -29,7 +26,7 @@ public class SetUpGameController {
         return ResponseEntity.ok().body(SendSuccessBody.of(gameId));
     }
 
-    @GetMapping("/{userId}")
+    @GetMapping("/{userId}/role")
     public ResponseEntity checkUserRole(@PathVariable("userId") String userId,
                                         @Valid @RequestBody GameUserInfoDto dto,
                                         HttpServletRequest request) {
