@@ -1,6 +1,9 @@
 package liar.gamemvcservice.common.redis;
 
 import liar.gamemvcservice.exception.exception.RedisLockException;
+import liar.gamemvcservice.game.domain.Game;
+import liar.gamemvcservice.game.domain.GameTurn;
+import liar.gamemvcservice.game.domain.Vote;
 import lombok.RequiredArgsConstructor;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
@@ -29,6 +32,8 @@ public class RedisLockAspect {
         Method method = signature.getMethod();
         Class<?> returnType = method.getReturnType();
 
+        System.out.println("joinPoint = " + joinPoint.getArgs());
+
         String lockKey = getLockKey(joinPoint.getArgs());
         RLock lock = redissonClient.getLock(lockKey);
 
@@ -41,18 +46,38 @@ public class RedisLockAspect {
             return returnType.cast(result);
 
         } finally {
-            lock.unlock();
+            if (lock.isHeldByCurrentThread()) {
+                lock.unlock();
+            }
         }
     }
 
-    private String getLockKey(Object[] args) {
-        for (Object arg : args) {
-            if (arg instanceof String) {
-                return (String) arg;
+    private <T> String getLockKey(T arg) {
+
+        if (arg instanceof String) {
+            return (String) arg;
+        }
+
+        else if (arg instanceof Game){
+            return ((Game) arg).getId();
+        }
+
+        else if (arg instanceof GameTurn) {
+            return ((GameTurn) arg).getId();
+        }
+
+        else if (arg instanceof Vote) {
+            return ((Vote) arg).getId();
+        }
+
+        else if (arg instanceof Object[]) {
+            StringBuilder sb = new StringBuilder();
+            for (Object obj : (Object[]) arg) {
+                sb.append(getLockKey(obj));
             }
+            return sb.toString();
         }
         throw new RedisLockException();
-
     }
 
 }
