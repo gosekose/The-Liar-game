@@ -13,7 +13,7 @@ public class GameTurnResponse {
     private List<String> userIdTurns;
 
     public static GameTurnResponse of(GameTurn gameTurn) {
-        return new GameTurnResponse(gameTurn.getGameId(), gameTurn.getPlayerTurn());
+        return new GameTurnResponse(gameTurn.getGameId(), gameTurn.getPlayerTurnsConsistingOfUserId());
     }
 
     public GameTurnResponse(String gameId, List<String> userIdTurns) {
