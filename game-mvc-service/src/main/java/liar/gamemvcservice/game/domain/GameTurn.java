@@ -24,13 +24,13 @@ public class GameTurn {
     @Indexed
     private String gameId;
 
-    private List<String> playerTurn;
+    private List<String> playerTurnsConsistingOfUserId;
     private int nowTurn;
 
-    public GameTurn(String gameId, List<String> playerTurn) {
+    public GameTurn(String gameId, List<String> playerTurnsConsistingOfUserId) {
         this.id = UUID.randomUUID().toString();
         this.gameId = gameId;
-        this.playerTurn = playerTurn;
+        this.playerTurnsConsistingOfUserId = playerTurnsConsistingOfUserId;
         this.nowTurn = 0;
     }
 
@@ -58,23 +58,23 @@ public class GameTurn {
      * 플레이어의 턴이 맞는지 확인하는 메소드
      */
     private boolean isPlayerTurn(String requestId) {
-        int idx = nowTurn % playerTurn.size();
+        int idx = nowTurn % playerTurnsConsistingOfUserId.size();
 
-        if (playerTurn.get(idx).equals(requestId)) {
+        if (playerTurnsConsistingOfUserId.get(idx).equals(requestId)) {
             return true;
         }
         return false;
     }
 
     /**
-     * 플레이어의 다음 턴을 알리는 매소드
+     * 플레이어의 다음 턴을 알리는 매소드 (기본 로테이션 횟수 2회)
      * 현재 플레이어가 게임의 마지막 턴인 경우, next 턴은 없다
      */
     public NextTurn setIfExistsNextTurn() {
-        if (nowTurn == (playerTurn.size()-1)) {
+        if (nowTurn >= (playerTurnsConsistingOfUserId.size() * 2)) {
             return new NextTurn(null, true);
         } else {
-            return new NextTurn(playerTurn.get(nowTurn % playerTurn.size()), false);
+            return new NextTurn(playerTurnsConsistingOfUserId.get(nowTurn % playerTurnsConsistingOfUserId.size()), false);
         }
     }
 }

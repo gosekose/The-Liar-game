@@ -77,7 +77,7 @@ public class GameService {
     public List<String> setUpTurn(String gameId) {
         Game game = findGameById(gameId);
         GameTurn gameTurn = playerTurnPolicy.setUpTurn(game);
-        return gameTurn.getPlayerTurn();
+        return gameTurn.getPlayerTurnsConsistingOfUserId();
     }
 
     public NextTurn updatePlayerTurnAndNotifyNextTurnWhenPlayerTurnIsValidated(String gameId, String userId) {

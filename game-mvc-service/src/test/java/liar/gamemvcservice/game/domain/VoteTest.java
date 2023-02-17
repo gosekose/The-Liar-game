@@ -139,7 +139,7 @@ class VoteTest {
         for (Thread thread : threads) {
             thread.join();
         }
-        
+
         //when
         List<VotedResult> maxVotedResult = vote.getMaxVotedResult();
 
