@@ -51,4 +51,9 @@ public class Vote {
                 .map(Map.Entry::getValue)
                 .orElse(Collections.emptyList());
     }
+
+    @Override
+    public String toString() {
+        return "Vote:" + id;
+    }
 }

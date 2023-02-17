@@ -1,6 +1,7 @@
-package liar.gamemvcservice.game.repository;
+package liar.gamemvcservice.game.repository.redis;
 
 import liar.gamemvcservice.game.domain.Topic;
+import liar.gamemvcservice.game.repository.TopicRepository;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

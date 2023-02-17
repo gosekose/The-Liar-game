@@ -1,4 +1,4 @@
-package liar.gamemvcservice.game.repository;
+package liar.gamemvcservice.game.repository.redis;
 
 import liar.gamemvcservice.game.domain.GameRole;
 import liar.gamemvcservice.game.domain.JoinPlayer;

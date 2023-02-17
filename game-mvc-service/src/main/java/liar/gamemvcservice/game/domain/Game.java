@@ -6,6 +6,7 @@ import liar.gamemvcservice.game.controller.dto.SetUpGameDto;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 import org.springframework.data.redis.core.RedisHash;
 
 import java.util.Collections;
@@ -45,5 +46,10 @@ public class Game {
     public List<String> shufflePlayer() {
         Collections.shuffle(playerIds);
         return this.getPlayerIds();
+    }
+
+    @Override
+    public String toString() {
+        return "Game:" + id;
     }
 }
