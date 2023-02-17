@@ -1,7 +1,7 @@
 package liar.gamemvcservice.game.service;
 
 import liar.gamemvcservice.exception.exception.NotFoundGameException;
-import liar.gamemvcservice.game.controller.dto.GameUserInfoDto;
+import liar.gamemvcservice.game.controller.dto.RequestCommonDto;
 import liar.gamemvcservice.game.controller.dto.SetUpGameDto;
 import liar.gamemvcservice.game.domain.*;
 import liar.gamemvcservice.game.repository.redis.GameRepository;
@@ -36,11 +36,11 @@ public class GameService {
         return gameRepository.save(setUpTopicGame).getId();
     }
 
-    public Player checkPlayerRole(GameUserInfoDto dto) {
+    public Player checkPlayerRole(RequestCommonDto dto) {
         return playerPolicy.checkPlayerInfo(dto.getGameId(), dto.getUserId());
     }
 
-    public Topic checkTopic(GameUserInfoDto dto) {
+    public Topic checkTopic(RequestCommonDto dto) {
         Player player = playerPolicy.checkPlayerInfo(dto.getGameId(), dto.getUserId());
 
         if (player.getGameRole() == GameRole.CITIZEN) {
@@ -80,11 +80,11 @@ public class GameService {
         return gameTurn.getPlayerTurn();
     }
 
-    public String updatePlayerTurnAndNotifyNextTurnWhenPlayerTurnIsValidated(String gameId, String userId) {
+    public NextTurn updatePlayerTurnAndNotifyNextTurnWhenPlayerTurnIsValidated(String gameId, String userId) {
         GameTurn gameTurn = playerTurnPolicy
                 .updatePlayerTurnWhenPlayerTurnIsValidated(gameTurnRepository.findGameTurnByGameId(gameId), userId);
         gameTurnRepository.save(gameTurn);
-        return gameTurn.notifyNextTurnUserId();
+        return gameTurn.setIfExistsNextTurn();
     }
 
 }

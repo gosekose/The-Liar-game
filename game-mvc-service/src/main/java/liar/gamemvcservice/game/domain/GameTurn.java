@@ -67,10 +67,15 @@ public class GameTurn {
     }
 
     /**
-     * 플레이어의 다음 턴을 알리는 메소드
+     * 플레이어의 다음 턴을 알리는 매소드
+     * 현재 플레이어가 게임의 마지막 턴인 경우, next 턴은 없다
      */
-    public String notifyNextTurnUserId() {
-        return playerTurn.get(nowTurn % playerTurn.size());
+    public NextTurn setIfExistsNextTurn() {
+        if (nowTurn == (playerTurn.size()-1)) {
+            return new NextTurn(null, true);
+        } else {
+            return new NextTurn(playerTurn.get(nowTurn % playerTurn.size()), false);
+        }
     }
 }
 

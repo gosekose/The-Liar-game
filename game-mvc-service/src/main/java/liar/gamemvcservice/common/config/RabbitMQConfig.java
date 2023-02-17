@@ -34,7 +34,7 @@ public class RabbitMQConfig {
         SimpleMessageListenerContainer listenerContainer = new SimpleMessageListenerContainer();
         listenerContainer.setConnectionFactory(connectionFactory);
         listenerContainer.setQueues(new Queue(gameTurnQueue));
-        listenerContainer.setMessageListener(new MessageListenerAdapter(new GameTurnSubscriber()));
+//        listenerContainer.setMessageListener(new MessageListenerAdapter(new GameTurnSubscriber()));
         return listenerContainer;
     }
 }

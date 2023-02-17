@@ -44,16 +44,6 @@ public class PlayerTurnPolicyImpl implements PlayerTurnPolicy {
         return gameTurn.updateTurnCntByTimeOut();
     }
 
-    /**
-     * 마감 회전 횟수에 도달하면, 더 이상 턴이 돌지 않도록 마지막임을 알리는 메세지를 전송하는 메소드
-     *
-     * @param gameTurn
-     */
-    @Override
-    public GameTurn notifyWhenLastTurn(GameTurn gameTurn) {
-        return null;
-    }
-
     private boolean isFirstSetUpTurn(Game game) {
         GameTurn gameTurn = gameTurnRepository.findGameTurnByGameId(game.getId());
         if (gameTurn == null) {
