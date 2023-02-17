@@ -1,11 +1,9 @@
 package liar.gamemvcservice.game.controller;
 
 import com.google.gson.Gson;
-import io.netty.handler.codec.http2.Http2Connection;
-import liar.gamemvcservice.game.controller.dto.GameUserInfoDto;
+import liar.gamemvcservice.game.controller.dto.RequestCommonDto;
 import liar.gamemvcservice.game.controller.dto.SetUpGameDto;
 import liar.gamemvcservice.game.service.GameService;
-import org.apache.http.entity.ContentType;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -14,7 +12,6 @@ import org.springframework.http.MediaType;
 import org.springframework.restdocs.payload.JsonFieldType;
 import org.springframework.test.web.servlet.ResultActions;
 
-import javax.print.DocFlavor;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
@@ -30,7 +27,7 @@ import static org.springframework.restdocs.request.RequestDocumentation.pathPara
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 
-class SetUpGameSocketControllerTest extends CommonController {
+class SetUpChatControllerTest extends CommonController {
 
     @Autowired
     GameService gameService;
@@ -84,14 +81,14 @@ class SetUpGameSocketControllerTest extends CommonController {
     public void checkUserRole() throws Exception {
         //given
         String gameId = saveGameAndGetGameId();
-        GameUserInfoDto gameUserInfoDto = new GameUserInfoDto(gameId, devUser1Id);
+        RequestCommonDto requestCommonDto = new RequestCommonDto(gameId, devUser1Id);
 
         //when
         ResultActions result = mockMvc.perform(
-                get("/game-service/game/{userId}/role", gameUserInfoDto.getUserId())
+                get("/game-service/game/{userId}/role", requestCommonDto.getUserId())
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(new Gson().toJson(gameUserInfoDto))
+                        .content(new Gson().toJson(requestCommonDto))
                         .header("Authorization", "Bearer AccessToken")
                         .header("RefreshToken", "refreshToken")
                         .header("userId", devUser1Id));
@@ -122,14 +119,14 @@ class SetUpGameSocketControllerTest extends CommonController {
     public void checkTopic() throws Exception {
         //given
         String gameId = saveGameAndGetGameId();
-        GameUserInfoDto gameUserInfoDto = new GameUserInfoDto(gameId, devUser1Id);
+        RequestCommonDto requestCommonDto = new RequestCommonDto(gameId, devUser1Id);
 
         //when
         ResultActions result = mockMvc.perform(
-                get("/game-service/game/{userId}/topic", gameUserInfoDto.getUserId())
+                get("/game-service/game/{userId}/topic", requestCommonDto.getUserId())
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(new Gson().toJson(gameUserInfoDto))
+                        .content(new Gson().toJson(requestCommonDto))
                         .header("Authorization", "Bearer AccessToken")
                         .header("RefreshToken", "refreshToken")
                         .header("userId", devUser1Id));

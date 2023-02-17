@@ -2,7 +2,7 @@ package liar.gamemvcservice.game.service;
 
 import liar.gamemvcservice.exception.exception.NotFoundGameException;
 import liar.gamemvcservice.exception.exception.NotFoundUserException;
-import liar.gamemvcservice.game.controller.dto.GameUserInfoDto;
+import liar.gamemvcservice.game.controller.dto.RequestCommonDto;
 import liar.gamemvcservice.game.controller.dto.SetUpGameDto;
 import liar.gamemvcservice.game.domain.*;
 import liar.gamemvcservice.game.repository.redis.GameRepository;
@@ -81,10 +81,10 @@ class GameServiceTest {
         String gameId = gameService.save(setUpGameDto);
 
         //when
-        Player player1 = gameService.checkPlayerRole(new GameUserInfoDto(gameId, "1"));
-        Player player2 = gameService.checkPlayerRole(new GameUserInfoDto(gameId, "2"));
-        Player player3 = gameService.checkPlayerRole(new GameUserInfoDto(gameId, "3"));
-        Player player4 = gameService.checkPlayerRole(new GameUserInfoDto(gameId, "4"));
+        Player player1 = gameService.checkPlayerRole(new RequestCommonDto(gameId, "1"));
+        Player player2 = gameService.checkPlayerRole(new RequestCommonDto(gameId, "2"));
+        Player player3 = gameService.checkPlayerRole(new RequestCommonDto(gameId, "3"));
+        Player player4 = gameService.checkPlayerRole(new RequestCommonDto(gameId, "4"));
 
         List<Player> players = Arrays.asList(player1, player2, player3, player4);
 
@@ -114,7 +114,7 @@ class GameServiceTest {
 
         //then
         Assertions.assertThatThrownBy(() -> {
-            gameService.checkPlayerRole(new GameUserInfoDto("wrongId", "1"));
+            gameService.checkPlayerRole(new RequestCommonDto("wrongId", "1"));
         })
                 .isInstanceOf(NotFoundGameException.class);
     }
@@ -130,7 +130,7 @@ class GameServiceTest {
 
         //then
         Assertions.assertThatThrownBy(() -> {
-                    gameService.checkPlayerRole(new GameUserInfoDto(gameId, "wrongUserId"));
+                    gameService.checkPlayerRole(new RequestCommonDto(gameId, "wrongUserId"));
                 })
                 .isInstanceOf(NotFoundUserException.class);
     }
@@ -144,10 +144,10 @@ class GameServiceTest {
         String gameId = gameService.save(setUpGameDto);
 
         //when
-        Topic topic1 = gameService.checkTopic(new GameUserInfoDto(gameId, "1"));
-        Topic topic2 = gameService.checkTopic(new GameUserInfoDto(gameId, "2"));
-        Topic topic3 = gameService.checkTopic(new GameUserInfoDto(gameId, "3"));
-        Topic topic4 = gameService.checkTopic(new GameUserInfoDto(gameId, "4"));
+        Topic topic1 = gameService.checkTopic(new RequestCommonDto(gameId, "1"));
+        Topic topic2 = gameService.checkTopic(new RequestCommonDto(gameId, "2"));
+        Topic topic3 = gameService.checkTopic(new RequestCommonDto(gameId, "3"));
+        Topic topic4 = gameService.checkTopic(new RequestCommonDto(gameId, "4"));
 
         List<Topic> topics = Arrays.asList(topic1, topic2, topic3, topic4);
 
@@ -177,7 +177,7 @@ class GameServiceTest {
 
         //then
         assertThatThrownBy(() -> {
-            gameService.checkTopic(new GameUserInfoDto("wrongGameId", "1"));
+            gameService.checkTopic(new RequestCommonDto("wrongGameId", "1"));
         })
                 .isInstanceOf(NotFoundGameException.class);
     }
@@ -193,7 +193,7 @@ class GameServiceTest {
 
         //then
         assertThatThrownBy(() -> {
-            gameService.checkTopic(new GameUserInfoDto(gameId, "wrongUserID"));
+            gameService.checkTopic(new RequestCommonDto(gameId, "wrongUserID"));
         })
                 .isInstanceOf(NotFoundUserException.class);
     }

@@ -20,8 +20,11 @@ public class RedisLockAspect {
 
     private final RedissonClient redissonClient;
 
-    @Around("execution(* liar.gamemvcservice.game.repository.redis..*.*(..))")
-    public Object executeWithLock(ProceedingJoinPoint joinPoint) throws Throwable {
+    @Around("execution(* liar.gamemvcservice.game.repository.redis..*.save(..)) || " +
+            "execution(* liar.gamemvcservice.game.repository.redis..*.delete(..)) || " +
+            "execution(* liar.gamemvcservice.game.service.GameService..*.updatePlayerTurnAndNotifyNextTurnWhenPlayerTurnIsValidated(..)) || " +
+            "execution(* liar.gamemvcservice.game.service.GameService..*.save(..))")
+    public Object executeWithRock(ProceedingJoinPoint joinPoint) throws Throwable {
         MethodSignature signature = (MethodSignature) joinPoint.getSignature();
         Method method = signature.getMethod();
         Class<?> returnType = method.getReturnType();
@@ -37,10 +40,7 @@ public class RedisLockAspect {
             Object result = joinPoint.proceed();
             return returnType.cast(result);
 
-        } catch (InterruptedException e) {
-            throw new RedisLockException();
-        }
-        finally {
+        } finally {
             lock.unlock();
         }
     }

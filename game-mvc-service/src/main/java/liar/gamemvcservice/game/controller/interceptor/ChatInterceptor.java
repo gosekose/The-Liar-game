@@ -4,6 +4,7 @@ import liar.gamemvcservice.exception.exception.BindingInvalidException;
 import liar.gamemvcservice.game.service.GameService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.integration.config.GlobalChannelInterceptor;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.simp.stomp.StompCommand;
@@ -14,7 +15,7 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @RequiredArgsConstructor
 @Component
-public class GameSocketInterceptor implements ChannelInterceptor {
+public class ChatInterceptor implements ChannelInterceptor {
 
     private final GameService gameService;
 
