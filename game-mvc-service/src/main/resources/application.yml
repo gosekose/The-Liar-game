@@ -7,6 +7,9 @@ spring:
     username: guest
     password: guest
 
+  main:
+    allow-bean-definition-overriding: true
+
   profiles:
     include:
       - db
@@ -18,7 +21,7 @@ spring:
 
 
 server:
-  port: 8081
+  port: 8079
 
 management:
   endpoints:
