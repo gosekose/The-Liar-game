@@ -1,4 +1,4 @@
-package liar.gamemvcservice.game.service;
+package liar.gamemvcservice.game.service.player;
 
 import liar.gamemvcservice.exception.exception.NotFoundUserException;
 import liar.gamemvcservice.game.controller.dto.SetUpGameDto;
@@ -7,7 +7,6 @@ import liar.gamemvcservice.game.domain.GameRole;
 import liar.gamemvcservice.game.domain.JoinPlayer;
 import liar.gamemvcservice.game.domain.Player;
 import liar.gamemvcservice.game.repository.redis.JoinPlayerRepository;
-import liar.gamemvcservice.game.service.player.PlayerPolicyImpl;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
@@ -24,10 +23,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
 @Transactional
-class PlayerPolicyImplTest {
+class PlayerPolicyTest {
 
     @Autowired
-    PlayerPolicyImpl playerPolicy;
+    PlayerPolicy playerPolicy;
 
     @Autowired
     JoinPlayerRepository joinPlayerRepository;

@@ -1,8 +1,7 @@
-package liar.gamemvcservice.game.service;
+package liar.gamemvcservice.game.service.topic;
 
 import liar.gamemvcservice.game.domain.Topic;
 import liar.gamemvcservice.game.repository.TopicRepository;
-import liar.gamemvcservice.game.service.topic.TopicPolicyImpl;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,10 +12,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
 @Transactional
-class TopicPolicyImplTest {
+class TopicPolicyTest {
 
     @Autowired
-    TopicPolicyImpl topicPolicy;
+    TopicPolicy topicPolicy;
 
     @Autowired
     TopicRepository topicRepository;
