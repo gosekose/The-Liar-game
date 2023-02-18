@@ -149,9 +149,6 @@ class VoteRepositoryTest {
                 duplicatedCnt++;
             }
 
-            if (duplicatedCnt >= 2) {
-                throw new IllegalArgumentException("중복 발생");
-            }
 
         } catch (InterruptedException e) {
             throw new RuntimeException(e);

@@ -1,15 +1,19 @@
 package liar.gamemvcservice.game.repository.redis;
 
+import liar.gamemvcservice.exception.exception.RedisLockException;
 import liar.gamemvcservice.game.controller.dto.SetUpGameDto;
 import liar.gamemvcservice.game.domain.Game;
 import liar.gamemvcservice.game.repository.redis.GameRepository;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.redisson.api.RLock;
+import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.util.Arrays;
+import java.util.concurrent.TimeUnit;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -19,9 +23,18 @@ class GameRepositoryTest {
     @Autowired
     GameRepository gameRepository;
 
+    @Autowired
+    RedissonClient redissonClient;
+
+    private int duplicatedTotalCnt = 0;
+    @Autowired
+    private VoteRepository voteRepository;
+
     @AfterEach
     public void tearDown() {
-        gameRepository.deleteAll();
+
+//        gameRepository.deleteAll();
+        duplicatedTotalCnt = 0;
     }
 
     @Test
@@ -40,6 +53,100 @@ class GameRepositoryTest {
         assertThat(savedGame.getHostId()).isEqualTo(game.getHostId());
         assertThat(savedGame.getRoomId()).isEqualTo(game.getRoomId());
         assertThat(savedGame.getPlayerIds()).isEqualTo(game.getPlayerIds());
+    }
+
+    @Test
+    @DisplayName("스레드 safe 하지 않은 상태에서 game이 있다면 값을 저장하지 않고, 없다면 값을 저장한다.")
+    public void saveIfNotExistsGame_ThreadNotSafe() throws Exception {
+        //given
+        Thread[] threads = new Thread[100];
+
+        SetUpGameDto setUpGameDto = new SetUpGameDto("1", "1", "1", Arrays.asList("2", "3", "4"));
+        Game game = Game.of(setUpGameDto);
+
+        //when
+
+        for (int i = 0; i < 100; i++) {
+            threads[i] = new Thread(() -> {
+
+                if (gameRepository.findById(game.getId()).isEmpty()) {
+                    System.out.println("repository에 저장합니다.");
+                    gameRepository.save(game);
+                    duplicatedTotalCnt++;
+                }
+            });
+        }
+
+        for (int i = 0; i < 100; i++) threads[i].start();
+        for (int i = 0; i < 100; i++) threads[i].join();
+
+        //then
+        System.out.println("duplicatedTotalCnt = " + duplicatedTotalCnt);
+        assertThat(duplicatedTotalCnt).isNotEqualTo(1);
+    }
+
+    @Test
+    @DisplayName("스레드 safe 한 상태로 game 단건 저장하기")
+    public void saveIfNotExistsGame_ThreadSafe() throws Exception {
+        //given
+        Thread[] threads = new Thread[100];
+
+        SetUpGameDto setUpGameDto = new SetUpGameDto("1", "1", "1", Arrays.asList("2", "3", "4"));
+        Game game = Game.of(setUpGameDto);
+
+        //when
+        for (int i = 0; i < 100; i++) {
+            threads[i] = new Thread(() -> {
+
+                String lockKey = getLockKey(game.getId());
+                RLock lock = redissonClient.getLock(lockKey);
+
+                try {
+                    boolean isLocked = lock.tryLock(2, 3, TimeUnit.SECONDS);
+                    if (!isLocked) {
+                        System.out.println("락을 획득할 수 없습니다.");
+                        throw new RedisLockException();
+                    }
+
+                    if (gameRepository.findById(game.getId()).isEmpty()) {
+                        System.out.println("game = " + game);
+                        gameRepository.save(game);
+                        duplicatedTotalCnt++;
+                    }
+
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                    System.out.println("런타임 에러");
+                    throw new RuntimeException(e);
+                } finally {
+                    if (lock.isHeldByCurrentThread()) {
+                        lock.unlock();
+                    }
+                }
+
+            });
+        }
+
+        for (int i = 0; i < 100; i++) threads[i].start();
+        for (int i = 0; i < 100; i++) threads[i].join();
+
+        //then
+        System.out.println("duplicatedTotalCnt = " + duplicatedTotalCnt);
+        assertThat(duplicatedTotalCnt).isEqualTo(1);
+
+    }
+
+    private <T> String getLockKey(T arg) {
+
+        if (arg instanceof String) {
+            return (String) arg;
+        }
+
+        else if (arg instanceof Game) {
+            return ((Game) arg).getId();
+        }
+
+        throw new IllegalArgumentException();
     }
 
 }

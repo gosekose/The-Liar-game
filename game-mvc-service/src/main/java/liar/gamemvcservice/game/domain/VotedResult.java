@@ -27,4 +27,5 @@ public class VotedResult {
     public void updateCnt() {
         this.cnt++;
     }
+
 }
