@@ -25,6 +25,8 @@ public class RedisLockAspect {
 
     @Around("execution(* liar.gamemvcservice.game.repository.redis..*.save(..)) || " +
             "execution(* liar.gamemvcservice.game.repository.redis..*.delete(..)) || " +
+            "execution(* liar.gamemvcservice.game.repository.redis.VoteRepository.*.findVoteByGameId(..)) || " +
+            "execution(* liar.gamemvcservice.game.repository.redis.VoteRepository.*.findById(..)) || " +
             "execution(* liar.gamemvcservice.game.service.GameService..*.updatePlayerTurnAndNotifyNextTurnWhenPlayerTurnIsValidated(..)) || " +
             "execution(* liar.gamemvcservice.game.service.GameService..*.save(..))")
     public Object executeWithRock(ProceedingJoinPoint joinPoint) throws Throwable {
