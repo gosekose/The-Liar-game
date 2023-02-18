@@ -8,6 +8,7 @@ import liar.gamemvcservice.game.repository.redis.VoteRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.Synchronized;
 import lombok.extern.slf4j.Slf4j;
+import org.jetbrains.annotations.NotNull;
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
 import org.springframework.stereotype.Component;
@@ -23,6 +24,7 @@ import java.util.concurrent.TimeUnit;
 public class VotePolicyImpl implements VotePolicy {
 
     private final VoteRepository voteRepository;
+    private final RedissonClient redissonClient;
 
     /**
      * game의 모든 턴이 끝나면, vote 객체를 생성하여 저장한다.
