@@ -3,6 +3,7 @@ package liar.gamemvcservice.common.redis;
 import liar.gamemvcservice.exception.exception.RedisLockException;
 import liar.gamemvcservice.game.domain.Game;
 import liar.gamemvcservice.game.domain.GameTurn;
+import liar.gamemvcservice.game.domain.JoinPlayer;
 import liar.gamemvcservice.game.domain.Vote;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -29,6 +30,7 @@ public class RedisLockAspect {
             "execution(* liar.gamemvcservice.game.repository.redis..*.save(..)) || " +
             "execution(* liar.gamemvcservice.game.repository.redis..*.delete(..)) || " +
             "execution(* liar.gamemvcservice.game.repository.redis..*.findVoteByGameId(..)) || " +
+            "execution(* liar.gamemvcservice.game.repository.redis..*.findByGameId(..)) || " +
             "execution(* liar.gamemvcservice.game.repository.redis..*.findById(..)) || " +
             "execution(* liar.gamemvcservice.game.service..*.save(..)) || " +
             "execution(* liar.gamemvcservice.game.service.vote..*.saveVote(..))"
@@ -37,8 +39,6 @@ public class RedisLockAspect {
         MethodSignature signature = (MethodSignature) joinPoint.getSignature();
         Method method = signature.getMethod();
         Class<?> returnType = method.getReturnType();
-
-        log.info("joinPoint.getArgs() = {}", joinPoint.getArgs());
 
         String lockKey = getLockKey(joinPoint.getArgs());
         RLock lock = redissonClient.getLock(lockKey);
@@ -58,31 +58,32 @@ public class RedisLockAspect {
         }
     }
 
-
-//    @Around("execution(* liar.gamemvcservice.game.service.vote..*.voteLiarUser(..)) && args(gameId, userId)")
-//    public Object lockVoteLiarUser(ProceedingJoinPoint joinPoint, String gameId, String userId) throws Throwable {
-//
-//        String lockKey = "voteLiarUser:" + gameId;
-//        RLock lock = redissonClient.getLock(lockKey);
-//
-//        try{
-//            boolean isLocked = lock.tryLock(2, 3, TimeUnit.SECONDS);
-//            if (!isLocked) {
-//                throw new RedisLockException();
-//            }
-//            return joinPoint.proceed();
-//
-//        } finally {
-//            if (lock.isHeldByCurrentThread()) {
-//                lock.unlock();
-//            }
-//        }
-//    }
-
-
     @Around("execution(* liar.gamemvcservice.game.service.vote.VotePolicy.voteLiarUser(..)) && args(gameId, userId, liarId)")
     public void voteLiarUserWithRedisLock(ProceedingJoinPoint joinPoint, String gameId, String userId, String liarId) throws Throwable {
         String lockKey = "VoteLiarUser: " + gameId;
+        voidJoinPointRedissonRLock(joinPoint, lockKey);
+    }
+
+    @Around("execution(* liar.gamemvcservice.game.service.turn.PlayerTurnPolicy.setUpTurn(..)) && args(game)")
+    public GameTurn setUpTurn(ProceedingJoinPoint joinPoint, Game game) throws Throwable {
+        String lockKey = "setUpTurn: " + game.getId();
+        RLock lock = redissonClient.getLock(lockKey);
+
+        try{
+            boolean isLocked = lock.tryLock(2, 3, TimeUnit.SECONDS);
+            if (!isLocked) {
+                throw new RedisLockException();
+            }
+            return (GameTurn) joinPoint.proceed();
+
+        } finally {
+            if (lock.isHeldByCurrentThread()) {
+                lock.unlock();
+            }
+        }
+    }
+
+    private void voidJoinPointRedissonRLock(ProceedingJoinPoint joinPoint, String lockKey) throws Throwable {
         RLock lock = redissonClient.getLock(lockKey);
 
         try {
@@ -114,6 +115,10 @@ public class RedisLockAspect {
 
         else if (arg instanceof Vote) {
             return ((Vote) arg).getId();
+        }
+
+        else if (arg instanceof JoinPlayer) {
+            return ((JoinPlayer) arg).getId();
         }
 
         else if (arg instanceof Object[]) {

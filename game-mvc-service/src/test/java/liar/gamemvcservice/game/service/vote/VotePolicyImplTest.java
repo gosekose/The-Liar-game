@@ -2,8 +2,10 @@ package liar.gamemvcservice.game.service.vote;
 
 import liar.gamemvcservice.game.controller.dto.SetUpGameDto;
 import liar.gamemvcservice.game.domain.Game;
+import liar.gamemvcservice.game.domain.Vote;
 import liar.gamemvcservice.game.domain.VotedResult;
 import liar.gamemvcservice.game.repository.redis.VoteRepository;
+import liar.gamemvcservice.game.service.ThreadServiceOnlyTest;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -23,23 +25,14 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @Transactional
-class VotePolicyImplTest {
+class VotePolicyImplTest extends ThreadServiceOnlyTest {
 
     @Autowired
     VotePolicy votePolicy;
-
-    @Autowired
-    VotePolicyImpl votePolicyImpl;
-
     @Autowired
     VoteRepository voteRepository;
 
-    @Autowired
-    RedissonClient redissonClient;
-
     private Game game;
-    private int num;
-    private Thread[] threads;
 
     @BeforeEach
     public void init() {
@@ -104,7 +97,7 @@ class VotePolicyImplTest {
     }
 
     @Test
-    @DisplayName("멀티 스레딩 환경에서 liar를 투표한다.")
+    @DisplayName("멀티 스레딩 환경에서 liar를 투표한다. : RedissonClient")
     public void voteLiarUser_multiThread() throws Exception {
         //given
         num = 5;
@@ -125,15 +118,80 @@ class VotePolicyImplTest {
         runThreads();
         List<VotedResult> maxVotedLiarUser = votePolicy.getMaxVotedLiarUser(game.getId());
 
-
+        //then
         assertThat(maxVotedLiarUser.size()).isEqualTo(1);
         assertThat(maxVotedLiarUser.get(0).getLiarId()).isEqualTo("2");
         assertThat(maxVotedLiarUser.get(0).getCnt()).isEqualTo(5);
     }
 
-    private void runThreads() throws InterruptedException {
-        for (int i = 0; i < num; i++) threads[i].start();
-        for (int i = 0; i < num; i++) threads[i].join();
+    @Test
+    @DisplayName("멀티 스레딩 환경에서 liar 투표 결과를 반환한다.")
+    public void getMaxVotedLiarUser_multiThread() throws Exception {
+        //given
+        num = 5;
+        votePolicy.saveVote(game);
+
+        //when
+        for (int i = 0; i < num; i++) {
+            int finalIndex = i;
+            threads[i] = new Thread(() -> {
+                try {
+
+                    if (finalIndex  < 2) {
+                        votePolicy.voteLiarUser(game.getId(), String.valueOf(finalIndex + 1), "2");
+                    }
+                    else if (finalIndex < 4) {
+                        votePolicy.voteLiarUser(game.getId(), String.valueOf(finalIndex + 1), "1");
+                    }
+                    else {
+                        votePolicy.voteLiarUser(game.getId(), String.valueOf(finalIndex + 1), "3");
+                    }
+
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
+            });
+        }
+
+        runThreads();
+        List<VotedResult> maxVotedLiarUser = votePolicy.getMaxVotedLiarUser(game.getId());
+
+        //then
+        assertThat(maxVotedLiarUser.size()).isEqualTo(2);
+    }
+
+
+    @Test
+    @DisplayName("멀티 스레딩 환경에서 liar를 투표한다. : synchronized")
+    public void voteUser_synchronized() throws Exception {
+        //given
+        num = 5;
+        votePolicy.saveVote(game);
+
+        //when
+        for (int i = 0; i < num; i++) {
+            int finalIndex = i;
+            threads[i] = new Thread(() -> {
+                voteLiarUser(game.getId(), String.valueOf(finalIndex + 1), "2");
+            });
+        }
+
+        runThreads();
+        List<VotedResult> maxVotedLiarUser = votePolicy.getMaxVotedLiarUser(game.getId());
+
+        //then
+        assertThat(maxVotedLiarUser.size()).isEqualTo(1);
+        assertThat(maxVotedLiarUser.get(0).getLiarId()).isEqualTo("2");
+        assertThat(maxVotedLiarUser.get(0).getCnt()).isEqualTo(5);
+    }
+
+    /**
+     * Syncronized와 성능 비교를 위한 테스트
+     */
+    private synchronized void voteLiarUser(String gameId, String userId, String liarId) {
+        Vote vote = voteRepository.findVoteByGameId(gameId);
+        vote.updateVoteResults(userId, liarId);
+        voteRepository.save(vote);
     }
 
 }

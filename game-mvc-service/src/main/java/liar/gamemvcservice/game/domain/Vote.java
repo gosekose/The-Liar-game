@@ -40,7 +40,6 @@ public class Vote {
                     votedResult.addUserId(userId);
                     votedResult.updateCnt();
                 });
-        System.out.println("votedResults = " + votedResults);
     }
 
     public List<VotedResult> getMaxVotedResult() {

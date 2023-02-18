@@ -41,7 +41,7 @@ class GameRepositoryTest {
     @DisplayName("Game을 저장하면, redis에 저장되어야 한다.")
     public void save_game_success() throws Exception {
         //given
-        SetUpGameDto setUpGameDto = new SetUpGameDto("1", "1", "1", Arrays.asList("2", "3", "4"));
+        SetUpGameDto setUpGameDto = new SetUpGameDto("1", "1", "1", Arrays.asList("1", "2", "3", "4"));
         Game game = Game.of(setUpGameDto);
 
         //when
