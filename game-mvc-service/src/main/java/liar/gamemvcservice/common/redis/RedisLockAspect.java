@@ -5,6 +5,7 @@ import liar.gamemvcservice.game.domain.Game;
 import liar.gamemvcservice.game.domain.GameTurn;
 import liar.gamemvcservice.game.domain.Vote;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
@@ -17,6 +18,7 @@ import java.lang.reflect.Method;
 import java.util.concurrent.TimeUnit;
 
 @Aspect
+@Slf4j
 @RequiredArgsConstructor
 @Component
 public class RedisLockAspect {
@@ -25,16 +27,16 @@ public class RedisLockAspect {
 
     @Around("execution(* liar.gamemvcservice.game.repository.redis..*.save(..)) || " +
             "execution(* liar.gamemvcservice.game.repository.redis..*.delete(..)) || " +
-            "execution(* liar.gamemvcservice.game.repository.redis.VoteRepository.*.findVoteByGameId(..)) || " +
-            "execution(* liar.gamemvcservice.game.repository.redis.VoteRepository.*.findById(..)) || " +
-            "execution(* liar.gamemvcservice.game.service.GameService..*.updatePlayerTurnAndNotifyNextTurnWhenPlayerTurnIsValidated(..)) || " +
-            "execution(* liar.gamemvcservice.game.service.GameService..*.save(..))")
+            "execution(* liar.gamemvcservice.game.repository.redis..*.findVoteByGameId(..)) || " +
+            "execution(* liar.gamemvcservice.game.repository.redis..*.findById(..)) || " +
+            "execution(* liar.gamemvcservice.game.service..*.save(..)) || " +
+            "execution(* liar.gamemvcservice.game.service.vote..*.saveVote(..))")
     public Object executeWithRock(ProceedingJoinPoint joinPoint) throws Throwable {
         MethodSignature signature = (MethodSignature) joinPoint.getSignature();
         Method method = signature.getMethod();
         Class<?> returnType = method.getReturnType();
 
-        System.out.println("joinPoint = " + joinPoint.getArgs());
+        log.info("joinPoint.getArgs() = {}", joinPoint.getArgs());
 
         String lockKey = getLockKey(joinPoint.getArgs());
         RLock lock = redissonClient.getLock(lockKey);
