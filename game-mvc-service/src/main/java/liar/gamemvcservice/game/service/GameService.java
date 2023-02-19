@@ -30,10 +30,10 @@ public class GameService {
 
     public String save(SetUpGameDto dto) {
         Game notSetUpTopicGame = Game.of(dto);
+        String liarId = playerPolicy.setUpPlayerRole(notSetUpTopicGame);
         Topic topic = topicPolicy.setUp();
-        Game setUpTopicGame = notSetUpTopicGame.updateTopicOfGame(topic);
-        playerPolicy.setUpPlayerRole(setUpTopicGame);
-        return gameRepository.save(setUpTopicGame).getId();
+        Game completeGame = notSetUpTopicGame.updateTopicOfGame(topic, liarId);
+        return gameRepository.save(completeGame).getId();
     }
 
     public Player checkPlayerRole(RequestCommonDto dto) {

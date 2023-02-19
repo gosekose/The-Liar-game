@@ -24,7 +24,10 @@ public class Game {
     private String hostId;
     private String gameName;
     private List<String> playerIds;
+    private String liarId;
     private Topic topic;
+    private boolean sendMessage;
+    private boolean sendMessageSuccess;
 
     protected Game (SetUpGameDto setUpGameDto) {
         this.id = UUID.randomUUID().toString();
@@ -32,20 +35,33 @@ public class Game {
         this.hostId = setUpGameDto.getHostId();
         this.gameName = setUpGameDto.getRoomName();
         this.playerIds = setUpGameDto.getUserIds();
+        this.sendMessage = false;
+        this.sendMessageSuccess = false;
     }
 
     public static Game of(SetUpGameDto setUpGameDto) {
         return new Game(setUpGameDto);
     }
 
-    public Game updateTopicOfGame(Topic topic) {
+    public Game updateTopicOfGame(Topic topic, String liarId) {
         this.topic = topic;
+        this.liarId = liarId;
         return this;
     }
 
     public List<String> shufflePlayer() {
         Collections.shuffle(playerIds);
         return this.getPlayerIds();
+    }
+
+    public Game sendMessage() {
+        this.sendMessage = true;
+        return this;
+    }
+
+    public Game sendMessageSuccess() {
+        this.sendMessageSuccess = true;
+        return this;
     }
 
     @Override

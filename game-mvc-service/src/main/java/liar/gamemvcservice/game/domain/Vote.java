@@ -1,6 +1,7 @@
 package liar.gamemvcservice.game.domain;
 
 import jakarta.persistence.Id;
+import liar.gamemvcservice.exception.exception.NotFoundUserException;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -50,6 +51,13 @@ public class Vote {
                 .max(Map.Entry.comparingByKey())
                 .map(Map.Entry::getValue)
                 .orElse(Collections.emptyList());
+    }
+
+    public VotedResult getVotedResult(String userId) {
+        return votedResults.stream()
+                .filter(vote -> vote.getLiarId().equals(userId))
+                .findFirst()
+                .orElseThrow(NotFoundUserException::new);
     }
 
     @Override

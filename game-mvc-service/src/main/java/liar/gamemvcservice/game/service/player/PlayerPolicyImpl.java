@@ -21,7 +21,7 @@ public class PlayerPolicyImpl implements PlayerPolicy {
     private final JoinPlayerRepository joinPlayerRepository;
 
     @Override
-    public void setUpPlayerRole(Game game) {
+    public String setUpPlayerRole(Game game) {
 
         int randomIdx = (int) (Math.random() * game.getPlayerIds().size());
         String liarId = game.getPlayerIds().get(randomIdx);
@@ -42,6 +42,8 @@ public class PlayerPolicyImpl implements PlayerPolicy {
                             }
                         }
                 );
+
+        return liarId;
     }
 
     @Override

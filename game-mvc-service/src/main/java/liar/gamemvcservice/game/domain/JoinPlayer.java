@@ -23,7 +23,7 @@ public class JoinPlayer {
     private Player player;
 
     public JoinPlayer(String gameId, Player player) {
-        this.id = UUID.randomUUID().toString();
+        this.id = gameId + "_" + player.getUserId();
         this.gameId = gameId;
         this.player = player;
     }

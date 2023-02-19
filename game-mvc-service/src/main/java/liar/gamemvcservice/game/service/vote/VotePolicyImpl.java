@@ -24,7 +24,6 @@ import java.util.concurrent.TimeUnit;
 public class VotePolicyImpl implements VotePolicy {
 
     private final VoteRepository voteRepository;
-    private final RedissonClient redissonClient;
 
     /**
      * game의 모든 턴이 끝나면, vote 객체를 생성하여 저장한다.

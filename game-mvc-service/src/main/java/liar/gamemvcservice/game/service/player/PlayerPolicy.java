@@ -6,7 +6,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 public interface PlayerPolicy {
-    void setUpPlayerRole(Game game);
+    String setUpPlayerRole(Game game);
 
     Player checkPlayerInfo(String gameId, String userId);
 }
