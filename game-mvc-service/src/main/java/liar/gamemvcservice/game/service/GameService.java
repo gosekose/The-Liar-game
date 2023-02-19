@@ -82,8 +82,7 @@ public class GameService {
 
     public NextTurn updatePlayerTurnAndNotifyNextTurnWhenPlayerTurnIsValidated(String gameId, String userId) {
         GameTurn gameTurn = playerTurnPolicy
-                .updatePlayerTurnWhenPlayerTurnIsValidated(gameTurnRepository.findGameTurnByGameId(gameId), userId);
-        gameTurnRepository.save(gameTurn);
+                .updateTurnWhenPlayerTurnIsValidated(gameTurnRepository.findGameTurnByGameId(gameId), userId);
         return gameTurn.setIfExistsNextTurn();
     }
 
