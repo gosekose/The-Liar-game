@@ -34,7 +34,6 @@ public class RedisLockAspect {
             "execution(* liar.gamemvcservice.game.repository.redis..*.findVoteByGameId(..)) || " +
             "execution(* liar.gamemvcservice.game.repository.redis..*.findByGameId(..)) || " +
             "execution(* liar.gamemvcservice.game.repository.redis..*.findById(..)) || " +
-            "execution(* liar.gamemvcservice.game.service..*.save(..)) || " +
             "execution(* liar.gamemvcservice.game.service.vote..*.saveVote(..))"
     )
     public Object executeWithRock(ProceedingJoinPoint joinPoint) throws Throwable {

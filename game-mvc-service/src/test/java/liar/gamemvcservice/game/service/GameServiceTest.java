@@ -8,6 +8,7 @@ import liar.gamemvcservice.game.domain.*;
 import liar.gamemvcservice.game.repository.redis.GameRepository;
 import liar.gamemvcservice.game.repository.redis.JoinPlayerRepository;
 import org.assertj.core.api.Assertions;
+import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -15,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -45,31 +47,23 @@ class GameServiceTest {
     public void save_success() throws Exception {
         //given
         SetUpGameDto setUpGameDto = new SetUpGameDto("roomId", "1", "gameName", Arrays.asList("1", "2", "3", "4"));
-
-        //when
         String gameId = gameService.save(setUpGameDto);
         Game game = gameRepository.findById(gameId).orElseThrow(NotFoundGameException::new);
+
+        //when
         List<JoinPlayer> joinPlayers = joinPlayerRepository.findByGameId(game.getId());
-
-        List<JoinPlayer> liar = joinPlayers.stream()
-                .filter(player -> player.getPlayer().getGameRole() == GameRole.LIAR)
-                .collect(Collectors.toList());
-
-        List<JoinPlayer> citizens = joinPlayers.stream()
-                .filter(player -> player.getPlayer().getGameRole() == GameRole.CITIZEN)
-                .collect(Collectors.toList());
-
+        List<JoinPlayer> liar = getJoinPlayersByRole(joinPlayers, GameRole.LIAR);
+        List<JoinPlayer> citizens = getJoinPlayersByRole(joinPlayers, GameRole.CITIZEN);
 
         //then
         assertThat(game.getGameName()).isEqualTo("gameName");
         assertThat(game.getHostId()).isEqualTo("1");
         assertThat(game.getRoomId()).isEqualTo("roomId");
         assertThat(game.getTopic()).isNotNull();
-
+        assertThat(game.getLiarId()).isNotNull();
         assertThat(joinPlayers.size()).isEqualTo(4);
         assertThat(liar.size()).isEqualTo(1);
         assertThat(citizens.size()).isEqualTo(3);
-
     }
 
 
@@ -81,24 +75,12 @@ class GameServiceTest {
         String gameId = gameService.save(setUpGameDto);
 
         //when
-        Player player1 = gameService.checkPlayerRole(new RequestCommonDto(gameId, "1"));
-        Player player2 = gameService.checkPlayerRole(new RequestCommonDto(gameId, "2"));
-        Player player3 = gameService.checkPlayerRole(new RequestCommonDto(gameId, "3"));
-        Player player4 = gameService.checkPlayerRole(new RequestCommonDto(gameId, "4"));
-
-        List<Player> players = Arrays.asList(player1, player2, player3, player4);
-
-        List<Player> citizens = players.stream()
-                .filter(player -> player.getGameRole() == GameRole.CITIZEN)
-                .collect(Collectors.toList());
-
-        List<Player> liar = players.stream()
-                .filter(player -> player.getGameRole() == GameRole.LIAR)
-                .collect(Collectors.toList());
-
+        List<Player> players = getPlayers(gameId);
+        List<Player> citizens = getPlayersByRole(players, GameRole.CITIZEN);
+        List<Player> liar = getPlayersByRole(players, GameRole.LIAR);
 
         //then
-        assertThat(player1.getUserId()).isEqualTo("1");
+        assertThat(players.get(0).getUserId()).isEqualTo("1");
         assertThat(citizens.size()).isEqualTo(3);
         assertThat(liar.size()).isEqualTo(1);
     }
@@ -115,8 +97,7 @@ class GameServiceTest {
         //then
         Assertions.assertThatThrownBy(() -> {
             gameService.checkPlayerRole(new RequestCommonDto("wrongId", "1"));
-        })
-                .isInstanceOf(NotFoundGameException.class);
+        }).isInstanceOf(NotFoundGameException.class);
     }
 
     @Test
@@ -131,8 +112,7 @@ class GameServiceTest {
         //then
         Assertions.assertThatThrownBy(() -> {
                     gameService.checkPlayerRole(new RequestCommonDto(gameId, "wrongUserId"));
-                })
-                .isInstanceOf(NotFoundUserException.class);
+                }).isInstanceOf(NotFoundUserException.class);
     }
 
 
@@ -144,20 +124,9 @@ class GameServiceTest {
         String gameId = gameService.save(setUpGameDto);
 
         //when
-        Topic topic1 = gameService.checkTopic(new RequestCommonDto(gameId, "1"));
-        Topic topic2 = gameService.checkTopic(new RequestCommonDto(gameId, "2"));
-        Topic topic3 = gameService.checkTopic(new RequestCommonDto(gameId, "3"));
-        Topic topic4 = gameService.checkTopic(new RequestCommonDto(gameId, "4"));
-
-        List<Topic> topics = Arrays.asList(topic1, topic2, topic3, topic4);
-
-        List<Topic> liarTopic = topics.stream()
-                .filter(topic -> topic == null)
-                .collect(Collectors.toList());
-
-        List<Topic> citizensTopic = topics.stream()
-                .filter(topic -> topic != null)
-                .collect(Collectors.toList());
+        List<Topic> topics = getTopics(gameId);
+        List<Topic> liarTopic = getLiarTopic(topics);
+        List<Topic> citizensTopic = getCitizensTopic(topics);
 
         //then
         assertThat(liarTopic.size()).isEqualTo(1);
@@ -171,15 +140,14 @@ class GameServiceTest {
     public void checkTopic_fail_notFoundGameId() throws Exception {
         //given
         SetUpGameDto setUpGameDto = new SetUpGameDto("roomId", "1", "gameName", Arrays.asList("1", "2", "3", "4"));
-        gameService.save(setUpGameDto);
 
         //when
+        gameService.save(setUpGameDto);
 
         //then
         assertThatThrownBy(() -> {
             gameService.checkTopic(new RequestCommonDto("wrongGameId", "1"));
-        })
-                .isInstanceOf(NotFoundGameException.class);
+        }).isInstanceOf(NotFoundGameException.class);
     }
 
     @Test
@@ -187,14 +155,54 @@ class GameServiceTest {
     public void checkTopic_fail_notFoundUserId() throws Exception {
         //given
         SetUpGameDto setUpGameDto = new SetUpGameDto("roomId", "1", "gameName", Arrays.asList("1", "2", "3", "4"));
-        String gameId = gameService.save(setUpGameDto);
 
         //when
+        String gameId = gameService.save(setUpGameDto);
 
         //then
         assertThatThrownBy(() -> {
             gameService.checkTopic(new RequestCommonDto(gameId, "wrongUserID"));
-        })
-                .isInstanceOf(NotFoundUserException.class);
+        }).isInstanceOf(NotFoundUserException.class);
+    }
+
+    @NotNull
+    private static List<JoinPlayer> getJoinPlayersByRole(List<JoinPlayer> joinPlayers, GameRole liar) {
+        return joinPlayers.stream()
+                .filter(player -> player.getPlayer().getGameRole() == liar)
+                .collect(Collectors.toList());
+    }
+
+    @NotNull
+    private static List<Player> getPlayersByRole(List<Player> players, GameRole citizen) {
+        return players.stream()
+                .filter(player -> player.getGameRole() == citizen)
+                .collect(Collectors.toList());
+    }
+
+    @NotNull
+    private List<Topic> getTopics(String gameId) {
+        List<Topic> topics = new ArrayList<>();
+        for (int i = 0; i < 4; i++) topics.add(gameService.checkTopic(new RequestCommonDto(gameId, String.valueOf(i))));
+        return topics;
+    }
+
+    @NotNull
+    private static List<Topic> getCitizensTopic(List<Topic> topics) {
+        return topics.stream()
+                .filter(topic -> topic != null)
+                .collect(Collectors.toList());
+    }
+
+    @NotNull
+    private static List<Topic> getLiarTopic(List<Topic> topics) {
+        return topics.stream()
+                .filter(topic -> topic == null)
+                .collect(Collectors.toList());
+    }
+
+    private List<Player> getPlayers(String gameId) {
+        List<Player> players = new ArrayList<>();
+        for (int i = 0; i < 4; i++) players.add(gameService.checkPlayerRole(new RequestCommonDto(gameId, "1")));
+        return players;
     }
 }

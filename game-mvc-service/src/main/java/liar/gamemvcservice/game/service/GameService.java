@@ -47,23 +47,11 @@ public class GameService {
             Game game = findGameById(dto.getGameId());
             return game.getTopic();
         }
-
         return null;
     }
 
     public Game findGameById(String gameId) {
         return gameRepository.findById(gameId).orElseThrow(NotFoundGameException::new);
-    }
-
-    public List<JoinPlayer> findJoinPlayersByGameId(String gameId) {
-        return isValidateGameId(joinPlayerRepository.findByGameId(gameId));
-    }
-
-    private List<JoinPlayer> isValidateGameId(List<JoinPlayer> joinPlayers) {
-        if (!joinPlayers.isEmpty()) {
-            return joinPlayers;
-        }
-        throw new NotFoundGameException();
     }
 
     public JoinPlayer findJoinMemberOfRequestGame(String gameId, String userId) {
@@ -84,6 +72,17 @@ public class GameService {
         GameTurn gameTurn = playerTurnPolicy
                 .updateTurnWhenPlayerTurnIsValidated(gameTurnRepository.findGameTurnByGameId(gameId), userId);
         return gameTurn.setIfExistsNextTurn();
+    }
+
+    private List<JoinPlayer> findJoinPlayersByGameId(String gameId) {
+        return isValidateGameId(joinPlayerRepository.findByGameId(gameId));
+    }
+
+    private List<JoinPlayer> isValidateGameId(List<JoinPlayer> joinPlayers) {
+        if (!joinPlayers.isEmpty()) {
+            return joinPlayers;
+        }
+        throw new NotFoundGameException();
     }
 
 }
