@@ -2,13 +2,10 @@ package liar.gamemvcservice.game.service.dto;
 
 import liar.gamemvcservice.game.domain.Game;
 import liar.gamemvcservice.game.domain.GameRole;
-import liar.gamemvcservice.game.domain.Player;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.List;
 
 @Getter
 @NoArgsConstructor
@@ -20,11 +17,11 @@ public class GameResultSaveMessage {
     private Long topicId;
     private int totalUserCnt;
     private GameRole winner;
-    private ConcurrentHashMap<Player, Boolean> playersInfoAndWhoRightAnswers;
+    private List<PlayersInfoDto> playersInfo;
 
     protected GameResultSaveMessage(String gameId, String roomId, String gameName, String hostId,
                                  Long topicId, int totalUserCnt, GameRole winner,
-                                 ConcurrentHashMap<Player, Boolean> playersInfoAndWhoRightAnswers) {
+                                    List<PlayersInfoDto> playersInfo) {
         this.gameId = gameId;
         this.roomId = roomId;
         this.gameName = gameName;
@@ -32,12 +29,12 @@ public class GameResultSaveMessage {
         this.topicId = topicId;
         this.totalUserCnt = totalUserCnt;
         this.winner = winner;
-        this.playersInfoAndWhoRightAnswers = playersInfoAndWhoRightAnswers;
+        this.playersInfo = playersInfo;
     }
 
     public static GameResultSaveMessage of(Game game, GameResultToClient results) {
         return new GameResultSaveMessage(game.getId(), game.getRoomId(), game.getGameName(),
                 game.getHostId(), game.getTopic().getId(), game.getPlayerIds().size(),
-                results.getWinner(), results.getPlayersInfoAndWhoRightAnswers());
+                results.getWinner(), results.getPlayersInfo());
     }
 }

@@ -8,11 +8,12 @@ import liar.gamemvcservice.game.repository.redis.JoinPlayerRepository;
 import liar.gamemvcservice.game.repository.redis.VoteRepository;
 import liar.gamemvcservice.game.service.dto.GameResultSaveMessage;
 import liar.gamemvcservice.game.service.dto.GameResultToClient;
+import liar.gamemvcservice.game.service.dto.PlayersInfoDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 import static liar.gamemvcservice.game.domain.GameRole.CITIZEN;
 import static liar.gamemvcservice.game.domain.GameRole.LIAR;
@@ -21,7 +22,7 @@ import static liar.gamemvcservice.game.domain.GameRole.LIAR;
 @RequiredArgsConstructor
 public class ResultPolicyImpl implements ResultPolicy {
 
-    private JoinPlayerRepository joinPlayerRepository;
+    private final JoinPlayerRepository joinPlayerRepository;
     private final GameRepository gameRepository;
     private final VoteRepository voteRepository;
 
@@ -44,15 +45,15 @@ public class ResultPolicyImpl implements ResultPolicy {
     public GameResultToClient informGameResult(Game game, List<VotedResult> votedResults) {
         GameRole winner = checkWhoWin(game, votedResults) ? CITIZEN : LIAR;
         VotedResult votedResult = getVotedResult(game.getId());
-        ConcurrentHashMap map = new ConcurrentHashMap<>();
 
-        joinPlayerRepository
-                .findByGameId(game.getId())
-                .stream()
-                .map(player -> player.getPlayer())
-                .forEach(player -> {map.put(player,votedResult.getUserIds().contains(player));});
+        return GameResultToClient.of(game.getId(), winner,
+                joinPlayerRepository.findByGameId(game.getId())
+                        .stream()
+                        .map(JoinPlayer::getPlayer)
+                        .map(player -> new PlayersInfoDto(player.getUserId(), player.getGameRole(),
+                                votedResult.getUserIds().contains(player.getUserId())))
+                        .collect(Collectors.toList()));
 
-        return GameResultToClient.of(game.getId(), winner, map);
     }
 
     /**
@@ -61,6 +62,7 @@ public class ResultPolicyImpl implements ResultPolicy {
     @Override
     public GameResultSaveMessage messageGameResult(Game game, GameResultToClient gameResult) {
         if (!game.isSendMessage()) {
+            updateSendMessage(game);
             return GameResultSaveMessage.of(game, gameResult);
         }
         return null;
@@ -83,6 +85,11 @@ public class ResultPolicyImpl implements ResultPolicy {
 
     private JoinPlayer getJoinPlayer(String gameId, String userId) {
         return joinPlayerRepository.findById(gameId + "_" + userId).orElseThrow(NotFoundUserException::new);
+    }
+
+    private void updateSendMessage(Game game) {
+        game.sendMessage();
+        gameRepository.save(game);
     }
 
 }

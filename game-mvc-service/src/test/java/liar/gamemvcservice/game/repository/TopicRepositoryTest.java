@@ -1,4 +1,4 @@
-package liar.gamemvcservice.game.repository.redis;
+package liar.gamemvcservice.game.repository;
 
 import liar.gamemvcservice.game.domain.Topic;
 import liar.gamemvcservice.game.repository.TopicRepository;

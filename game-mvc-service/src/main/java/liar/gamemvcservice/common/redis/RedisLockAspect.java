@@ -5,6 +5,8 @@ import liar.gamemvcservice.game.domain.Game;
 import liar.gamemvcservice.game.domain.GameTurn;
 import liar.gamemvcservice.game.domain.JoinPlayer;
 import liar.gamemvcservice.game.domain.Vote;
+import liar.gamemvcservice.game.service.dto.GameResultSaveMessage;
+import liar.gamemvcservice.game.service.dto.GameResultToClient;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
@@ -64,17 +66,28 @@ public class RedisLockAspect {
         voidJoinPointRedissonRLock(joinPoint, lockKey);
     }
 
+    @Around("execution(* liar.gamemvcservice.game.service.result.ResultPolicy.messageGameResult(..)) && args(game, gameResult)")
+    public GameResultSaveMessage messageGameResultWithRedisLock(ProceedingJoinPoint joinPoint, Game game, GameResultToClient gameResult) throws Throwable {
+        String lockKey = "messageGameResult: " + game.getId();
+        return (GameResultSaveMessage) executeWithRedisLock(joinPoint, lockKey);
+    }
+
+
     @Around("execution(* liar.gamemvcservice.game.service.turn.PlayerTurnPolicy.setUpTurn(..)) && args(game)")
     public GameTurn setUpTurn(ProceedingJoinPoint joinPoint, Game game) throws Throwable {
         String lockKey = "setUpTurn: " + game.getId();
+        return (GameTurn) executeWithRedisLock(joinPoint, lockKey);
+    }
+
+    public Object executeWithRedisLock(ProceedingJoinPoint joinPoint, String lockKey) throws Throwable {
         RLock lock = redissonClient.getLock(lockKey);
 
-        try{
+        try {
             boolean isLocked = lock.tryLock(2, 3, TimeUnit.SECONDS);
             if (!isLocked) {
                 throw new RedisLockException();
             }
-            return (GameTurn) joinPoint.proceed();
+            return joinPoint.proceed();
 
         } finally {
             if (lock.isHeldByCurrentThread()) {
@@ -82,6 +95,7 @@ public class RedisLockAspect {
             }
         }
     }
+
 
     private void voidJoinPointRedissonRLock(ProceedingJoinPoint joinPoint, String lockKey) throws Throwable {
         RLock lock = redissonClient.getLock(lockKey);

@@ -1,13 +1,12 @@
 package liar.gamemvcservice.game.service.dto;
 
 import liar.gamemvcservice.game.domain.GameRole;
-import liar.gamemvcservice.game.domain.Player;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.List;
 
 @Getter
 @AllArgsConstructor
@@ -15,9 +14,9 @@ import java.util.concurrent.ConcurrentHashMap;
 public class GameResultToClient {
     private String gameId;
     private GameRole winner;
-    private ConcurrentHashMap<Player, Boolean> playersInfoAndWhoRightAnswers;
+    private List<PlayersInfoDto> playersInfo;
 
-    public static GameResultToClient of(String gameId, GameRole whoWin, ConcurrentHashMap<Player, Boolean> playersInfoAndWhoRightAnswers) {
-        return new GameResultToClient(gameId, whoWin, playersInfoAndWhoRightAnswers);
+    public static GameResultToClient of(String gameId, GameRole whoWin, List<PlayersInfoDto> playersInfoDto) {
+        return new GameResultToClient(gameId, whoWin, playersInfoDto);
     }
 }
