@@ -4,10 +4,14 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class RequestCommonDto {
-    private String gameId;
-    private String userId;
+public class SetUpGameRequest {
+    private String roomId;
+    private String hostId;
+    private String roomName;
+    private List<String> userIds;
 }

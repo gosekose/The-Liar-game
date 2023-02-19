@@ -6,8 +6,8 @@ import liar.gamemvcservice.game.domain.*;
 import liar.gamemvcservice.game.repository.redis.GameRepository;
 import liar.gamemvcservice.game.repository.redis.JoinPlayerRepository;
 import liar.gamemvcservice.game.repository.redis.VoteRepository;
-import liar.gamemvcservice.game.service.dto.GameResultSaveMessage;
-import liar.gamemvcservice.game.service.dto.GameResultToClient;
+import liar.gamemvcservice.game.service.dto.GameResultSaveMessageDto;
+import liar.gamemvcservice.game.service.dto.GameResultToClientDto;
 import liar.gamemvcservice.game.service.dto.PlayersInfoDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -42,11 +42,11 @@ public class ResultPolicyImpl implements ResultPolicy {
      * 게임 결과를 클라이언트에게 알리다.
      */
     @Override
-    public GameResultToClient informGameResult(Game game, List<VotedResult> votedResults) {
+    public GameResultToClientDto informGameResult(Game game, List<VotedResult> votedResults) {
         GameRole winner = checkWhoWin(game, votedResults) ? CITIZEN : LIAR;
         VotedResult votedResult = getVotedResult(game.getId());
 
-        return GameResultToClient.of(game.getId(), winner,
+        return GameResultToClientDto.of(game.getId(), winner,
                 joinPlayerRepository.findByGameId(game.getId())
                         .stream()
                         .map(JoinPlayer::getPlayer)
@@ -60,10 +60,10 @@ public class ResultPolicyImpl implements ResultPolicy {
      * 게임 결과를 result 서버로 메세지 보낸다.
      */
     @Override
-    public GameResultSaveMessage messageGameResult(Game game, GameResultToClient gameResult) {
+    public GameResultSaveMessageDto messageGameResult(Game game, GameResultToClientDto gameResult) {
         if (!game.isSendMessage()) {
             updateSendMessage(game);
-            return GameResultSaveMessage.of(game, gameResult);
+            return GameResultSaveMessageDto.of(game, gameResult);
         }
         return null;
     }

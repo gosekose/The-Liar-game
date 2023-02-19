@@ -1,7 +1,7 @@
 package liar.gamemvcservice.game.service.turn;
 
 import liar.gamemvcservice.exception.exception.NotUserTurnException;
-import liar.gamemvcservice.game.controller.dto.SetUpGameDto;
+import liar.gamemvcservice.game.service.dto.SetUpGameDto;
 import liar.gamemvcservice.game.domain.Game;
 import liar.gamemvcservice.game.domain.GameTurn;
 import liar.gamemvcservice.game.repository.redis.GameRepository;

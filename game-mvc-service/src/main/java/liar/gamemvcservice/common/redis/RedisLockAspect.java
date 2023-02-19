@@ -5,8 +5,8 @@ import liar.gamemvcservice.game.domain.Game;
 import liar.gamemvcservice.game.domain.GameTurn;
 import liar.gamemvcservice.game.domain.JoinPlayer;
 import liar.gamemvcservice.game.domain.Vote;
-import liar.gamemvcservice.game.service.dto.GameResultSaveMessage;
-import liar.gamemvcservice.game.service.dto.GameResultToClient;
+import liar.gamemvcservice.game.service.dto.GameResultSaveMessageDto;
+import liar.gamemvcservice.game.service.dto.GameResultToClientDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
@@ -66,9 +66,9 @@ public class RedisLockAspect {
     }
 
     @Around("execution(* liar.gamemvcservice.game.service.result.ResultPolicy.messageGameResult(..)) && args(game, gameResult)")
-    public GameResultSaveMessage messageGameResultWithRedisLock(ProceedingJoinPoint joinPoint, Game game, GameResultToClient gameResult) throws Throwable {
+    public GameResultSaveMessageDto messageGameResultWithRedisLock(ProceedingJoinPoint joinPoint, Game game, GameResultToClientDto gameResult) throws Throwable {
         String lockKey = "messageGameResult: " + game.getId();
-        return (GameResultSaveMessage) executeWithRedisLock(joinPoint, lockKey);
+        return (GameResultSaveMessageDto) executeWithRedisLock(joinPoint, lockKey);
     }
 
 

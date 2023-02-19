@@ -4,12 +4,13 @@ import liar.gamemvcservice.exception.exception.GameTurnEndException;
 import liar.gamemvcservice.exception.exception.NotFoundGameException;
 import liar.gamemvcservice.exception.exception.NotFoundUserException;
 import liar.gamemvcservice.exception.exception.NotUserTurnException;
-import liar.gamemvcservice.game.controller.dto.RequestCommonDto;
-import liar.gamemvcservice.game.controller.dto.SetUpGameDto;
+import liar.gamemvcservice.game.service.dto.CommonDto;
+import liar.gamemvcservice.game.service.dto.SetUpGameDto;
 import liar.gamemvcservice.game.domain.*;
 import liar.gamemvcservice.game.repository.redis.GameRepository;
 import liar.gamemvcservice.game.repository.redis.GameTurnRepository;
 import liar.gamemvcservice.game.repository.redis.JoinPlayerRepository;
+import liar.gamemvcservice.game.repository.redis.VoteRepository;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -41,6 +42,8 @@ class GameServiceTest extends ThreadServiceOnlyTest {
     private String gameId;
     @Autowired
     private GameTurnRepository gameTurnRepository;
+    @Autowired
+    private VoteRepository voteRepository;
 
     @BeforeEach
     public void init() {
@@ -102,7 +105,7 @@ class GameServiceTest extends ThreadServiceOnlyTest {
 
         //then
         assertThatThrownBy(() -> {
-            gameService.checkPlayerRole(new RequestCommonDto(wrongId, "1"));
+            gameService.checkPlayerRole(new CommonDto(wrongId, "1"));
         }).isInstanceOf(NotFoundGameException.class);
     }
 
@@ -114,7 +117,7 @@ class GameServiceTest extends ThreadServiceOnlyTest {
 
         //then
         assertThatThrownBy(() -> {
-                    gameService.checkPlayerRole(new RequestCommonDto(gameId, wrongId));
+                    gameService.checkPlayerRole(new CommonDto(gameId, wrongId));
                 }).isInstanceOf(NotFoundUserException.class);
     }
 
@@ -143,7 +146,7 @@ class GameServiceTest extends ThreadServiceOnlyTest {
 
         //then
         assertThatThrownBy(() -> {
-            gameService.checkTopic(new RequestCommonDto(wrongId, "1"));
+            gameService.checkTopic(new CommonDto(wrongId, "1"));
         }).isInstanceOf(NotFoundGameException.class);
     }
 
@@ -155,7 +158,7 @@ class GameServiceTest extends ThreadServiceOnlyTest {
 
         //then
         assertThatThrownBy(() -> {
-            gameService.checkTopic(new RequestCommonDto(gameId, wrongId));
+            gameService.checkTopic(new CommonDto(gameId, wrongId));
         }).isInstanceOf(NotFoundUserException.class);
     }
 
@@ -220,12 +223,12 @@ class GameServiceTest extends ThreadServiceOnlyTest {
 
     @Test
     @DisplayName("플레이어 턴이라면, 턴을 업데이트하고 다음 턴을 리턴한다.")
-    public void updatePlayerTurnAndNotifyNextTurnWhenPlayerTurnIsValidated() throws Exception {
+    public void updateAndInformPlayerTurn() throws Exception {
         //given
         List<String> gamePlayerTurns = gameService.setUpTurn(gameId);
 
         //when
-        NextTurn nextTurn = gameService.updatePlayerTurnAndInformNextTurnWhenPlayerTurnIsValidated(gameId, gamePlayerTurns.get(0));
+        NextTurn nextTurn = gameService.updateAndInformPlayerTurn(gameId, gamePlayerTurns.get(0));
 
         //then
         assertThat(nextTurn.getUserIdOfNextTurn()).isEqualTo(gamePlayerTurns.get(1));
@@ -234,7 +237,7 @@ class GameServiceTest extends ThreadServiceOnlyTest {
 
     @Test
     @DisplayName("플레이어 턴이 아니라면, NotUserTurnException 예외 발생")
-    public void updatePlayerTurnAndNotifyNextTurnWhenPlayerTurnIsValidated_notTurn() throws Exception {
+    public void updateAndInformPlayerTurn_notTurn() throws Exception {
         //given
         List<String> gamePlayerTurns = gameService.setUpTurn(gameId);
 
@@ -243,27 +246,29 @@ class GameServiceTest extends ThreadServiceOnlyTest {
 
         //then
         assertThatThrownBy(() -> {
-            gameService.updatePlayerTurnAndInformNextTurnWhenPlayerTurnIsValidated(gameId, userId);
+            gameService.updateAndInformPlayerTurn(gameId, userId);
         }).isInstanceOf(NotUserTurnException.class);
     }
 
     @Test
-    @DisplayName("플레이어가 마지막 턴이라면, NextTurn null 반환")
-    public void updatePlayerTurnAndNotifyNextTurnWhenPlayerTurnIsValidated_lastTurn() throws Exception {
+    @DisplayName("플레이어가 마지막 턴이라면, NextTurn null 반환하고 vote를 set한다.")
+    public void updateAndInformPlayerTurn_lastTurn() throws Exception {
         //given
         List<String> gamePlayerTurns = gameService.setUpTurn(gameId);
 
         //when
         NextTurn nextTurn = playUntilLastTurn(gamePlayerTurns);
+        Vote vote = voteRepository.findVoteByGameId(gameId);
 
         //then
         assertThat(nextTurn.getUserIdOfNextTurn()).isNull();
         assertThat(nextTurn.isLastTurn()).isTrue();
+        assertThat(vote.getVotedResults().size()).isEqualTo(gamePlayerTurns.size());
     }
 
     @Test
     @DisplayName("플레이어가 마지막 턴이 지났음에도 요청이 오면, GameTurnEndException 반환")
-    public void updatePlayerTurnAndNotifyNextTurnWhenPlayerTurnIsValidated_exception() throws Exception {
+    public void updateAndInformPlayerTurn_exception() throws Exception {
         //given
         List<String> gamePlayerTurns = gameService.setUpTurn(gameId);
 
@@ -273,7 +278,7 @@ class GameServiceTest extends ThreadServiceOnlyTest {
         //then
         assertThatThrownBy(() -> {
             gameService
-                    .updatePlayerTurnAndInformNextTurnWhenPlayerTurnIsValidated(gameId, gamePlayerTurns.get(0));
+                    .updateAndInformPlayerTurn(gameId, gamePlayerTurns.get(0));
         }).isInstanceOf(GameTurnEndException.class);
     }
 
@@ -294,7 +299,7 @@ class GameServiceTest extends ThreadServiceOnlyTest {
     @NotNull
     private List<Topic> getTopics(String gameId) {
         List<Topic> topics = new ArrayList<>();
-        for (int i = 1; i < 5; i++) topics.add(gameService.checkTopic(new RequestCommonDto(gameId, String.valueOf(i))));
+        for (int i = 1; i < 5; i++) topics.add(gameService.checkTopic(new CommonDto(gameId, String.valueOf(i))));
         return topics;
     }
 
@@ -315,7 +320,7 @@ class GameServiceTest extends ThreadServiceOnlyTest {
     private List<Player> getPlayers(String gameId) {
         List<Player> players = new ArrayList<>();
         for (int i = 1; i < 5; i++)
-            players.add(gameService.checkPlayerRole(new RequestCommonDto(gameId, String.valueOf(i))));
+            players.add(gameService.checkPlayerRole(new CommonDto(gameId, String.valueOf(i))));
         return players;
     }
 
@@ -325,10 +330,10 @@ class GameServiceTest extends ThreadServiceOnlyTest {
         }
     }
 
-    private NextTurn playUntilLastTurn(List<String> gamePlayerTurns) {
+    private NextTurn playUntilLastTurn(List<String> gamePlayerTurns) throws InterruptedException {
         NextTurn nextTurn = null;
         for (int i = 0; i < gamePlayerTurns.size() * 2; i++) {
-            nextTurn = gameService.updatePlayerTurnAndInformNextTurnWhenPlayerTurnIsValidated(gameId,
+            nextTurn = gameService.updateAndInformPlayerTurn(gameId,
                     gamePlayerTurns.get(i % gamePlayerTurns.size()));
         }
         return nextTurn;

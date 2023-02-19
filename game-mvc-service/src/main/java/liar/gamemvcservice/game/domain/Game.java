@@ -1,12 +1,10 @@
 package liar.gamemvcservice.game.domain;
 
 import jakarta.persistence.Id;
-import jakarta.persistence.Index;
-import liar.gamemvcservice.game.controller.dto.SetUpGameDto;
+import liar.gamemvcservice.game.service.dto.SetUpGameDto;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.ToString;
 import org.springframework.data.redis.core.RedisHash;
 
 import java.util.Collections;

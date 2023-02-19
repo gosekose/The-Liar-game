@@ -11,12 +11,12 @@ import java.util.List;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class GameResultToClient {
+public class GameResultToClientDto {
     private String gameId;
     private GameRole winner;
     private List<PlayersInfoDto> playersInfo;
 
-    public static GameResultToClient of(String gameId, GameRole whoWin, List<PlayersInfoDto> playersInfoDto) {
-        return new GameResultToClient(gameId, whoWin, playersInfoDto);
+    public static GameResultToClientDto of(String gameId, GameRole whoWin, List<PlayersInfoDto> playersInfoDto) {
+        return new GameResultToClientDto(gameId, whoWin, playersInfoDto);
     }
 }

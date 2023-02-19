@@ -1,8 +1,8 @@
 package liar.gamemvcservice.game.controller;
 
 import com.google.gson.Gson;
-import liar.gamemvcservice.game.controller.dto.RequestCommonDto;
-import liar.gamemvcservice.game.controller.dto.SetUpGameDto;
+import liar.gamemvcservice.game.service.dto.CommonDto;
+import liar.gamemvcservice.game.service.dto.SetUpGameDto;
 import liar.gamemvcservice.game.service.GameService;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
@@ -81,14 +81,14 @@ class SetUpChatControllerTest extends CommonController {
     public void checkUserRole() throws Exception {
         //given
         String gameId = saveGameAndGetGameId();
-        RequestCommonDto requestCommonDto = new RequestCommonDto(gameId, devUser1Id);
+        CommonDto commonDto = new CommonDto(gameId, devUser1Id);
 
         //when
         ResultActions result = mockMvc.perform(
-                get("/game-service/game/{userId}/role", requestCommonDto.getUserId())
+                get("/game-service/game/{userId}/role", commonDto.getUserId())
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(new Gson().toJson(requestCommonDto))
+                        .content(new Gson().toJson(commonDto))
                         .header("Authorization", "Bearer AccessToken")
                         .header("RefreshToken", "refreshToken")
                         .header("userId", devUser1Id));
@@ -119,14 +119,14 @@ class SetUpChatControllerTest extends CommonController {
     public void checkTopic() throws Exception {
         //given
         String gameId = saveGameAndGetGameId();
-        RequestCommonDto requestCommonDto = new RequestCommonDto(gameId, devUser1Id);
+        CommonDto commonDto = new CommonDto(gameId, devUser1Id);
 
         //when
         ResultActions result = mockMvc.perform(
-                get("/game-service/game/{userId}/topic", requestCommonDto.getUserId())
+                get("/game-service/game/{userId}/topic", commonDto.getUserId())
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(new Gson().toJson(requestCommonDto))
+                        .content(new Gson().toJson(commonDto))
                         .header("Authorization", "Bearer AccessToken")
                         .header("RefreshToken", "refreshToken")
                         .header("userId", devUser1Id));
