@@ -60,9 +60,9 @@ public class RedisLockAspect {
     }
 
     @Around("execution(* liar.gamemvcservice.game.service.vote.VotePolicy.voteLiarUser(..)) && args(gameId, userId, liarId)")
-    public void voteLiarUserWithRedisLock(ProceedingJoinPoint joinPoint, String gameId, String userId, String liarId) throws Throwable {
+    public boolean voteLiarUserWithRedisLock(ProceedingJoinPoint joinPoint, String gameId, String userId, String liarId) throws Throwable {
         String lockKey = "VoteLiarUser: " + gameId;
-        voidJoinPointRedissonRLock(joinPoint, lockKey);
+        return (boolean) executeWithRedisLock(joinPoint, lockKey);
     }
 
     @Around("execution(* liar.gamemvcservice.game.service.result.ResultPolicy.messageGameResult(..)) && args(game, gameResult)")

@@ -1,17 +1,13 @@
 package liar.gamemvcservice.game.domain;
 
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
 
 class VoteTest {
 
@@ -109,7 +105,7 @@ class VoteTest {
         updateVoteResultsByUsers(vote);
 
         //when
-        List<VotedResult> maxVotedResult = vote.getMaxVotedResult();
+        List<VotedResult> maxVotedResult = vote.getMostVotedResult();
 
         //then
         assertThat(maxVotedResult.size()).isEqualTo(2);
@@ -141,7 +137,7 @@ class VoteTest {
         }
 
         //when
-        List<VotedResult> maxVotedResult = vote.getMaxVotedResult();
+        List<VotedResult> maxVotedResult = vote.getMostVotedResult();
 
         //then
         assertThat(maxVotedResult.size()).isEqualTo(2);

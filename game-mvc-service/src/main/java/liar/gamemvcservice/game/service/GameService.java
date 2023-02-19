@@ -88,8 +88,8 @@ public class GameService {
         return nextTurn;
     }
 
-    public void saveVote(VoteLiarDto dto) throws InterruptedException {
-        votePolicy.voteLiarUser(dto.getGameId(), dto.getUserId(), dto.getLiarId());
+    public boolean voteLiarUser(VoteLiarDto dto) throws InterruptedException {
+        return votePolicy.voteLiarUser(dto.getGameId(), dto.getUserId(), dto.getLiarId());
     }
 
     private List<JoinPlayer> findJoinPlayersByGameId(String gameId) {

@@ -11,6 +11,7 @@ import liar.gamemvcservice.game.repository.redis.GameRepository;
 import liar.gamemvcservice.game.repository.redis.GameTurnRepository;
 import liar.gamemvcservice.game.repository.redis.JoinPlayerRepository;
 import liar.gamemvcservice.game.repository.redis.VoteRepository;
+import liar.gamemvcservice.game.service.dto.VoteLiarDto;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -204,7 +205,7 @@ class GameServiceTest extends ThreadServiceOnlyTest {
     public void setUpTurn_multiThread() throws Exception {
         //given
         num = 10;
-        threads = new Thread[10];
+        threads = new Thread[num];
         List<String>[] results = new List[num];
 
         //when
@@ -271,8 +272,6 @@ class GameServiceTest extends ThreadServiceOnlyTest {
     public void updateAndInformPlayerTurn_exception() throws Exception {
         //given
         List<String> gamePlayerTurns = gameService.setUpTurn(gameId);
-
-        //when
         playUntilLastTurn(gamePlayerTurns);
 
         //then
@@ -280,6 +279,79 @@ class GameServiceTest extends ThreadServiceOnlyTest {
             gameService
                     .updateAndInformPlayerTurn(gameId, gamePlayerTurns.get(0));
         }).isInstanceOf(GameTurnEndException.class);
+    }
+
+    @Test
+    @DisplayName("voteLiarUser후 값이 변하면 true를 리턴한다.")
+    public void voteLiarUser_returnTrue() throws Exception {
+        //given
+        doPlayUntilLastTurns();
+
+        //when
+        boolean result1 = gameService.voteLiarUser(new VoteLiarDto(gameId, "1", "2"));
+        boolean result2 = gameService.voteLiarUser(new VoteLiarDto(gameId, "2", "3"));
+        boolean result3 = gameService.voteLiarUser(new VoteLiarDto(gameId, "3", "2"));
+        List<VotedResult> mostVotedResult = voteRepository.findVoteByGameId(gameId).getMostVotedResult();
+
+        //then
+        assertThat(result1).isTrue();
+        assertThat(result2).isTrue();
+        assertThat(result3).isTrue();
+        assertThat(mostVotedResult.size()).isEqualTo(1);
+        assertThat(mostVotedResult.get(0).getLiarId()).isEqualTo("2");
+    }
+
+    @Test
+    @DisplayName("voteLiarUser후 없는 liar 요청이 온 경우, false를 리턴한다.")
+    public void voteLiarUser_returnFalse() throws Exception {
+        //given
+        doPlayUntilLastTurns();
+
+        //when
+        boolean result1 = gameService.voteLiarUser(new VoteLiarDto(gameId, "1", "7"));
+        boolean result2 = gameService.voteLiarUser(new VoteLiarDto(gameId, "2", "8"));
+        boolean result3 = gameService.voteLiarUser(new VoteLiarDto(gameId, "3", "9"));
+        List<VotedResult> mostVotedResult = voteRepository.findVoteByGameId(gameId).getMostVotedResult();
+
+        //then
+        assertThat(result1).isFalse();
+        assertThat(result2).isFalse();
+        assertThat(result3).isFalse();
+        assertThat(mostVotedResult.get(0).getCnt()).isEqualTo(0);
+    }
+
+    @Test
+    @DisplayName("멀티 스레드 환경에서 voteLiarUser후 값이 변하면 true를 리턴한다.")
+    public void voteLiarUser_multiThread() throws Exception {
+        num = 4;
+        threads = new Thread[num];
+
+        doPlayUntilLastTurns();
+        boolean[] results = new boolean[num];
+
+        //when
+        for (int i = 0; i < num; i++) {
+            int finalIndex = i;
+            threads[i] = new Thread(() -> {
+                try {
+                    results[finalIndex] = gameService.voteLiarUser(new VoteLiarDto(gameId, String.valueOf(finalIndex + 1), "2"));
+                    System.out.println("finalIndex = " + finalIndex);
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
+            });
+        }
+        runThreads();
+
+        List<VotedResult> mostVotedResult = voteRepository.findVoteByGameId(gameId).getMostVotedResult();
+
+        //then
+
+        assertThatAllVoteLiarUserReturnTure(results);
+        assertThat(mostVotedResult.size()).isEqualTo(1);
+        assertThat(mostVotedResult.get(0).getCnt()).isEqualTo(4);
+        assertThat(mostVotedResult.get(0).getUserIds().size()).isEqualTo(4);
+        assertThat(mostVotedResult.get(0).getLiarId()).isEqualTo("2");
     }
 
     @NotNull
@@ -339,4 +411,15 @@ class GameServiceTest extends ThreadServiceOnlyTest {
         return nextTurn;
     }
 
+
+    private void doPlayUntilLastTurns() throws InterruptedException {
+        List<String> gamePlayerTurns = gameService.setUpTurn(gameId);
+        playUntilLastTurn(gamePlayerTurns);
+    }
+
+    private void assertThatAllVoteLiarUserReturnTure(boolean[] results) {
+        for (int i = 0; i < num; i++) {
+            assertThat(results[i]).isTrue();
+        }
+    }
 }

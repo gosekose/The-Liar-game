@@ -18,7 +18,7 @@ public interface VotePolicy {
      * 유저가(userId)가 라이어(liar)를 투표하여
      * Vote 객체 값을 저장한다.
      */
-    void voteLiarUser(String gameId, String userId, String liarId) throws InterruptedException;
+    boolean voteLiarUser(String gameId, String userId, String liarId) throws InterruptedException;
 
     /**
      * 가장 많은 LiarId 투표를 받은 결과를 출력한다.

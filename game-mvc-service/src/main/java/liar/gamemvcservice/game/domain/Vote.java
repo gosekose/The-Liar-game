@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 import org.springframework.data.redis.core.RedisHash;
 import org.springframework.data.redis.core.index.Indexed;
 
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -23,6 +24,9 @@ public class Vote {
     @Indexed
     private String gameId;
     private List<VotedResult> votedResults;
+    private LocalDateTime modifiedAt;
+
+
 
     public Vote(String gameId, List<String> userIds) {
         this.id = UUID.randomUUID().toString();
@@ -31,6 +35,7 @@ public class Vote {
                 .stream()
                 .map(userId -> new VotedResult(userId, 0))
                 .collect(Collectors.toList());
+        this.modifiedAt = LocalDateTime.now();
     }
 
     public void updateVoteResults(String userId, String liarId) {
@@ -40,10 +45,12 @@ public class Vote {
                 .ifPresent(votedResult -> {
                     votedResult.addUserId(userId);
                     votedResult.updateCnt();
+                    modifiedAt = LocalDateTime.now();
                 });
+
     }
 
-    public List<VotedResult> getMaxVotedResult() {
+    public List<VotedResult> getMostVotedResult() {
         return votedResults.stream()
                 .collect(Collectors.groupingBy(VotedResult::getCnt))
                 .entrySet()
@@ -59,7 +66,7 @@ public class Vote {
                 .findFirst()
                 .orElseThrow(NotFoundUserException::new);
     }
-
+    
     @Override
     public String toString() {
         return "Vote:" + id;
