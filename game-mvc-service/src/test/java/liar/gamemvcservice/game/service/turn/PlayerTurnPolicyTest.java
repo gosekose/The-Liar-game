@@ -111,7 +111,6 @@ class PlayerTurnPolicyTest extends ThreadServiceOnlyTest {
         threads = new Thread[num];
         List<String> firstUserIdsOfGame = new ArrayList<>();
         List<String> gameIds = new ArrayList<>();
-        List<GameTurn> results = new ArrayList<>();
 
         for (int i = 0; i < num; i++) {
             Game game = gameRepository.save(Game.of(new SetUpGameDto(String.valueOf(i + 100), "1", "1",
