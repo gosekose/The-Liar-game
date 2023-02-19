@@ -1,18 +1,14 @@
 package liar.gamemvcservice.game.service.turn;
 
+import liar.gamemvcservice.exception.exception.NotUserTurnException;
 import liar.gamemvcservice.game.controller.dto.SetUpGameDto;
 import liar.gamemvcservice.game.domain.Game;
 import liar.gamemvcservice.game.domain.GameTurn;
 import liar.gamemvcservice.game.repository.redis.GameRepository;
 import liar.gamemvcservice.game.repository.redis.GameTurnRepository;
-import liar.gamemvcservice.game.repository.redis.JoinPlayerRepository;
 import liar.gamemvcservice.game.service.ThreadServiceOnlyTest;
-import liar.gamemvcservice.game.service.player.PlayerPolicyImpl;
 import org.assertj.core.api.Assertions;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,7 +18,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @Transactional
@@ -47,6 +42,7 @@ class PlayerTurnPolicyTest extends ThreadServiceOnlyTest {
     @AfterEach
     public void tearDown() {
         gameRepository.deleteAll();
+        gameTurnRepository.deleteAll();
     }
 
     @Test
@@ -86,4 +82,81 @@ class PlayerTurnPolicyTest extends ThreadServiceOnlyTest {
 
     }
 
+    @Test
+    @DisplayName("플레이어의 턴이 확인이 되면 플레이어의 턴을 업데이트 한다.")
+    public void updatePlayerTurnWhenPlayerTurnIsValidated() throws Exception {
+        //given
+        GameTurn gameTurn = playerTurnPolicy.setUpTurn(game);
+        List<String> turns = gameTurn.getPlayerTurnsConsistingOfUserId();
+        List<GameTurn> results = new ArrayList<>();
+
+        //when
+        for (int i = 0; i < turns.size(); i++) {
+            GameTurn findGameTurn = gameTurnRepository.findGameTurnByGameId(game.getId()); // gameTurn 업테이트
+            results.add(playerTurnPolicy.updateTurnWhenPlayerTurnIsValidated(findGameTurn, turns.get(i)));
+        }
+
+        //then
+        for (int i = 0; i < turns.size(); i++) {
+            assertThat(results.get(i).getNowTurn()).isEqualTo(gameTurn.getNowTurn() + (i + 1));
+            assertThat(results.get(i).getGameId()).isEqualTo(game.getId());
+        }
+    }
+
+    @Test
+    @DisplayName("플레이어의 턴이 확인이 되면, 플레이어의 턴을 하되 멀티 스레드 환경에서 원자성이 유지되어야 한다.")
+    public void updatePlayerTurnWhenPlayerTurnIsValidated_multiThead() throws Exception {
+        //given
+        num = 100;
+        threads = new Thread[num];
+        List<String> firstUserIdsOfGame = new ArrayList<>();
+        List<String> gameIds = new ArrayList<>();
+        List<GameTurn> results = new ArrayList<>();
+
+        for (int i = 0; i < num; i++) {
+            Game game = gameRepository.save(Game.of(new SetUpGameDto(String.valueOf(i + 100), "1", "1",
+                    Arrays.asList("1", "2", "3", "4", "5"))));
+            gameIds.add(game.getId());
+            firstUserIdsOfGame.add(playerTurnPolicy.setUpTurn(game)
+                    .getPlayerTurnsConsistingOfUserId().get(0));
+        }
+
+        //when
+        for (int i = 0; i < num; i++) {
+            int finalIdx = i;
+            GameTurn gameTurn = gameTurnRepository.findGameTurnByGameId(gameIds.get(finalIdx));
+            threads[i] = new Thread(() -> {
+                playerTurnPolicy.updateTurnWhenPlayerTurnIsValidated(gameTurn, firstUserIdsOfGame.get(finalIdx));
+            });
+        }
+        runThreads();
+
+        //then
+        for (int i = 0; i < num; i++) {
+            assertThat(gameTurnRepository.findGameTurnByGameId(gameIds.get(i))
+                    .getNowTurn()).isEqualTo(1);
+        }
+    }
+
+
+    @Test
+    @DisplayName("플레이어의 턴이 아니라면 예외를 발생시킨다.")
+    public void updatePlayerTurnWhenPlayerTurnIsValidated_exception() throws Exception {
+        //given
+        GameTurn gameTurn = playerTurnPolicy.setUpTurn(game);
+        List<String> turns = gameTurn.getPlayerTurnsConsistingOfUserId();
+
+        //when
+        for (int i = 0; i < turns.size() - 1; i++) {
+            GameTurn findGameTurn = gameTurnRepository.findGameTurnByGameId(game.getId()); // gameTurn 업테이트
+            gameTurn = playerTurnPolicy.updateTurnWhenPlayerTurnIsValidated(findGameTurn, turns.get(i));
+        }
+
+        //then
+        final GameTurn lastGameTurn = gameTurn;
+        Assertions.assertThatThrownBy(() -> {
+            playerTurnPolicy.updateTurnWhenPlayerTurnIsValidated(lastGameTurn, turns.get(0));
+        }).isInstanceOf(NotUserTurnException.class);
+    }
+    
 }

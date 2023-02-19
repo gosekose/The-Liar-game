@@ -56,7 +56,7 @@ public class VotePolicyImpl implements VotePolicy {
      * 가장 많은 LiarId 투표를 받은 결과를 출력한다.
      */
     @Override
-    public List<VotedResult> getMaxVotedLiarUser(String gameId) {
+    public List<VotedResult> getMostVotedLiarUser(String gameId) {
         Vote vote = voteRepository.findVoteByGameId(gameId);
         return vote.getMaxVotedResult();
     }

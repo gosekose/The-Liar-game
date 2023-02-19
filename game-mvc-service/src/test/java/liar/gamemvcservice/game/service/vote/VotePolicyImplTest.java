@@ -6,13 +6,10 @@ import liar.gamemvcservice.game.domain.Vote;
 import liar.gamemvcservice.game.domain.VotedResult;
 import liar.gamemvcservice.game.repository.redis.VoteRepository;
 import liar.gamemvcservice.game.service.ThreadServiceOnlyTest;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.redisson.api.RLock;
-import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,7 +18,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @Transactional
@@ -88,7 +84,7 @@ class VotePolicyImplTest extends ThreadServiceOnlyTest {
         for (int i = 0; i < num; i++) {
             votePolicy.voteLiarUser(game.getId(), String.valueOf(i + 1), "2");
         }
-        List<VotedResult> maxVotedLiarUser = votePolicy.getMaxVotedLiarUser(game.getId());
+        List<VotedResult> maxVotedLiarUser = votePolicy.getMostVotedLiarUser(game.getId());
 
         //then
         assertThat(maxVotedLiarUser.size()).isEqualTo(1);
@@ -116,7 +112,7 @@ class VotePolicyImplTest extends ThreadServiceOnlyTest {
         }
 
         runThreads();
-        List<VotedResult> maxVotedLiarUser = votePolicy.getMaxVotedLiarUser(game.getId());
+        List<VotedResult> maxVotedLiarUser = votePolicy.getMostVotedLiarUser(game.getId());
 
         //then
         assertThat(maxVotedLiarUser.size()).isEqualTo(1);
@@ -154,7 +150,7 @@ class VotePolicyImplTest extends ThreadServiceOnlyTest {
         }
 
         runThreads();
-        List<VotedResult> maxVotedLiarUser = votePolicy.getMaxVotedLiarUser(game.getId());
+        List<VotedResult> maxVotedLiarUser = votePolicy.getMostVotedLiarUser(game.getId());
 
         //then
         assertThat(maxVotedLiarUser.size()).isEqualTo(2);
@@ -177,7 +173,7 @@ class VotePolicyImplTest extends ThreadServiceOnlyTest {
         }
 
         runThreads();
-        List<VotedResult> maxVotedLiarUser = votePolicy.getMaxVotedLiarUser(game.getId());
+        List<VotedResult> maxVotedLiarUser = votePolicy.getMostVotedLiarUser(game.getId());
 
         //then
         assertThat(maxVotedLiarUser.size()).isEqualTo(1);

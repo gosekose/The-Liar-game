@@ -1,7 +1,6 @@
 package liar.gamemvcservice.game.service.vote;
 
 import liar.gamemvcservice.game.domain.Game;
-import liar.gamemvcservice.game.domain.Vote;
 import liar.gamemvcservice.game.domain.VotedResult;
 import org.springframework.stereotype.Component;
 
@@ -24,7 +23,7 @@ public interface VotePolicy {
     /**
      * 가장 많은 LiarId 투표를 받은 결과를 출력한다.
      */
-    List<VotedResult> getMaxVotedLiarUser(String gameId);
+    List<VotedResult> getMostVotedLiarUser(String gameId);
 
 
 }

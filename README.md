@@ -1,6 +1,6 @@
 
 # The-Liar-game
-> SpringBoot 라이어 게임 (MSA 리펙토링) 개인 프로젝트입니다.
+SpringBoot 라이어 게임 (MSA 아키텍처) 개인 프로젝트입니다.
 
 ![](../header.png)
 
