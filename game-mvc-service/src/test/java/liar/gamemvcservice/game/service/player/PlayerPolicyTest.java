@@ -1,7 +1,7 @@
 package liar.gamemvcservice.game.service.player;
 
 import liar.gamemvcservice.exception.exception.NotFoundUserException;
-import liar.gamemvcservice.game.controller.dto.SetUpGameDto;
+import liar.gamemvcservice.game.service.dto.SetUpGameDto;
 import liar.gamemvcservice.game.domain.Game;
 import liar.gamemvcservice.game.domain.GameRole;
 import liar.gamemvcservice.game.domain.JoinPlayer;

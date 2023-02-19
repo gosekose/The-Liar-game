@@ -25,11 +25,11 @@ public class ChatController {
     @MessageMapping("/{gameId}")
     public void chatTopic(@DestinationVariable String gameId,
                           StompHeaderAccessor headerAccessor,
-                          ChatMessage message) {
+                          ChatMessage message) throws InterruptedException {
 
         isMatchUserIdAndRequestMessageUserId(headerAccessor, message);
         NextTurn nextTurn = gameService
-                .updatePlayerTurnAndNotifyNextTurnWhenPlayerTurnIsValidated(gameId, message.getCharMessage());
+                .updateAndInformPlayerTurn(gameId, message.getCharMessage());
 
         template.convertAndSend("/topic/" + gameId, ChatMessageResponse.of(message, nextTurn));
     }

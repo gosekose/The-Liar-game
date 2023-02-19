@@ -8,15 +8,15 @@ import java.util.List;
 
 @Getter
 @NoArgsConstructor
-public class GameTurnResponse {
+public class GameTurnDto {
     private String gameId;
     private List<String> userIdTurns;
 
-    public static GameTurnResponse of(GameTurn gameTurn) {
-        return new GameTurnResponse(gameTurn.getGameId(), gameTurn.getPlayerTurnsConsistingOfUserId());
+    public static GameTurnDto of(GameTurn gameTurn) {
+        return new GameTurnDto(gameTurn.getGameId(), gameTurn.getPlayerTurnsConsistingOfUserId());
     }
 
-    public GameTurnResponse(String gameId, List<String> userIdTurns) {
+    public GameTurnDto(String gameId, List<String> userIdTurns) {
         this.gameId = gameId;
         this.userIdTurns = userIdTurns;
     }

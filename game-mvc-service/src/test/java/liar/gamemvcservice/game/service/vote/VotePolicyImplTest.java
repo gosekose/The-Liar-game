@@ -1,6 +1,6 @@
 package liar.gamemvcservice.game.service.vote;
 
-import liar.gamemvcservice.game.controller.dto.SetUpGameDto;
+import liar.gamemvcservice.game.service.dto.SetUpGameDto;
 import liar.gamemvcservice.game.domain.Game;
 import liar.gamemvcservice.game.domain.Vote;
 import liar.gamemvcservice.game.domain.VotedResult;

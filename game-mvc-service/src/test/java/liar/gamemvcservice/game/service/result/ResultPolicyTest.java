@@ -1,14 +1,14 @@
 package liar.gamemvcservice.game.service.result;
 
 import liar.gamemvcservice.exception.exception.NotFoundUserException;
-import liar.gamemvcservice.game.controller.dto.SetUpGameDto;
+import liar.gamemvcservice.game.service.dto.SetUpGameDto;
 import liar.gamemvcservice.game.domain.Game;
 import liar.gamemvcservice.game.repository.redis.GameRepository;
 import liar.gamemvcservice.game.repository.redis.JoinPlayerRepository;
 import liar.gamemvcservice.game.repository.redis.VoteRepository;
 import liar.gamemvcservice.game.service.ThreadServiceOnlyTest;
-import liar.gamemvcservice.game.service.dto.GameResultSaveMessage;
-import liar.gamemvcservice.game.service.dto.GameResultToClient;
+import liar.gamemvcservice.game.service.dto.GameResultSaveMessageDto;
+import liar.gamemvcservice.game.service.dto.GameResultToClientDto;
 import liar.gamemvcservice.game.service.dto.PlayersInfoDto;
 import liar.gamemvcservice.game.service.player.PlayerPolicy;
 import liar.gamemvcservice.game.service.topic.TopicPolicy;
@@ -23,7 +23,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.concurrent.ConcurrentHashMap;
 
 import static liar.gamemvcservice.game.domain.GameRole.CITIZEN;
 import static liar.gamemvcservice.game.domain.GameRole.LIAR;
@@ -116,7 +115,7 @@ class ResultPolicyTest extends ThreadServiceOnlyTest {
     @DisplayName("시민이 이긴 결과를 모든 클라이언트에게 informGameResult로 알린다.")
     public void informGameResult_winCitizen() throws Exception {
         //given
-        GameResultToClient gameResult = getGameResultToClient();
+        GameResultToClientDto gameResult = getGameResultToClient();
 
         List<PlayersInfoDto> playersInfo = gameResult.getPlayersInfo();
 
@@ -134,7 +133,7 @@ class ResultPolicyTest extends ThreadServiceOnlyTest {
         voteMostOthers();
 
         //when
-        GameResultToClient gameResult = resultPolicy
+        GameResultToClientDto gameResult = resultPolicy
                 .informGameResult(game, votePolicy.getMostVotedLiarUser(game.getId()));
 
         List<PlayersInfoDto> playersInfo = gameResult.getPlayersInfo();
@@ -153,7 +152,7 @@ class ResultPolicyTest extends ThreadServiceOnlyTest {
         voteLiarAndOthersSame();
 
         //when
-        GameResultToClient gameResult = resultPolicy
+        GameResultToClientDto gameResult = resultPolicy
                 .informGameResult(game, votePolicy.getMostVotedLiarUser(game.getId()));
 
         List<PlayersInfoDto> playersInfo = gameResult.getPlayersInfo();
@@ -169,9 +168,9 @@ class ResultPolicyTest extends ThreadServiceOnlyTest {
     @DisplayName("게임 결과에 대한 메세지를 전송한다.")
     public void messageGameResult() throws Exception {
         //given
-        GameResultToClient gameResult = getGameResultToClient();
+        GameResultToClientDto gameResult = getGameResultToClient();
 
-        GameResultSaveMessage message = resultPolicy.messageGameResult(game, gameResult);
+        GameResultSaveMessageDto message = resultPolicy.messageGameResult(game, gameResult);
 
         //then
         assertThat(message.getGameId()).isEqualTo(game.getId());
@@ -189,10 +188,10 @@ class ResultPolicyTest extends ThreadServiceOnlyTest {
     public void messageGameResult_multiThead() throws Exception {
         //given
         int result = 0;
-        GameResultSaveMessage message = null;
+        GameResultSaveMessageDto message = null;
 
-        GameResultSaveMessage[] messages = initGameResultSateMessage();
-        GameResultToClient gameResult = getGameResultToClient();
+        GameResultSaveMessageDto[] messages = initGameResultSateMessage();
+        GameResultToClientDto gameResult = getGameResultToClient();
 
         //when
         for (int i = 0; i < num; i++) {
@@ -223,19 +222,19 @@ class ResultPolicyTest extends ThreadServiceOnlyTest {
         assertThat(message.getPlayersInfo()).isEqualTo(gameResult.getPlayersInfo());
     }
 
-    private GameResultToClient getGameResultToClient() throws InterruptedException {
+    private GameResultToClientDto getGameResultToClient() throws InterruptedException {
         voteMostLiar();
-        GameResultToClient gameResult = resultPolicy
+        GameResultToClientDto gameResult = resultPolicy
                 .informGameResult(game, votePolicy.getMostVotedLiarUser(game.getId()));
         return gameResult;
     }
 
     @NotNull
-    private GameResultSaveMessage[] initGameResultSateMessage() {
+    private GameResultSaveMessageDto[] initGameResultSateMessage() {
         num = 100;
         threads = new Thread[num];
-        GameResultSaveMessage[] messages = new GameResultSaveMessage[num];
-        Arrays.fill(messages,new GameResultSaveMessage());
+        GameResultSaveMessageDto[] messages = new GameResultSaveMessageDto[num];
+        Arrays.fill(messages,new GameResultSaveMessageDto());
         return messages;
     }
 

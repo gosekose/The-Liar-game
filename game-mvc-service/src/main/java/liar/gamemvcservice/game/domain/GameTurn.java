@@ -1,6 +1,7 @@
 package liar.gamemvcservice.game.domain;
 
 import jakarta.persistence.Id;
+import liar.gamemvcservice.exception.exception.GameTurnEndException;
 import liar.gamemvcservice.exception.exception.NotUserTurnException;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -71,11 +72,12 @@ public class GameTurn {
      * 현재 플레이어가 게임의 마지막 턴인 경우, next 턴은 없다
      */
     public NextTurn setIfExistsNextTurn() {
-        if (nowTurn >= (playerTurnsConsistingOfUserId.size() * 2)) {
-            return new NextTurn(null, true);
-        } else {
-            return new NextTurn(playerTurnsConsistingOfUserId.get(nowTurn % playerTurnsConsistingOfUserId.size()), false);
-        }
+        int lastTurn = playerTurnsConsistingOfUserId.size() * 2;
+
+        if (nowTurn > lastTurn) throw new GameTurnEndException();
+        else if (nowTurn == lastTurn) return new NextTurn(null, true);
+        else return new NextTurn(playerTurnsConsistingOfUserId
+                    .get(nowTurn % playerTurnsConsistingOfUserId.size()), false);
     }
 }
 

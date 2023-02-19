@@ -6,6 +6,7 @@ import liar.gamemvcservice.exception.exception.NotFoundUserException;
 import liar.gamemvcservice.exception.type.ExceptionCode;
 import liar.gamemvcservice.exception.type.ExceptionMessage;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -45,6 +46,11 @@ public class ExceptionControllerAdvice {
     @ExceptionHandler
     public ResponseEntity<ErrorDto> userNotFoundHandler(NotFoundUserException e) {
         return new ResponseEntity<>(new ErrorDto(e.getErrorCode(), e.getMessage()), NOT_FOUND);
+    }
+
+    @ExceptionHandler(InterruptedException.class)
+    public ResponseEntity<ErrorDto> interruptedExceptionHandler(InterruptedException e) {
+        return new ResponseEntity<>(new ErrorDto(ExceptionCode.INTERNAL_SERVER_ERROR, ExceptionMessage.REDIS_ROCK_EXCEPTION), REQUEST_TIMEOUT);
     }
 
     /**

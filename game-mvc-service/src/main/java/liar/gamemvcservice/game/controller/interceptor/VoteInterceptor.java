@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import liar.gamemvcservice.exception.exception.NotEqualUserIdException;
-import liar.gamemvcservice.game.controller.dto.VoteLiarDto;
+import liar.gamemvcservice.game.controller.dto.VoteLiarRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
@@ -22,9 +22,9 @@ public class VoteInterceptor implements HandlerInterceptor {
         String userId = request.getPathInfo().split("/")[1];
         String headerUserId = request.getHeader("userId");
 
-        VoteLiarDto dto = objectMapper
+        VoteLiarRequest dto = objectMapper
                 .readValue(request.getReader().lines().collect(Collectors.joining()),
-                        VoteLiarDto.class);
+                        VoteLiarRequest.class);
 
         if (!(headerUserId.equals(userId) && dto.getUserId().equals(userId))) {
             throw new NotEqualUserIdException();

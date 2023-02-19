@@ -1,8 +1,7 @@
 package liar.gamemvcservice.game.controller;
 
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
-import liar.gamemvcservice.game.controller.dto.VoteLiarDto;
+import liar.gamemvcservice.game.controller.dto.VoteLiarRequest;
 import liar.gamemvcservice.game.service.GameService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,7 +18,7 @@ public class VoteLiarController {
 
     @PostMapping("/{userId}/vote")
     public ResponseEntity voteLiar(@PathVariable String userId,
-                                   @Valid @RequestBody VoteLiarDto dto) {
+                                   @Valid @RequestBody VoteLiarRequest dto) {
 
         return null;
     }

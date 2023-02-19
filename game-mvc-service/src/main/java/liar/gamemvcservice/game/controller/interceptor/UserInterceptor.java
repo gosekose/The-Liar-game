@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import liar.gamemvcservice.exception.exception.NotEqualUserIdException;
-import liar.gamemvcservice.game.controller.dto.RequestCommonDto;
+import liar.gamemvcservice.game.service.dto.CommonDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
@@ -22,9 +22,9 @@ public class UserInterceptor implements HandlerInterceptor {
         String userId = request.getPathInfo().split("/")[1];
 
         String headerUserId = request.getHeader("userId");
-        RequestCommonDto dto = objectMapper
+        CommonDto dto = objectMapper
                 .readValue(request.getReader().lines().collect(Collectors.joining()),
-                        RequestCommonDto.class);
+                        CommonDto.class);
 
         if (!(headerUserId.equals(userId) && dto.getUserId().equals(userId))) {
             throw new NotEqualUserIdException();

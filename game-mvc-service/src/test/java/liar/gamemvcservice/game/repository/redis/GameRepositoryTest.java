@@ -1,9 +1,8 @@
 package liar.gamemvcservice.game.repository.redis;
 
 import liar.gamemvcservice.exception.exception.RedisLockException;
-import liar.gamemvcservice.game.controller.dto.SetUpGameDto;
+import liar.gamemvcservice.game.service.dto.SetUpGameDto;
 import liar.gamemvcservice.game.domain.Game;
-import liar.gamemvcservice.game.repository.redis.GameRepository;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
