@@ -29,7 +29,7 @@ public class ChatController {
 
         isMatchUserIdAndRequestMessageUserId(headerAccessor, message);
         NextTurn nextTurn = gameService
-                .updatePlayerTurnAndNotifyNextTurnWhenPlayerTurnIsValidated(gameId, message.getCharMessage());
+                .updatePlayerTurnAndInformNextTurnWhenPlayerTurnIsValidated(gameId, message.getCharMessage());
 
         template.convertAndSend("/topic/" + gameId, ChatMessageResponse.of(message, nextTurn));
     }

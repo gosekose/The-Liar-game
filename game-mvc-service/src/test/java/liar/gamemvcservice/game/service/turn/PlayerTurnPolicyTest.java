@@ -73,12 +73,7 @@ class PlayerTurnPolicyTest extends ThreadServiceOnlyTest {
         runThreads();
 
         //then
-        for (int i = 0; i < num; i++) {
-            if (i < num - 1) assertThat(gameTurns.get(i).getPlayerTurnsConsistingOfUserId())
-                    .isEqualTo(gameTurns.get(i + 1).getPlayerTurnsConsistingOfUserId());
-            else assertThat(gameTurns.get(i).getPlayerTurnsConsistingOfUserId())
-                    .isEqualTo(gameTurns.get(0).getPlayerTurnsConsistingOfUserId());
-        }
+        assertThatGameTurnsAllEqual(gameTurns);
 
     }
 
@@ -131,10 +126,7 @@ class PlayerTurnPolicyTest extends ThreadServiceOnlyTest {
         runThreads();
 
         //then
-        for (int i = 0; i < num; i++) {
-            assertThat(gameTurnRepository.findGameTurnByGameId(gameIds.get(i))
-                    .getNowTurn()).isEqualTo(1);
-        }
+        assertThatFindGameTurnByGameIdAllEqual(gameIds);
     }
 
 
@@ -157,5 +149,21 @@ class PlayerTurnPolicyTest extends ThreadServiceOnlyTest {
             playerTurnPolicy.updateTurnWhenPlayerTurnIsValidated(lastGameTurn, turns.get(0));
         }).isInstanceOf(NotUserTurnException.class);
     }
-    
+
+
+    private void assertThatFindGameTurnByGameIdAllEqual(List<String> gameIds) {
+        for (int i = 0; i < num; i++) {
+            assertThat(gameTurnRepository.findGameTurnByGameId(gameIds.get(i))
+                    .getNowTurn()).isEqualTo(1);
+        }
+    }
+
+    private void assertThatGameTurnsAllEqual(List<GameTurn> gameTurns) {
+        for (int i = 0; i < num; i++) {
+            if (i < num - 1) assertThat(gameTurns.get(i).getPlayerTurnsConsistingOfUserId())
+                    .isEqualTo(gameTurns.get(i + 1).getPlayerTurnsConsistingOfUserId());
+            else assertThat(gameTurns.get(i).getPlayerTurnsConsistingOfUserId())
+                    .isEqualTo(gameTurns.get(0).getPlayerTurnsConsistingOfUserId());
+        }
+    }
 }

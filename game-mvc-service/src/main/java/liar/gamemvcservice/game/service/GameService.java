@@ -57,7 +57,7 @@ public class GameService {
     public JoinPlayer findJoinMemberOfRequestGame(String gameId, String userId) {
         return findJoinPlayersByGameId(gameId)
                 .stream()
-                .filter(player -> player.getId().equals(userId))
+                .filter(player -> player.getPlayer().getUserId().equals(userId))
                 .findFirst()
                 .orElseThrow(NotFoundGameException::new);
     }
@@ -68,7 +68,7 @@ public class GameService {
         return gameTurn.getPlayerTurnsConsistingOfUserId();
     }
 
-    public NextTurn updatePlayerTurnAndNotifyNextTurnWhenPlayerTurnIsValidated(String gameId, String userId) {
+    public NextTurn updatePlayerTurnAndInformNextTurnWhenPlayerTurnIsValidated(String gameId, String userId) {
         GameTurn gameTurn = playerTurnPolicy
                 .updateTurnWhenPlayerTurnIsValidated(gameTurnRepository.findGameTurnByGameId(gameId), userId);
         return gameTurn.setIfExistsNextTurn();
