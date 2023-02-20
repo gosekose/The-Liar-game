@@ -26,8 +26,6 @@ public class Vote {
     private List<VotedResult> votedResults;
     private LocalDateTime modifiedAt;
 
-
-
     public Vote(String gameId, List<String> userIds) {
         this.id = UUID.randomUUID().toString();
         this.gameId = gameId;

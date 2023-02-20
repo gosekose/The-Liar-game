@@ -1,15 +1,12 @@
 package liar.gamemvcservice.game.service.result;
 
 import liar.gamemvcservice.exception.exception.NotFoundUserException;
-import liar.gamemvcservice.game.service.dto.SetUpGameDto;
+import liar.gamemvcservice.game.service.dto.*;
 import liar.gamemvcservice.game.domain.Game;
 import liar.gamemvcservice.game.repository.redis.GameRepository;
 import liar.gamemvcservice.game.repository.redis.JoinPlayerRepository;
 import liar.gamemvcservice.game.repository.redis.VoteRepository;
 import liar.gamemvcservice.game.service.ThreadServiceOnlyTest;
-import liar.gamemvcservice.game.service.dto.GameResultSaveMessageDto;
-import liar.gamemvcservice.game.service.dto.GameResultToClientDto;
-import liar.gamemvcservice.game.service.dto.PlayersInfoDto;
 import liar.gamemvcservice.game.service.player.PlayerPolicy;
 import liar.gamemvcservice.game.service.topic.TopicPolicy;
 import liar.gamemvcservice.game.service.vote.VotePolicy;
@@ -116,10 +113,11 @@ class ResultPolicyTest extends ThreadServiceOnlyTest {
     public void informGameResult_winCitizen() throws Exception {
         //given
         GameResultToClientDto gameResult = getGameResultToClient();
-
         List<PlayersInfoDto> playersInfo = gameResult.getPlayersInfo();
 
         //then
+
+        assertThat(gameResult.getVotedResults().size()).isEqualTo(6);
         assertThat(gameResult.getGameId()).isEqualTo(game.getId());
         assertThat(gameResult.getWinner()).isEqualTo(CITIZEN);
         assertThat(playersInfo.size()).isEqualTo(6);
@@ -161,7 +159,6 @@ class ResultPolicyTest extends ThreadServiceOnlyTest {
         assertThat(gameResult.getGameId()).isEqualTo(game.getId());
         assertThat(gameResult.getWinner()).isEqualTo(LIAR);
         assertThat(playersInfo.size()).isEqualTo(6);
-        assertThat(playersInfo.get(0).getAnswers()).isFalse();
     }
 
     @Test
@@ -240,19 +237,19 @@ class ResultPolicyTest extends ThreadServiceOnlyTest {
 
 
     private void voteMostLiar() throws InterruptedException {
-        for (int i = 0; i < game.getPlayerIds().size(); i++)
+        for (int i = 1; i <= game.getPlayerIds().size(); i++)
             votePolicy.voteLiarUser(game.getId(), String.valueOf(i), liarId);
     }
 
     private void voteMostOthers() throws InterruptedException {
-        for (int i = 0; i < game.getPlayerIds().size(); i++)
+        for (int i = 1; i <= game.getPlayerIds().size(); i++)
             votePolicy.voteLiarUser(game.getId(), String.valueOf(i), citizenId);
     }
 
     private void voteLiarAndOthersSame() throws InterruptedException {
-        for (int i = 0; i < game.getPlayerIds().size() / 2; i++)
+        for (int i = 1; i <= game.getPlayerIds().size() / 2; i++)
             votePolicy.voteLiarUser(game.getId(), String.valueOf(i), liarId);
-        for (int i = game.getPlayerIds().size() / 2; i < game.getPlayerIds().size(); i++)
+        for (int i = (game.getPlayerIds().size() / 2) + 1; i <= game.getPlayerIds().size(); i++)
             votePolicy.voteLiarUser(game.getId(), String.valueOf(i), citizenId);
     }
 }

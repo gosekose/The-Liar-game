@@ -14,9 +14,11 @@ import java.util.List;
 public class GameResultToClientDto {
     private String gameId;
     private GameRole winner;
+    private List<VotedResultDto> votedResults;
     private List<PlayersInfoDto> playersInfo;
 
-    public static GameResultToClientDto of(String gameId, GameRole whoWin, List<PlayersInfoDto> playersInfoDto) {
-        return new GameResultToClientDto(gameId, whoWin, playersInfoDto);
+    public static GameResultToClientDto of(String gameId, GameRole whoWin, List<VotedResultDto> votedResults,
+                                           List<PlayersInfoDto> playersInfoDto) {
+        return new GameResultToClientDto(gameId, whoWin, votedResults, playersInfoDto);
     }
 }
