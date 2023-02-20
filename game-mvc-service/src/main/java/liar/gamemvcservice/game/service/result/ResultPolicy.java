@@ -1,9 +1,10 @@
 package liar.gamemvcservice.game.service.result;
 
 import liar.gamemvcservice.game.domain.Game;
+import liar.gamemvcservice.game.domain.Vote;
 import liar.gamemvcservice.game.domain.VotedResult;
-import liar.gamemvcservice.game.service.dto.GameResultSaveMessageDto;
-import liar.gamemvcservice.game.service.dto.GameResultToClientDto;
+import liar.gamemvcservice.game.service.dto.PlayerResultInfo;
+import liar.gamemvcservice.game.service.dto.VotedResultDto;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -17,14 +18,8 @@ public interface ResultPolicy {
      */
     boolean checkWhoWin(Game game, List<VotedResult> votedResults);
 
-    /**
-     * 게임 결과를 클라이언트에게 알리다.
-     */
-    GameResultToClientDto informGameResult(Game game, List<VotedResult> votedResults);
+    List<VotedResultDto> getVotedResultDto(Vote vote);
+    List<PlayerResultInfo> getPlayersResultInfo(Game game, VotedResult votedResult);
 
-    /**
-     * 게임 결과를 result 서버로 메세지 보낸다.
-     */
-    GameResultSaveMessageDto messageGameResult(Game game, GameResultToClientDto gameResult);
 
 }

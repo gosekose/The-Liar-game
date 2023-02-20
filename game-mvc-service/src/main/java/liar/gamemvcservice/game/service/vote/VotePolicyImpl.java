@@ -27,7 +27,6 @@ public class VotePolicyImpl implements VotePolicy {
     public String saveVote(Game game) throws InterruptedException {
 
         Vote findVote = voteRepository.findVoteByGameId(game.getId());
-
         if (findVote == null) {
             Vote save = voteRepository.save(new Vote(game.getId(), game.getPlayerIds()));
             return save.getId();

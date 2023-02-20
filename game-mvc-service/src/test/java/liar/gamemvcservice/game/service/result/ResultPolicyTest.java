@@ -1,6 +1,7 @@
 package liar.gamemvcservice.game.service.result;
 
 import liar.gamemvcservice.exception.exception.NotFoundUserException;
+import liar.gamemvcservice.game.service.dto.GameResultToServerDto;
 import liar.gamemvcservice.game.service.dto.*;
 import liar.gamemvcservice.game.domain.Game;
 import liar.gamemvcservice.game.repository.redis.GameRepository;
@@ -108,130 +109,12 @@ class ResultPolicyTest extends ThreadServiceOnlyTest {
         assertThat(win).isFalse();
     }
 
-    @Test
-    @DisplayName("시민이 이긴 결과를 모든 클라이언트에게 informGameResult로 알린다.")
-    public void informGameResult_winCitizen() throws Exception {
-        //given
-        GameResultToClientDto gameResult = getGameResultToClient();
-        List<PlayersInfoDto> playersInfo = gameResult.getPlayersInfo();
-
-        //then
-
-        assertThat(gameResult.getVotedResults().size()).isEqualTo(6);
-        assertThat(gameResult.getGameId()).isEqualTo(game.getId());
-        assertThat(gameResult.getWinner()).isEqualTo(CITIZEN);
-        assertThat(playersInfo.size()).isEqualTo(6);
-        assertThat(playersInfo.get(0).getAnswers()).isTrue();
-    }
-
-    @Test
-    @DisplayName("라이어가 이긴 결과를 모든 클라이언트에게 informGameResult로 알린다.")
-    public void informGameResult_winLiar() throws Exception {
-        //given
-        voteMostOthers();
-
-        //when
-        GameResultToClientDto gameResult = resultPolicy
-                .informGameResult(game, votePolicy.getMostVotedLiarUser(game.getId()));
-
-        List<PlayersInfoDto> playersInfo = gameResult.getPlayersInfo();
-
-        //then
-        assertThat(gameResult.getGameId()).isEqualTo(game.getId());
-        assertThat(gameResult.getWinner()).isEqualTo(LIAR);
-        assertThat(playersInfo.size()).isEqualTo(6);
-        assertThat(playersInfo.get(0).getAnswers()).isFalse();
-    }
-
-    @Test
-    @DisplayName("라이어가 이긴 결과를 모든 클라이언트에게 informGameResult로 알린다.")
-    public void informGameResult_winLiar2() throws Exception {
-        //given
-        voteLiarAndOthersSame();
-
-        //when
-        GameResultToClientDto gameResult = resultPolicy
-                .informGameResult(game, votePolicy.getMostVotedLiarUser(game.getId()));
-
-        List<PlayersInfoDto> playersInfo = gameResult.getPlayersInfo();
-
-        //then
-        assertThat(gameResult.getGameId()).isEqualTo(game.getId());
-        assertThat(gameResult.getWinner()).isEqualTo(LIAR);
-        assertThat(playersInfo.size()).isEqualTo(6);
-    }
-
-    @Test
-    @DisplayName("게임 결과에 대한 메세지를 전송한다.")
-    public void messageGameResult() throws Exception {
-        //given
-        GameResultToClientDto gameResult = getGameResultToClient();
-
-        GameResultSaveMessageDto message = resultPolicy.messageGameResult(game, gameResult);
-
-        //then
-        assertThat(message.getGameId()).isEqualTo(game.getId());
-        assertThat(message.getWinner()).isEqualTo(CITIZEN);
-        assertThat(message.getGameName()).isEqualTo(game.getGameName());
-        assertThat(message.getHostId()).isEqualTo(game.getHostId());
-        assertThat(message.getRoomId()).isEqualTo(game.getRoomId());
-        assertThat(message.getTopicId()).isEqualTo(game.getTopic().getId());
-        assertThat(message.getTotalUserCnt()).isEqualTo(game.getPlayerIds().size());
-        assertThat(message.getPlayersInfo()).isEqualTo(gameResult.getPlayersInfo());
-    }
-
-    @Test
-    @DisplayName("멀티 스레드 환경에서 게임 결과에 대한 메세지를 전송하되, 단 한번만 발송하고 그 이후에는 null을 리턴한다.")
-    public void messageGameResult_multiThead() throws Exception {
-        //given
-        int result = 0;
-        GameResultSaveMessageDto message = null;
-
-        GameResultSaveMessageDto[] messages = initGameResultSateMessage();
-        GameResultToClientDto gameResult = getGameResultToClient();
-
-        //when
-        for (int i = 0; i < num; i++) {
-            int finalIdx = i;
-            threads[i] = new Thread(() -> {
-                messages[finalIdx] = resultPolicy.messageGameResult(game, gameResult);
-            });
-        }
-
-        runThreads();
-
-        for (int i = 0; i < num; i++) {
-            if (messages[i] != null)  {
-                result++;
-                message = messages[i];
-            }
-        }
-
-        //then
-        assertThat(result).isEqualTo(1);
-        assertThat(message.getGameId()).isEqualTo(game.getId());
-        assertThat(message.getWinner()).isEqualTo(CITIZEN);
-        assertThat(message.getGameName()).isEqualTo(game.getGameName());
-        assertThat(message.getHostId()).isEqualTo(game.getHostId());
-        assertThat(message.getRoomId()).isEqualTo(game.getRoomId());
-        assertThat(message.getTopicId()).isEqualTo(game.getTopic().getId());
-        assertThat(message.getTotalUserCnt()).isEqualTo(game.getPlayerIds().size());
-        assertThat(message.getPlayersInfo()).isEqualTo(gameResult.getPlayersInfo());
-    }
-
-    private GameResultToClientDto getGameResultToClient() throws InterruptedException {
-        voteMostLiar();
-        GameResultToClientDto gameResult = resultPolicy
-                .informGameResult(game, votePolicy.getMostVotedLiarUser(game.getId()));
-        return gameResult;
-    }
-
     @NotNull
-    private GameResultSaveMessageDto[] initGameResultSateMessage() {
+    private GameResultToServerDto[] initGameResultSateMessage() {
         num = 100;
         threads = new Thread[num];
-        GameResultSaveMessageDto[] messages = new GameResultSaveMessageDto[num];
-        Arrays.fill(messages,new GameResultSaveMessageDto());
+        GameResultToServerDto[] messages = new GameResultToServerDto[num];
+        Arrays.fill(messages,new GameResultToServerDto());
         return messages;
     }
 

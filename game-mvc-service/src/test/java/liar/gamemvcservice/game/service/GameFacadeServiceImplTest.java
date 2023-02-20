@@ -4,13 +4,14 @@ import liar.gamemvcservice.exception.exception.GameTurnEndException;
 import liar.gamemvcservice.exception.exception.NotFoundGameException;
 import liar.gamemvcservice.exception.exception.NotFoundUserException;
 import liar.gamemvcservice.exception.exception.NotUserTurnException;
+import liar.gamemvcservice.game.controller.dto.request.VoteLiarRequest;
 import liar.gamemvcservice.game.domain.*;
 import liar.gamemvcservice.game.repository.redis.GameRepository;
 import liar.gamemvcservice.game.repository.redis.GameTurnRepository;
 import liar.gamemvcservice.game.repository.redis.JoinPlayerRepository;
 import liar.gamemvcservice.game.repository.redis.VoteRepository;
-import liar.gamemvcservice.game.service.dto.CommonDto;
-import liar.gamemvcservice.game.service.dto.SetUpGameDto;
+import liar.gamemvcservice.game.service.dto.*;
+import liar.gamemvcservice.game.service.vote.VotePolicy;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -25,35 +26,50 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static liar.gamemvcservice.game.domain.GameRole.CITIZEN;
+import static liar.gamemvcservice.game.domain.GameRole.LIAR;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @SpringBootTest
 @Transactional
-class GameFacadeServiceTest extends ThreadServiceOnlyTest {
+class GameFacadeServiceImplTest extends ThreadServiceOnlyTest {
 
     @Autowired
     GameFacadeService gameFacadeService;
     @Autowired
+    VotePolicy votePolicy;
+    @Autowired
     private GameRepository gameRepository;
     @Autowired
     private JoinPlayerRepository joinPlayerRepository;
-
-    private String gameId;
     @Autowired
     private GameTurnRepository gameTurnRepository;
     @Autowired
     private VoteRepository voteRepository;
 
+    private String gameId;
+    private Game game;
+    private String liarId;
+    private String citizenId;
+
     @BeforeEach
     public void init() {
         gameId = gameFacadeService.save(new SetUpGameDto("roomId", "1", "gameName",
                 Arrays.asList("1", "2", "3", "4")));
+        game = gameRepository.findById(gameId).orElseThrow(NotFoundGameException::new);
+        liarId = game.getLiarId();
+        citizenId = game.getPlayerIds()
+                .stream()
+                .filter(player -> !player.equals(liarId))
+                .findFirst()
+                .orElseThrow(NotFoundUserException::new);
     }
 
     @AfterEach
     public void tearDown() {
         gameRepository.deleteAll();
+        gameTurnRepository.deleteAll();
         joinPlayerRepository.deleteAll();
     }
 
@@ -287,9 +303,9 @@ class GameFacadeServiceTest extends ThreadServiceOnlyTest {
         doPlayUntilLastTurns();
 
         //when
-        boolean result1 = gameFacadeService.voteLiarUser(gameId, "1", "2");
-        boolean result2 = gameFacadeService.voteLiarUser(gameId, "2", "3");
-        boolean result3 = gameFacadeService.voteLiarUser(gameId, "3", "2");
+        boolean result1 = gameFacadeService.voteLiarUser(new VoteLiarRequest(gameId, "1", "2"));
+        boolean result2 = gameFacadeService.voteLiarUser(new VoteLiarRequest(gameId, "2", "3"));
+        boolean result3 = gameFacadeService.voteLiarUser(new VoteLiarRequest(gameId, "3", "2"));
         List<VotedResult> mostVotedResult = voteRepository.findVoteByGameId(gameId).getMostVotedResult();
 
         //then
@@ -307,9 +323,9 @@ class GameFacadeServiceTest extends ThreadServiceOnlyTest {
         doPlayUntilLastTurns();
 
         //when
-        boolean result1 = gameFacadeService.voteLiarUser(gameId, "1", "7");
-        boolean result2 = gameFacadeService.voteLiarUser(gameId, "2", "8");
-        boolean result3 = gameFacadeService.voteLiarUser(gameId, "3", "9");
+        boolean result1 = gameFacadeService.voteLiarUser(new VoteLiarRequest(gameId, "1", "7"));
+        boolean result2 = gameFacadeService.voteLiarUser(new VoteLiarRequest(gameId, "2", "8"));
+        boolean result3 = gameFacadeService.voteLiarUser(new VoteLiarRequest(gameId, "3", "9"));
         List<VotedResult> mostVotedResult = voteRepository.findVoteByGameId(gameId).getMostVotedResult();
 
         //then
@@ -333,7 +349,7 @@ class GameFacadeServiceTest extends ThreadServiceOnlyTest {
             int finalIndex = i;
             threads[i] = new Thread(() -> {
                 try {
-                    results[finalIndex] = gameFacadeService.voteLiarUser(gameId, String.valueOf(finalIndex + 1), "2");
+                    results[finalIndex] = gameFacadeService.voteLiarUser(new VoteLiarRequest(gameId, String.valueOf(finalIndex + 1), "2"));
                     System.out.println("finalIndex = " + finalIndex);
                 } catch (InterruptedException e) {
                     throw new RuntimeException(e);
@@ -351,6 +367,134 @@ class GameFacadeServiceTest extends ThreadServiceOnlyTest {
         assertThat(mostVotedResult.get(0).getCnt()).isEqualTo(4);
         assertThat(mostVotedResult.get(0).getUserIds().size()).isEqualTo(4);
         assertThat(mostVotedResult.get(0).getLiarId()).isEqualTo("2");
+    }
+
+
+    @Test
+    @DisplayName("라이어가 이긴 결과를 모든 클라이언트에게 informGameResult로 알린다.")
+    public void messageGameResultToClient() throws Exception {
+        //given
+        voteMostOthers();
+
+        //when
+        GameResultToClientDto gameResult = gameFacadeService
+                .messageGameResultToClient(gameId);
+
+        List<PlayerResultInfo> playersInfo = gameResult.getPlayersInfo();
+
+        //then
+        assertThat(gameResult.getGameId()).isEqualTo(game.getId());
+        assertThat(gameResult.getWinner()).isEqualTo(LIAR);
+        assertThat(playersInfo.size()).isEqualTo(6);
+        assertThat(playersInfo.get(0).getAnswers()).isFalse();
+    }
+
+    @Test
+    @DisplayName("라이어가 이긴 결과를 모든 클라이언트에게 informGameResult로 알린다.")
+    public void informGameResult_winLiar2() throws Exception {
+        //given
+        voteLiarAndOthersSame();
+
+        //when
+        GameResultToClientDto gameResult = gameFacadeService.messageGameResultToClient(gameId);
+
+        List<PlayerResultInfo> playersInfo = gameResult.getPlayersInfo();
+
+        //then
+        assertThat(gameResult.getGameId()).isEqualTo(game.getId());
+        assertThat(gameResult.getWinner()).isEqualTo(LIAR);
+        assertThat(playersInfo.size()).isEqualTo(6);
+    }
+
+    @Test
+    @DisplayName("게임 결과에 대한 메세지를 전송한다.")
+    public void messageGameResult() throws Exception {
+        //given
+        GameResultToClientDto gameResult = getGameResultToClient();
+
+        GameResultToServerDto message = gameFacadeService.messageGameResultToServer(gameId);
+
+        //then
+        assertThat(message.getGameId()).isEqualTo(game.getId());
+        assertThat(message.getWinner()).isEqualTo(CITIZEN);
+        assertThat(message.getGameName()).isEqualTo(game.getGameName());
+        assertThat(message.getHostId()).isEqualTo(game.getHostId());
+        assertThat(message.getRoomId()).isEqualTo(game.getRoomId());
+        assertThat(message.getTopicId()).isEqualTo(game.getTopic().getId());
+        assertThat(message.getTotalUserCnt()).isEqualTo(game.getPlayerIds().size());
+        assertThat(message.getPlayersInfo()).isEqualTo(gameResult.getPlayersInfo());
+    }
+
+    @Test
+    @DisplayName("멀티 스레드 환경에서 게임 결과에 대한 메세지를 전송하되, 단 한번만 발송하고 그 이후에는 null을 리턴한다.")
+    public void messageGameResult_multiThead() throws Exception {
+        //given
+        int result = 0;
+        GameResultToServerDto message = null;
+
+        GameResultToServerDto[] messages = initGameResultSateMessage();
+        GameResultToClientDto gameResult = getGameResultToClient();
+
+        //when
+        for (int i = 0; i < num; i++) {
+            int finalIdx = i;
+            threads[i] = new Thread(() -> {
+                messages[finalIdx] = gameFacadeService.messageGameResultToServer(gameId);
+            });
+        }
+
+        runThreads();
+
+        for (int i = 0; i < num; i++) {
+            if (messages[i] != null)  {
+                result++;
+                message = messages[i];
+            }
+        }
+
+        //then
+        assertThat(result).isEqualTo(1);
+        assertThat(message.getGameId()).isEqualTo(game.getId());
+        assertThat(message.getWinner()).isEqualTo(CITIZEN);
+        assertThat(message.getGameName()).isEqualTo(game.getGameName());
+        assertThat(message.getHostId()).isEqualTo(game.getHostId());
+        assertThat(message.getRoomId()).isEqualTo(game.getRoomId());
+        assertThat(message.getTopicId()).isEqualTo(game.getTopic().getId());
+        assertThat(message.getTotalUserCnt()).isEqualTo(game.getPlayerIds().size());
+        assertThat(message.getPlayersInfo()).isEqualTo(gameResult.getPlayersInfo());
+    }
+
+    private GameResultToClientDto getGameResultToClient() throws InterruptedException {
+        voteMostLiar();
+        GameResultToClientDto gameResult = gameFacadeService.messageGameResultToClient(gameId);
+        return gameResult;
+    }
+
+    @NotNull
+    private GameResultToServerDto[] initGameResultSateMessage() {
+        num = 100;
+        threads = new Thread[num];
+        GameResultToServerDto[] messages = new GameResultToServerDto[num];
+        Arrays.fill(messages,new GameResultToServerDto());
+        return messages;
+    }
+
+
+    private void voteMostLiar() throws InterruptedException {
+        for (int i = 1; i <= game.getPlayerIds().size(); i++)
+            votePolicy.voteLiarUser(game.getId(), String.valueOf(i), liarId);
+    }
+
+    private void voteMostOthers() throws InterruptedException {
+        for (int i = 1; i <= game.getPlayerIds().size(); i++)
+            votePolicy.voteLiarUser(game.getId(), String.valueOf(i), citizenId);
+    }
+
+    private void voteLiarAndOthersSame() throws InterruptedException {
+        for (int i = 1; i <= game.getPlayerIds().size() / 2; i++)
+            votePolicy.voteLiarUser(game.getId(), String.valueOf(i), liarId);
+        for (int i = (game.getPlayerIds().size() / 2) + 1; i <= game.getPlayerIds().size(); i++)
+            votePolicy.voteLiarUser(game.getId(), String.valueOf(i), citizenId);
     }
 
     @NotNull
