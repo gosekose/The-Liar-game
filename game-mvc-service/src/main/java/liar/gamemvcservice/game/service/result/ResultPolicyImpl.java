@@ -6,9 +6,10 @@ import liar.gamemvcservice.game.domain.*;
 import liar.gamemvcservice.game.repository.redis.GameRepository;
 import liar.gamemvcservice.game.repository.redis.JoinPlayerRepository;
 import liar.gamemvcservice.game.repository.redis.VoteRepository;
-import liar.gamemvcservice.game.service.dto.GameResultSaveMessageDto;
+import liar.gamemvcservice.game.service.dto.GameResultToServerDto;
 import liar.gamemvcservice.game.service.dto.GameResultToClientDto;
-import liar.gamemvcservice.game.service.dto.PlayersInfoDto;
+import liar.gamemvcservice.game.service.dto.PlayerResultInfo;
+import liar.gamemvcservice.game.service.dto.VotedResultDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -38,58 +39,33 @@ public class ResultPolicyImpl implements ResultPolicy {
         return false;
     }
 
-    /**
-     * 게임 결과를 클라이언트에게 알리다.
-     */
     @Override
-    public GameResultToClientDto informGameResult(Game game, List<VotedResult> votedResults) {
-        GameRole winner = checkWhoWin(game, votedResults) ? CITIZEN : LIAR;
-        VotedResult votedResult = getVotedResult(game.getId());
-
-        return GameResultToClientDto.of(game.getId(), winner,
-                joinPlayerRepository.findByGameId(game.getId())
-                        .stream()
-                        .map(JoinPlayer::getPlayer)
-                        .map(player -> new PlayersInfoDto(player.getUserId(), player.getGameRole(),
-                                votedResult.getUserIds().contains(player.getUserId())))
-                        .collect(Collectors.toList()));
-
+    public List<VotedResultDto> getVotedResultDto(Vote vote) {
+        return vote.getVotedResults()
+                .stream()
+                .map(VotedResultDto::new)
+                .collect(Collectors.toList());
     }
 
-    /**
-     * 게임 결과를 result 서버로 메세지 보낸다.
-     */
     @Override
-    public GameResultSaveMessageDto messageGameResult(Game game, GameResultToClientDto gameResult) {
-        if (!game.isSendMessage()) {
-            updateSendMessage(game);
-            return GameResultSaveMessageDto.of(game, gameResult);
-        }
-        return null;
+    public List<PlayerResultInfo> getPlayersResultInfo(Game game, VotedResult votedResult) {
+        return joinPlayerRepository
+                .findByGameId(game.getId())
+                .stream()
+                .map(JoinPlayer::getPlayer)
+                .map(player -> new PlayerResultInfo(player.getUserId(),
+                        player.getGameRole(),
+                        votedResult.getUserIds().contains(player.getUserId())))
+                .collect(Collectors.toList());
     }
+
 
     private GameRole getGameRole(String gameId, List<VotedResult> votedResults) {
         return getJoinPlayer(gameId, votedResults.get(0).getLiarId())
                 .getPlayer().getGameRole();
     }
 
-    private VotedResult getVotedResult(String gameId) {
-        Game game = gameRepository.findById(gameId).orElseThrow(NotFoundGameException::new);
-        Vote vote = voteRepository.findVoteByGameId(game.getId());
-
-        if (vote == null) throw new NotFoundGameException();
-
-        VotedResult votedResult = vote.getVotedResult(game.getLiarId());
-        return votedResult;
-    }
-
     private JoinPlayer getJoinPlayer(String gameId, String userId) {
         return joinPlayerRepository.findById(gameId + "_" + userId).orElseThrow(NotFoundUserException::new);
     }
-
-    private void updateSendMessage(Game game) {
-        game.sendMessage();
-        gameRepository.save(game);
-    }
-
 }

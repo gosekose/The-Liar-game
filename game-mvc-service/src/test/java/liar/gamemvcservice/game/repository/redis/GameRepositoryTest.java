@@ -21,19 +21,13 @@ class GameRepositoryTest {
 
     @Autowired
     GameRepository gameRepository;
-
     @Autowired
     RedissonClient redissonClient;
-
     private int duplicatedTotalCnt = 0;
-    @Autowired
-    private VoteRepository voteRepository;
 
     @AfterEach
     public void tearDown() {
-
-//        gameRepository.deleteAll();
-        duplicatedTotalCnt = 0;
+        gameRepository.deleteAll();
     }
 
     @Test
@@ -52,36 +46,6 @@ class GameRepositoryTest {
         assertThat(savedGame.getHostId()).isEqualTo(game.getHostId());
         assertThat(savedGame.getRoomId()).isEqualTo(game.getRoomId());
         assertThat(savedGame.getPlayerIds()).isEqualTo(game.getPlayerIds());
-    }
-
-    @Test
-    @DisplayName("스레드 safe 하지 않은 상태에서 game이 있다면 값을 저장하지 않고, 없다면 값을 저장한다.")
-    public void saveIfNotExistsGame_ThreadNotSafe() throws Exception {
-        //given
-        Thread[] threads = new Thread[100];
-
-        SetUpGameDto setUpGameDto = new SetUpGameDto("1", "1", "1", Arrays.asList("2", "3", "4"));
-        Game game = Game.of(setUpGameDto);
-
-        //when
-
-        for (int i = 0; i < 100; i++) {
-            threads[i] = new Thread(() -> {
-
-                if (gameRepository.findById(game.getId()).isEmpty()) {
-                    System.out.println("repository에 저장합니다.");
-                    gameRepository.save(game);
-                    duplicatedTotalCnt++;
-                }
-            });
-        }
-
-        for (int i = 0; i < 100; i++) threads[i].start();
-        for (int i = 0; i < 100; i++) threads[i].join();
-
-        //then
-        System.out.println("duplicatedTotalCnt = " + duplicatedTotalCnt);
-        assertThat(duplicatedTotalCnt).isNotEqualTo(1);
     }
 
     @Test

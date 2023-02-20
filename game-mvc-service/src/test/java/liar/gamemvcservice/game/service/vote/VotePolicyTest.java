@@ -21,7 +21,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
 @Transactional
-class VotePolicyImplTest extends ThreadServiceOnlyTest {
+class VotePolicyTest extends ThreadServiceOnlyTest {
 
     @Autowired
     VotePolicy votePolicy;

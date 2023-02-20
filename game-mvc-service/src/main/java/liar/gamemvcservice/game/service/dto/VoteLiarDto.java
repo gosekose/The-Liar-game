@@ -1,6 +1,6 @@
 package liar.gamemvcservice.game.service.dto;
 
-import liar.gamemvcservice.game.controller.dto.VoteLiarRequest;
+import liar.gamemvcservice.game.controller.dto.request.VoteLiarRequest;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

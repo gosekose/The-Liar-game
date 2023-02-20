@@ -1,8 +1,9 @@
 package liar.gamemvcservice.game.controller;
 
 import jakarta.validation.Valid;
-import liar.gamemvcservice.game.controller.dto.VoteLiarRequest;
-import liar.gamemvcservice.game.service.GameService;
+import liar.gamemvcservice.game.controller.dto.message.SendSuccessBody;
+import liar.gamemvcservice.game.controller.dto.request.VoteLiarRequest;
+import liar.gamemvcservice.game.service.GameFacadeServiceImpl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -14,12 +15,12 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/game-service/game")
 public class VoteLiarController {
 
-    private final GameService gameService;
+    private final GameFacadeServiceImpl gameFacadeServiceImpl;
 
     @PostMapping("/{userId}/vote")
     public ResponseEntity voteLiar(@PathVariable String userId,
-                                   @Valid @RequestBody VoteLiarRequest dto) {
-
-        return null;
+                                   @Valid @RequestBody VoteLiarRequest dto) throws InterruptedException {
+        return ResponseEntity.ok().body(SendSuccessBody.of(gameFacadeServiceImpl
+                .voteLiarUser(dto)));
     }
 }

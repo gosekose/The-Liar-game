@@ -1,4 +1,4 @@
-package liar.gamemvcservice.game.controller.dto;
+package liar.gamemvcservice.game.controller.dto.message;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

@@ -1,10 +1,9 @@
-package liar.gamemvcservice.game.controller.dto;
+package liar.gamemvcservice.game.controller.dto.message.message;
 
 
-import lombok.AllArgsConstructor;
+import liar.gamemvcservice.game.controller.dto.message.ChatMessage;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.jetbrains.annotations.NotNull;
 
 import java.time.LocalDateTime;
 

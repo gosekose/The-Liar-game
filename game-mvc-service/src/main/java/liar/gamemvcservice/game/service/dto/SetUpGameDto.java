@@ -1,6 +1,6 @@
 package liar.gamemvcservice.game.service.dto;
 
-import liar.gamemvcservice.game.controller.dto.SetUpGameRequest;
+import liar.gamemvcservice.game.controller.dto.request.SetUpGameRequest;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
