@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import liar.gamemvcservice.exception.exception.NotEqualUserIdException;
-import liar.gamemvcservice.game.controller.dto.VoteLiarRequest;
+import liar.gamemvcservice.game.controller.dto.request.VoteLiarRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;

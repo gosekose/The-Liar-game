@@ -3,7 +3,7 @@ package liar.gamemvcservice.game.controller;
 import com.google.gson.Gson;
 import liar.gamemvcservice.game.service.dto.CommonDto;
 import liar.gamemvcservice.game.service.dto.SetUpGameDto;
-import liar.gamemvcservice.game.service.GameService;
+import liar.gamemvcservice.game.service.GameFacadeService;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -30,7 +30,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class SetUpChatControllerTest extends CommonController {
 
     @Autowired
-    GameService gameService;
+    GameFacadeService gameFacadeService;
 
     @AfterEach
     public void tearDown() {
@@ -156,7 +156,7 @@ class SetUpChatControllerTest extends CommonController {
         List<String> userIds = Arrays.asList(hostId, devUser1Id, devUser2Id, devUser3Id, devUser4Id);
 
         SetUpGameDto setUpGameDto = new SetUpGameDto(roomId, hostId, roomName, userIds);
-        return gameService.save(setUpGameDto);
+        return gameFacadeService.save(setUpGameDto);
     }
 
 }

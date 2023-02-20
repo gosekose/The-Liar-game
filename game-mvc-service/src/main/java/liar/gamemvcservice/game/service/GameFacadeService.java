@@ -1,7 +1,9 @@
 package liar.gamemvcservice.game.service;
 
 import liar.gamemvcservice.exception.exception.NotFoundGameException;
+import liar.gamemvcservice.game.repository.redis.VoteRepository;
 import liar.gamemvcservice.game.service.dto.CommonDto;
+import liar.gamemvcservice.game.service.dto.GameResultToClientDto;
 import liar.gamemvcservice.game.service.dto.SetUpGameDto;
 import liar.gamemvcservice.game.domain.*;
 import liar.gamemvcservice.game.repository.redis.GameRepository;
@@ -22,7 +24,7 @@ import java.util.List;
 @Service
 @Transactional
 @RequiredArgsConstructor
-public class GameService {
+public class GameFacadeService {
 
     private final GameRepository gameRepository;
     private final TopicPolicy topicPolicy;
@@ -32,6 +34,7 @@ public class GameService {
     private final ResultPolicy resultPolicy;
     private final JoinPlayerRepository joinPlayerRepository;
     private final GameTurnRepository gameTurnRepository;
+    private final VoteRepository voteRepository;
 
     /**
      * 방장의 요청을 받아 game을 저장한다,
@@ -110,12 +113,23 @@ public class GameService {
 
     /**
      * 클라이언트의 개별 투표를 저장한다.
-     * @param dto gameId(게임 Id), userId(클라이언트의 userId), liarId(라이어로 지목할 클라이언트 userId)
+     * gameId(게임 Id), userId(클라이언트의 userId), liarId(라이어로 지목할 클라이언트 userId)
      * @return vote가 수정되어 저장되면 true, 아니라면 false
      * @throws InterruptedException
      */
-    public boolean voteLiarUser(VoteLiarDto dto) throws InterruptedException {
-        return votePolicy.voteLiarUser(dto.getGameId(), dto.getUserId(), dto.getLiarId());
+    public boolean voteLiarUser(String gameId, String userid, String liarId) throws InterruptedException {
+        return votePolicy.voteLiarUser(gameId, userid, liarId);
+    }
+
+    /**
+     * gameResult를 client에게 전달하는 Dto를 생성한다.
+     * @param gameId gameId
+     * @return gameResultToClientDto
+     */
+    public GameResultToClientDto informGameResult(String gameId) {
+        Game game = findGameById(gameId);
+        Vote vote = getVote(game);
+        return resultPolicy.informGameResult(game, vote.getVotedResults());
     }
 
     /**
@@ -156,6 +170,12 @@ public class GameService {
             return joinPlayers;
         }
         throw new NotFoundGameException();
+    }
+
+    private Vote getVote(Game game) {
+        Vote vote = voteRepository.findVoteByGameId(game.getId());
+        if (vote == null) throw new NotFoundGameException();
+        return vote;
     }
 
 }

@@ -1,7 +1,7 @@
 package liar.gamemvcservice.game.controller.interceptor;
 
 import liar.gamemvcservice.exception.exception.BindingInvalidException;
-import liar.gamemvcservice.game.service.GameService;
+import liar.gamemvcservice.game.service.GameFacadeService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.Message;
@@ -16,7 +16,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class ChatInterceptor implements ChannelInterceptor {
 
-    private final GameService gameService;
+    private final GameFacadeService gameFacadeService;
 
     @Override
     public Message<?> preSend(Message<?> message, MessageChannel channel) {
@@ -36,7 +36,7 @@ public class ChatInterceptor implements ChannelInterceptor {
         String gameId = headerAccessor.getFirstNativeHeader("gameId");
 
         if(userId != null && gameId != null) {
-            if (gameService.findJoinPlayer(gameId, userId) != null) {
+            if (gameFacadeService.findJoinPlayer(gameId, userId) != null) {
                 return true;
             }
         }
