@@ -4,7 +4,6 @@ import liar.gamemvcservice.exception.exception.BindingInvalidException;
 import liar.gamemvcservice.game.service.GameService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.integration.config.GlobalChannelInterceptor;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.simp.stomp.StompCommand;
@@ -37,7 +36,7 @@ public class ChatInterceptor implements ChannelInterceptor {
         String gameId = headerAccessor.getFirstNativeHeader("gameId");
 
         if(userId != null && gameId != null) {
-            if (gameService.findJoinMemberOfRequestGame(gameId, userId) != null) {
+            if (gameService.findJoinPlayer(gameId, userId) != null) {
                 return true;
             }
         }

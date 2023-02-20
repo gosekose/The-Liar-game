@@ -167,7 +167,7 @@ class GameServiceTest extends ThreadServiceOnlyTest {
     @DisplayName("findJoinMemberOfRequestGame")
     public void findJoinMemberOfRequestGame_success() throws Exception {
         //when
-        JoinPlayer joinPlayer = gameService.findJoinMemberOfRequestGame(gameId, "1");
+        JoinPlayer joinPlayer = gameService.findJoinPlayer(gameId, "1");
 
         //then
         assertThat(joinPlayer).isNotNull();
@@ -181,7 +181,7 @@ class GameServiceTest extends ThreadServiceOnlyTest {
 
         //then
         assertThatThrownBy(() -> {
-            gameService.findJoinMemberOfRequestGame(gameId, userId);
+            gameService.findJoinPlayer(gameId, userId);
         }).isInstanceOf(NotFoundGameException.class);
     }
 
