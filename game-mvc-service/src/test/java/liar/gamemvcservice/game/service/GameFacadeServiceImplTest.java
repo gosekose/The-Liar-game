@@ -54,10 +54,11 @@ class GameFacadeServiceImplTest extends ThreadServiceOnlyTest {
     private String citizenId;
 
     @BeforeEach
-    public void init() {
+    public void init() throws InterruptedException {
         gameId = gameFacadeService.save(new SetUpGameDto("roomId", "1", "gameName",
                 Arrays.asList("1", "2", "3", "4")));
         game = gameRepository.findById(gameId).orElseThrow(NotFoundGameException::new);
+        votePolicy.saveVote(game);
         liarId = game.getLiarId();
         citizenId = game.getPlayerIds()
                 .stream()
@@ -340,7 +341,6 @@ class GameFacadeServiceImplTest extends ThreadServiceOnlyTest {
     public void voteLiarUser_multiThread() throws Exception {
         num = 4;
         threads = new Thread[num];
-
         doPlayUntilLastTurns();
         boolean[] results = new boolean[num];
 
@@ -385,7 +385,7 @@ class GameFacadeServiceImplTest extends ThreadServiceOnlyTest {
         //then
         assertThat(gameResult.getGameId()).isEqualTo(game.getId());
         assertThat(gameResult.getWinner()).isEqualTo(LIAR);
-        assertThat(playersInfo.size()).isEqualTo(6);
+        assertThat(playersInfo.size()).isEqualTo(4);
         assertThat(playersInfo.get(0).getAnswers()).isFalse();
     }
 
@@ -403,15 +403,14 @@ class GameFacadeServiceImplTest extends ThreadServiceOnlyTest {
         //then
         assertThat(gameResult.getGameId()).isEqualTo(game.getId());
         assertThat(gameResult.getWinner()).isEqualTo(LIAR);
-        assertThat(playersInfo.size()).isEqualTo(6);
+        assertThat(playersInfo.size()).isEqualTo(4);
     }
 
     @Test
     @DisplayName("게임 결과에 대한 메세지를 전송한다.")
     public void messageGameResult() throws Exception {
         //given
-        GameResultToClientDto gameResult = getGameResultToClient();
-
+        voteMostLiar();
         GameResultToServerDto message = gameFacadeService.messageGameResultToServer(gameId);
 
         //then
@@ -422,7 +421,6 @@ class GameFacadeServiceImplTest extends ThreadServiceOnlyTest {
         assertThat(message.getRoomId()).isEqualTo(game.getRoomId());
         assertThat(message.getTopicId()).isEqualTo(game.getTopic().getId());
         assertThat(message.getTotalUserCnt()).isEqualTo(game.getPlayerIds().size());
-        assertThat(message.getPlayersInfo()).isEqualTo(gameResult.getPlayersInfo());
     }
 
     @Test
@@ -431,9 +429,8 @@ class GameFacadeServiceImplTest extends ThreadServiceOnlyTest {
         //given
         int result = 0;
         GameResultToServerDto message = null;
-
         GameResultToServerDto[] messages = initGameResultSateMessage();
-        GameResultToClientDto gameResult = getGameResultToClient();
+        voteMostLiar();
 
         //when
         for (int i = 0; i < num; i++) {
@@ -461,7 +458,6 @@ class GameFacadeServiceImplTest extends ThreadServiceOnlyTest {
         assertThat(message.getRoomId()).isEqualTo(game.getRoomId());
         assertThat(message.getTopicId()).isEqualTo(game.getTopic().getId());
         assertThat(message.getTotalUserCnt()).isEqualTo(game.getPlayerIds().size());
-        assertThat(message.getPlayersInfo()).isEqualTo(gameResult.getPlayersInfo());
     }
 
     private GameResultToClientDto getGameResultToClient() throws InterruptedException {

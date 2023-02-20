@@ -208,7 +208,7 @@ public class GameFacadeServiceImpl implements GameFacadeService {
     private GameResultBaseDto createGameResultBaseDto(Game game, Vote vote) {
         return GameResultBaseDto.of(
                 game.getId(),
-                resultPolicy.checkWhoWin(game, vote.getVotedResults()) ? CITIZEN : LIAR,
+                resultPolicy.checkWhoWin(game, vote.getMostVotedResult()) ? CITIZEN : LIAR,
                 resultPolicy.getPlayersResultInfo(game, vote.getVotedResult(game.getLiarId()))
         );
     }
