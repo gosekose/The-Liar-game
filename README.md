@@ -6,7 +6,8 @@ SpringBoot 라이어 게임 (MSA 아키텍처) 개인 프로젝트입니다.
 
 
 ## 구조도
-![image](https://user-images.githubusercontent.com/88478829/217520008-4a5dfed7-4f20-40a7-9555-6a6d45767658.png)
+![image](https://user-images.githubusercontent.com/88478829/220101446-0456eb9e-6924-4376-8b1f-425af8410813.png)
+
 
 ![](../header.png)
 

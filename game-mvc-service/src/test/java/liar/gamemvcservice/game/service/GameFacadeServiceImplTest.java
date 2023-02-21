@@ -245,7 +245,7 @@ class GameFacadeServiceImplTest extends ThreadServiceOnlyTest {
         List<String> gamePlayerTurns = gameFacadeService.setUpTurn(gameId);
 
         //when
-        NextTurn nextTurn = gameFacadeService.updateAndInformPlayerTurn(gameId, gamePlayerTurns.get(0));
+        NextTurn nextTurn = gameFacadeService.setNextTurnWhenValidated(gameId, gamePlayerTurns.get(0));
 
         //then
         assertThat(nextTurn.getUserIdOfNextTurn()).isEqualTo(gamePlayerTurns.get(1));
@@ -263,7 +263,7 @@ class GameFacadeServiceImplTest extends ThreadServiceOnlyTest {
 
         //then
         assertThatThrownBy(() -> {
-            gameFacadeService.updateAndInformPlayerTurn(gameId, userId);
+            gameFacadeService.setNextTurnWhenValidated(gameId, userId);
         }).isInstanceOf(NotUserTurnException.class);
     }
 
@@ -293,7 +293,7 @@ class GameFacadeServiceImplTest extends ThreadServiceOnlyTest {
         //then
         assertThatThrownBy(() -> {
             gameFacadeService
-                    .updateAndInformPlayerTurn(gameId, gamePlayerTurns.get(0));
+                    .setNextTurnWhenValidated(gameId, gamePlayerTurns.get(0));
         }).isInstanceOf(GameTurnEndException.class);
     }
 
@@ -378,7 +378,7 @@ class GameFacadeServiceImplTest extends ThreadServiceOnlyTest {
 
         //when
         GameResultToClientDto gameResult = gameFacadeService
-                .messageGameResultToClient(gameId);
+                .sendGameResultToClient(gameId);
 
         List<PlayerResultInfo> playersInfo = gameResult.getPlayersInfo();
 
@@ -396,7 +396,7 @@ class GameFacadeServiceImplTest extends ThreadServiceOnlyTest {
         voteLiarAndOthersSame();
 
         //when
-        GameResultToClientDto gameResult = gameFacadeService.messageGameResultToClient(gameId);
+        GameResultToClientDto gameResult = gameFacadeService.sendGameResultToClient(gameId);
 
         List<PlayerResultInfo> playersInfo = gameResult.getPlayersInfo();
 
@@ -411,7 +411,7 @@ class GameFacadeServiceImplTest extends ThreadServiceOnlyTest {
     public void messageGameResult() throws Exception {
         //given
         voteMostLiar();
-        GameResultToServerDto message = gameFacadeService.messageGameResultToServer(gameId);
+        GameResultToServerDto message = gameFacadeService.sendGameResultToServer(gameId);
 
         //then
         assertThat(message.getGameId()).isEqualTo(game.getId());
@@ -436,7 +436,7 @@ class GameFacadeServiceImplTest extends ThreadServiceOnlyTest {
         for (int i = 0; i < num; i++) {
             int finalIdx = i;
             threads[i] = new Thread(() -> {
-                messages[finalIdx] = gameFacadeService.messageGameResultToServer(gameId);
+                messages[finalIdx] = gameFacadeService.sendGameResultToServer(gameId);
             });
         }
 
@@ -462,7 +462,7 @@ class GameFacadeServiceImplTest extends ThreadServiceOnlyTest {
 
     private GameResultToClientDto getGameResultToClient() throws InterruptedException {
         voteMostLiar();
-        GameResultToClientDto gameResult = gameFacadeService.messageGameResultToClient(gameId);
+        GameResultToClientDto gameResult = gameFacadeService.sendGameResultToClient(gameId);
         return gameResult;
     }
 
@@ -544,7 +544,7 @@ class GameFacadeServiceImplTest extends ThreadServiceOnlyTest {
     private NextTurn playUntilLastTurn(List<String> gamePlayerTurns) throws InterruptedException {
         NextTurn nextTurn = null;
         for (int i = 0; i < gamePlayerTurns.size() * 2; i++) {
-            nextTurn = gameFacadeService.updateAndInformPlayerTurn(gameId,
+            nextTurn = gameFacadeService.setNextTurnWhenValidated(gameId,
                     gamePlayerTurns.get(i % gamePlayerTurns.size()));
         }
         return nextTurn;
