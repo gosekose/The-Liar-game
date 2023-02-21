@@ -8,6 +8,7 @@ import liar.waitservice.wait.domain.WaitRoom;
 import liar.waitservice.wait.service.WaitRoomCompleteService;
 import liar.waitservice.wait.service.WaitRoomService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -16,6 +17,9 @@ public class DoProcessStartAndEndGameServiceImpl implements DoProcessStartAndEnd
 
     private final WaitRoomCompleteService waitRoomCompleteService;
     private final WaitRoomService waitRoomService;
+
+    @Value("${game.member.limit.min}")
+    private int limitMin;
 
     @Override
     public void doPreProcessBeforeGameStart(RequestWaitRoomDto saveRequest) {
@@ -39,7 +43,7 @@ public class DoProcessStartAndEndGameServiceImpl implements DoProcessStartAndEnd
     }
 
     private boolean isMinJoinMembers(WaitRoom waitRoom) {
-        if (waitRoom.getMembers().size() >= 3 ) {
+        if (waitRoom.getMembers().size() >= limitMin ) {
             return true;
         }
         throw new NotSatisfiedMinJoinMembers();

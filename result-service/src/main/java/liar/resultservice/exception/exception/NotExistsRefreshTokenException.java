@@ -1,7 +1,7 @@
 package liar.resultservice.exception.exception;
 
-import liar.gamemvcservice.exception.type.ExceptionCode;
-import liar.gamemvcservice.exception.type.ExceptionMessage;
+import liar.resultservice.exception.type.ExceptionCode;
+import liar.resultservice.exception.type.ExceptionMessage;
 
 public class NotExistsRefreshTokenException extends CommonException {
 

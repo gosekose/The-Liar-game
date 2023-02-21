@@ -24,6 +24,6 @@ public class PlayerResult {
 
     private String userId;
     private GameRole gameRole;
-    private Boolean sayAnswer;
-    private boolean win;
+    private Boolean answers;
+    private Long score;
 }
