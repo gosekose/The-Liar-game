@@ -1,5 +1,0 @@
-encrypt:
-  key-store:
-    location: file:///home/koseyun/IdeaProjects/liargame/keystore/liargameMemberServiceKey.jks
-    password: 123456
-    alias: liargameMemberserviceKey

@@ -4,7 +4,7 @@ import liar.gamemvcservice.exception.exception.NotEqualUserIdException;
 import liar.gamemvcservice.game.controller.dto.message.ChatMessage;
 import liar.gamemvcservice.game.controller.dto.message.message.ChatMessageResponse;
 import liar.gamemvcservice.game.domain.NextTurn;
-import liar.gamemvcservice.game.service.GameFacadeServiceImpl;
+import liar.gamemvcservice.game.service.GameFacadeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/game-service/game")
 public class ChatController {
 
-    private final GameFacadeServiceImpl gameFacadeServiceImpl;
+    private final GameFacadeService gameFacadeService;
     private final SimpMessagingTemplate template;
 
     @MessageMapping("/{gameId}")
@@ -28,8 +28,8 @@ public class ChatController {
                           ChatMessage message) throws InterruptedException {
 
         isMatchUserIdAndRequestMessageUserId(headerAccessor, message);
-        NextTurn nextTurn = gameFacadeServiceImpl
-                .updateAndInformPlayerTurn(gameId, message.getCharMessage());
+        NextTurn nextTurn = gameFacadeService
+                .setNextTurnWhenValidated(gameId, message.getCharMessage());
 
         template.convertAndSend("/topic/" + gameId, ChatMessageResponse.of(message, nextTurn));
     }

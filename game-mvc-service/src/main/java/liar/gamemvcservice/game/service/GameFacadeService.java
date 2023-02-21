@@ -53,7 +53,7 @@ public interface GameFacadeService {
      * @return nextTurn (다음턴 userId, 마지막 턴 boolean)
      * @throws InterruptedException
      */
-    NextTurn updateAndInformPlayerTurn(String gameId, String userId) throws InterruptedException;
+    NextTurn setNextTurnWhenValidated(String gameId, String userId) throws InterruptedException;
 
 
     /**
@@ -69,13 +69,13 @@ public interface GameFacadeService {
      * @param gameId
      * @return gameResultToClientDto
      */
-    GameResultToClientDto messageGameResultToClient(String gameId);
+    GameResultToClientDto sendGameResultToClient(String gameId);
 
     /**
      * 같은 게임을 공유하는 gameResultToServer가 처음 실행 되면 game save message를 보낸다.
      * @param gameId
      * @return gameResultToserverDto
      */
-    GameResultToServerDto messageGameResultToServer(String gameId);
+    GameResultToServerDto sendGameResultToServer(String gameId);
 
 }

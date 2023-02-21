@@ -65,7 +65,7 @@ public class RedisLockAspect {
         return (boolean) executeWithRedisLock(joinPoint, lockKey);
     }
 
-    @Around("execution(* liar.gamemvcservice.game.service.GameFacadeService.messageGameResultToServer(..)) && args(gameId)")
+    @Around("execution(* liar.gamemvcservice.game.service.GameFacadeService.sendGameResultToServer(..)) && args(gameId)")
     public GameResultToServerDto messageGameResultWithRedisLock(ProceedingJoinPoint joinPoint, String gameId) throws Throwable {
         String lockKey = "messageGameResult: " + gameId;
         return (GameResultToServerDto) executeWithRedisLock(joinPoint, lockKey);

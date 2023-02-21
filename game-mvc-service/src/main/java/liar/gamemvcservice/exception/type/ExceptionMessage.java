@@ -9,5 +9,6 @@ public class ExceptionMessage {
     public static final String NOT_FOUND = "요청 정보가 일치하지 않습니다.";
     public static final String NOT_USER_TURN = "유저의 차례가 아닙니다.";
     public static final String REDIS_ROCK_EXCEPTION = "다른 요청이 처리 중입니다.";
+    public static final String VOTE_NOT_FOUND = "투표를 할 수 없습니다.";
 
 }

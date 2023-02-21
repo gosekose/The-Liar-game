@@ -1,8 +1,0 @@
-spring:
-  cloud:
-    config:
-      url: http://localhost:8888
-      name: common, member-service, game-service
-
-#  profiles:
-#    active: dev
