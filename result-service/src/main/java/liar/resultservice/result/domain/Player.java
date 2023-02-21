@@ -26,6 +26,8 @@ public class Player {
     private Long exp;
     private Level level;
 
+    private boolean visibleGameResult;
+
     @Builder
     public Player(String userId, Long wins, Long loses, Long totalGames, Long exp, Level level) {
         this.userId = userId;
@@ -34,6 +36,7 @@ public class Player {
         this.totalGames = totalGames;
         this.exp = exp;
         this.level = level;
+        this.visibleGameResult = true;
     }
 
     public static Player of(String userId) {
@@ -60,5 +63,9 @@ public class Player {
         return ++totalGames;
     }
 
+    public boolean updateVisibleGameResult() {
+        if (isVisibleGameResult()) return this.visibleGameResult = false;
+        return this.visibleGameResult = true;
+    }
 
 }

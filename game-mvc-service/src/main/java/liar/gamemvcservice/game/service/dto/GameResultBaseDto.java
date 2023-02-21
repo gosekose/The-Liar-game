@@ -14,9 +14,9 @@ import java.util.List;
 public class GameResultBaseDto {
     private String gameId;
     private GameRole winner;
-    private List<PlayerResultInfo> playersInfo;
+    private List<PlayerResultInfoDto> playersInfo;
 
-    public static GameResultBaseDto of(String gameId, GameRole winner, List<PlayerResultInfo> playersInfo) {
+    public static GameResultBaseDto of(String gameId, GameRole winner, List<PlayerResultInfoDto> playersInfo) {
         return new GameResultBaseDto(gameId, winner, playersInfo);
     }
 }

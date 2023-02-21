@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-public class PlayerResultInfo {
+public class PlayerResultInfoDto {
 
     private String userId;
     private GameRole gameRole;

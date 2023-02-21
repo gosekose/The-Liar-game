@@ -15,7 +15,7 @@ public class GameResultToClientDto extends GameResultBaseDto {
     private List<VotedResultDto> votedResults;
 
     protected GameResultToClientDto(String gameId, GameRole winner, List<VotedResultDto> votedResults,
-                                    List<PlayerResultInfo> playersInfo) {
+                                    List<PlayerResultInfoDto> playersInfo) {
         super(gameId, winner, playersInfo);
         this.votedResults = votedResults;
     }

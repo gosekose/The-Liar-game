@@ -1,14 +1,11 @@
 package liar.gamemvcservice.game.service.result;
 
-import liar.gamemvcservice.exception.exception.NotFoundGameException;
 import liar.gamemvcservice.exception.exception.NotFoundUserException;
 import liar.gamemvcservice.game.domain.*;
 import liar.gamemvcservice.game.repository.redis.GameRepository;
 import liar.gamemvcservice.game.repository.redis.JoinPlayerRepository;
 import liar.gamemvcservice.game.repository.redis.VoteRepository;
-import liar.gamemvcservice.game.service.dto.GameResultToServerDto;
-import liar.gamemvcservice.game.service.dto.GameResultToClientDto;
-import liar.gamemvcservice.game.service.dto.PlayerResultInfo;
+import liar.gamemvcservice.game.service.dto.PlayerResultInfoDto;
 import liar.gamemvcservice.game.service.dto.VotedResultDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -16,7 +13,6 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static liar.gamemvcservice.game.domain.GameRole.CITIZEN;
 import static liar.gamemvcservice.game.domain.GameRole.LIAR;
 
 @Component
@@ -48,12 +44,12 @@ public class ResultPolicyImpl implements ResultPolicy {
     }
 
     @Override
-    public List<PlayerResultInfo> getPlayersResultInfo(Game game, VotedResult votedResult) {
+    public List<PlayerResultInfoDto> getPlayersResultInfo(Game game, VotedResult votedResult) {
         return joinPlayerRepository
                 .findByGameId(game.getId())
                 .stream()
                 .map(JoinPlayer::getPlayer)
-                .map(player -> new PlayerResultInfo(player.getUserId(),
+                .map(player -> new PlayerResultInfoDto(player.getUserId(),
                         player.getGameRole(),
                         votedResult.getUserIds().contains(player.getUserId())))
                 .collect(Collectors.toList());

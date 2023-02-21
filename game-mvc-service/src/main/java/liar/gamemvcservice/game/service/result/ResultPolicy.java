@@ -3,7 +3,7 @@ package liar.gamemvcservice.game.service.result;
 import liar.gamemvcservice.game.domain.Game;
 import liar.gamemvcservice.game.domain.Vote;
 import liar.gamemvcservice.game.domain.VotedResult;
-import liar.gamemvcservice.game.service.dto.PlayerResultInfo;
+import liar.gamemvcservice.game.service.dto.PlayerResultInfoDto;
 import liar.gamemvcservice.game.service.dto.VotedResultDto;
 import org.springframework.stereotype.Component;
 
@@ -19,7 +19,7 @@ public interface ResultPolicy {
     boolean checkWhoWin(Game game, List<VotedResult> votedResults);
 
     List<VotedResultDto> getVotedResultDto(Vote vote);
-    List<PlayerResultInfo> getPlayersResultInfo(Game game, VotedResult votedResult);
+    List<PlayerResultInfoDto> getPlayersResultInfo(Game game, VotedResult votedResult);
 
 
 }
