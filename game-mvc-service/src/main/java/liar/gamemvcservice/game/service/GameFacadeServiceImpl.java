@@ -164,7 +164,8 @@ public class GameFacadeServiceImpl implements GameFacadeService {
     private GameResultToServerDto createGameResultToServerDto(Game game) {
         Vote vote = getVote(game);
         updateSendMessage(game);
-        return GameResultToServerDto.fromBaseDtoAndGame(createGameResultBaseDto(game, vote), game);
+        return GameResultToServerDto
+                .fromBaseDtoAndGame(createGameResultBaseDto(game, vote), game, resultPolicy.getVotedResultDto(vote));
     }
 
     private NextTurn setNextTurnIfExistsNextTurn(String gameId, String userId) {

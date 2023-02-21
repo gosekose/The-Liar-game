@@ -22,9 +22,11 @@ public class GameResult extends BaseEntity {
     private AtomicLong id;
 
     private String gameId;
+    private String roomId;
     private String hostId;
+    private String topicId;
     private String gameName;
-    private GameRole whoWin;
+    private GameRole winner;
     private int totalUsers;
 
 }
