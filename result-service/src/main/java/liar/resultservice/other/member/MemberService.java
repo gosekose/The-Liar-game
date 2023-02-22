@@ -1,7 +1,7 @@
-package liar.resultservice.other;
+package liar.resultservice.other.member;
 
-import liar.resultservice.other.dao.UserIdOnly;
-import liar.resultservice.other.dao.UserNameOnly;
+import liar.resultservice.other.member.dao.UserIdOnly;
+import liar.resultservice.other.member.dao.UserNameOnly;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

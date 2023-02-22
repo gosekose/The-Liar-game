@@ -2,9 +2,6 @@ package liar.resultservice.result.repository.query.rank;
 
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-
-import liar.resultservice.result.service.dto.PlayerRankingDto;
-import liar.resultservice.result.service.dto.QPlayerRankingDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
@@ -13,7 +10,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
-import static liar.resultservice.other.QMember.member;
+import static liar.resultservice.other.member.QMember.member;
 import static liar.resultservice.result.domain.QPlayer.player;
 
 @Repository
@@ -26,7 +23,7 @@ public class PlayerRankingQueryDslRepositoryImpl implements PlayerRankingQueryDs
     public Slice<PlayerRankingDto> fetchPlayerRanking(Pageable pageable) {
         List<PlayerRankingDto> content = query
                 .select(
-                        new QPlayerRankingDto(
+                        new liar.resultservice.result.repository.query.rank.QPlayerRankingDto(
                                 member.userId,
                                 member.username,
                                 player.level,

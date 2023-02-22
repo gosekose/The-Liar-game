@@ -1,7 +1,7 @@
 package liar.resultservice.common.authentication;
 
 import jakarta.persistence.*;
-import liar.resultservice.other.Member;
+import liar.resultservice.other.member.Member;
 import lombok.*;
 
 import static jakarta.persistence.EnumType.STRING;

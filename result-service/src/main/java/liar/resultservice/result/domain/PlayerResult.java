@@ -12,6 +12,9 @@ import java.util.concurrent.atomic.AtomicLong;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Table(indexes = {
+        @Index(name = "player_result_user_id_index", columnList = "user_id")
+})
 public class PlayerResult extends BaseEntity {
 
     @Id @GeneratedValue
@@ -25,5 +28,6 @@ public class PlayerResult extends BaseEntity {
     private String userId;
     private GameRole gameRole;
     private Boolean answers;
+    private Boolean isWin;
     private Long exp;
 }

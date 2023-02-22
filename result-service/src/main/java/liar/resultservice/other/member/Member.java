@@ -1,4 +1,4 @@
-package liar.resultservice.other;
+package liar.resultservice.other.member;
 
 import jakarta.persistence.*;
 import liar.resultservice.result.domain.Player;

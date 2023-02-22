@@ -105,8 +105,8 @@ sourceSets {
 }
 
 
-//clean {
-//    delete file('src/main/generated')
-//}
+clean {
+    delete file('src/main/generated')
+}
 
 

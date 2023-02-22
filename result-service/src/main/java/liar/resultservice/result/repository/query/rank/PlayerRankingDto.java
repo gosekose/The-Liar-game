@@ -1,4 +1,4 @@
-package liar.resultservice.result.service.dto;
+package liar.resultservice.result.repository.query.rank;
 
 import com.querydsl.core.annotations.QueryProjection;
 import liar.resultservice.result.domain.Level;
