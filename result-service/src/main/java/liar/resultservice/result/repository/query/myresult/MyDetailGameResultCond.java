@@ -7,10 +7,11 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class MyGameResultDetailInfoCond {
+public class MyDetailGameResultCond {
 
-    private Boolean latest;
-    private Boolean wins;
-    private Boolean loes;
-    private String gameName;
+    private String userId;
+    private Boolean viewLatest;
+    private Boolean viewOnlyWin;
+    private Boolean viewOnlyLose;
+    private String searchGameName;
 }

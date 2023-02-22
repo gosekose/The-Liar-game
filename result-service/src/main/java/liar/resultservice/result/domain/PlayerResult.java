@@ -28,5 +28,6 @@ public class PlayerResult extends BaseEntity {
     private String userId;
     private GameRole gameRole;
     private Boolean answers;
+    private Boolean isWin;
     private Long exp;
 }

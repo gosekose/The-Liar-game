@@ -1,6 +1,7 @@
 package liar.resultservice.result.domain;
 
 import jakarta.persistence.*;
+import liar.resultservice.other.topic.Topic;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -24,7 +25,11 @@ public class GameResult extends BaseEntity {
     private String gameId;
     private String roomId;
     private String hostId;
-    private String topicId;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "topic_id")
+    private Topic topic;
+
     private String gameName;
     private GameRole winner;
     private int totalUsers;
