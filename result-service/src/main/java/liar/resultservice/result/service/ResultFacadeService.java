@@ -1,7 +1,7 @@
 package liar.resultservice.result.service;
 
 import liar.resultservice.result.service.dto.AllResultSavedWellDto;
-import liar.resultservice.result.service.dto.RankTopDto;
+import liar.resultservice.result.service.dto.PlayerRankingDto;
 import liar.resultservice.result.service.dto.SaveResultMessage;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
@@ -42,5 +42,5 @@ public interface ResultFacadeService {
     /**
      *
      */
-    Slice<RankTopDto> selectRankTop();
+    Slice<PlayerRankingDto> selectRankTop();
 }

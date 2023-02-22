@@ -1,12 +1,13 @@
 package liar.resultservice.other;
 
-import liar.resultservice.other.dao.MemberIdOnly;
-import liar.resultservice.other.dao.MemberNameOnly;
+import liar.resultservice.other.dao.UserIdOnly;
+import liar.resultservice.other.dao.UserNameOnly;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.concurrent.atomic.AtomicLong;
 
 @Service
 @RequiredArgsConstructor
@@ -15,12 +16,16 @@ public class MemberService {
 
     private final MemberRepository memberRepository;
 
-    public List<MemberIdOnly> findByUsername(String username) {
+    public List<UserIdOnly> findByUsername(String username) {
         return memberRepository.findProjectionByUsername(username);
     }
 
-    public MemberNameOnly findUsernameById(String userId) {
+    public UserNameOnly findUsernameById(String userId) {
         return memberRepository.findProjectionByUserId(userId);
+    }
+
+    public UserIdOnly getUserId(AtomicLong id) {
+        return memberRepository.findProjectionById(id);
     }
 
 }

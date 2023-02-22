@@ -1,5 +1,5 @@
 package liar.resultservice.other.dao;
 
-public interface MemberNameOnly {
+public interface UserNameOnly {
     String getUsername();
 }

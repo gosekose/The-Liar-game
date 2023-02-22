@@ -33,6 +33,7 @@ dependencies {
 
     implementation 'com.github.gavlyukovskiy:p6spy-spring-boot-starter:1.5.6'
 
+
     //common
     //jwt
     implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
@@ -54,7 +55,7 @@ dependencies {
     //StringEscapeUtils
     implementation 'org.apache.commons:commons-text:1.8'
 
-//    //config-service
+    //config-service
     implementation 'org.springframework.cloud:spring-cloud-starter-config:4.0.0'
     implementation 'org.springframework.cloud:spring-cloud-starter-bootstrap:4.0.0'
 
@@ -66,24 +67,23 @@ dependencies {
 
     // <-- querydsl start -->
     implementation 'com.querydsl:querydsl-jpa:5.0.0:jakarta'
-    annotationProcessor "com.querydsl:querydsl-apt:${dependencyManagement.importedProperties['querydsl.version']}:jakarta"
+    annotationProcessor 'com.querydsl:querydsl-apt:5.0.0:jakarta'
+
+//    annotationProcessor "com.querydsl:querydsl-apt:${dependencyManagement.importedProperties['querydsl.version']}:jakarta"
     annotationProcessor "jakarta.annotation:jakarta.annotation-api"
     annotationProcessor "jakarta.persistence:jakarta.persistence-api"
     // <-- querydsl end -->
 
     //테스트에서 lombok 사용
-//    testCompileOnly 'org.projectlombok:lombok'
-//    testAnnotationProcessor 'org.projectlombok:lombok'
+    testCompileOnly 'org.projectlombok:lombok'
+    testAnnotationProcessor 'org.projectlombok:lombok'
 
     compileOnly 'org.projectlombok:lombok'
-//    developmentOnly 'org.springframework.boot:spring-boot-devtools'
     runtimeOnly 'com.h2database:h2'
     annotationProcessor 'org.projectlombok:lombok'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.springframework.amqp:spring-rabbit-test'
 
-//    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.3.1'
-//    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.3.1'
 }
 
 dependencyManagement {
@@ -96,6 +96,17 @@ tasks.named('test') {
     useJUnitPlatform()
 }
 
-clean {
-    delete file('src/main/generated')
+sourceSets {
+    main {
+        java {
+            srcDirs = ["$projectDir/src/main/java", "$projectDir/build/generated"]
+        }
+    }
 }
+
+
+//clean {
+//    delete file('src/main/generated')
+//}
+
+

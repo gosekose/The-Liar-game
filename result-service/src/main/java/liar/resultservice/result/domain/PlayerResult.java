@@ -12,7 +12,7 @@ import java.util.concurrent.atomic.AtomicLong;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class PlayerResult {
+public class PlayerResult extends BaseEntity {
 
     @Id @GeneratedValue
     @Column(name = "player_result_id")

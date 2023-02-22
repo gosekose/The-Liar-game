@@ -1,5 +1,5 @@
 package liar.resultservice.other.dao;
 
-public interface MemberIdOnly {
+public interface UserIdOnly {
     String getUserId();
 }
