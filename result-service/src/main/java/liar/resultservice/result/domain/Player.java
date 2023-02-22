@@ -1,7 +1,7 @@
 package liar.resultservice.result.domain;
 
 import jakarta.persistence.*;
-import liar.resultservice.other.Member;
+import liar.resultservice.other.member.Member;
 import lombok.*;
 
 import java.util.concurrent.atomic.AtomicLong;

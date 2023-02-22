@@ -1,4 +1,4 @@
-package liar.resultservice.other.dao;
+package liar.resultservice.other.member.dao;
 
 public interface UserIdOnly {
     String getUserId();

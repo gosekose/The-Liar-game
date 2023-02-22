@@ -1,9 +1,6 @@
 package liar.resultservice.result.domain;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -15,6 +12,9 @@ import java.util.concurrent.atomic.AtomicLong;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Table(indexes = {
+        @Index(name = "game_result_game_id_index", columnList = "game_id")
+})
 public class GameResult extends BaseEntity {
 
     @Id @GeneratedValue

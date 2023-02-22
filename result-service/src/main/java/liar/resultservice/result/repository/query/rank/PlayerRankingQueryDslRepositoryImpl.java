@@ -3,7 +3,6 @@ package liar.resultservice.result.repository.query.rank;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
-import liar.resultservice.result.service.dto.PlayerRankingDto;
 import liar.resultservice.result.service.dto.QPlayerRankingDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
