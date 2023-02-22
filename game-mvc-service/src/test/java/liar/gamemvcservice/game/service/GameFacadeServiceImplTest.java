@@ -380,7 +380,7 @@ class GameFacadeServiceImplTest extends ThreadServiceOnlyTest {
         GameResultToClientDto gameResult = gameFacadeService
                 .sendGameResultToClient(gameId);
 
-        List<PlayerResultInfo> playersInfo = gameResult.getPlayersInfo();
+        List<PlayerResultInfoDto> playersInfo = gameResult.getPlayersInfo();
 
         //then
         assertThat(gameResult.getGameId()).isEqualTo(game.getId());
@@ -398,7 +398,7 @@ class GameFacadeServiceImplTest extends ThreadServiceOnlyTest {
         //when
         GameResultToClientDto gameResult = gameFacadeService.sendGameResultToClient(gameId);
 
-        List<PlayerResultInfo> playersInfo = gameResult.getPlayersInfo();
+        List<PlayerResultInfoDto> playersInfo = gameResult.getPlayersInfo();
 
         //then
         assertThat(gameResult.getGameId()).isEqualTo(game.getId());

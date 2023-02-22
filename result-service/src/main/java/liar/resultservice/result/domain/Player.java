@@ -1,9 +1,7 @@
 package liar.resultservice.result.domain;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
+import liar.resultservice.other.Member;
 import lombok.*;
 
 import java.util.concurrent.atomic.AtomicLong;
@@ -12,33 +10,42 @@ import java.util.concurrent.atomic.AtomicLong;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Player {
+@Table(indexes = {
+        @Index(name = "exp_index", columnList = "exp")
+})
+public class Player extends BaseEntity {
 
     @Id @GeneratedValue
     @Column(name = "player_id")
     private AtomicLong id;
 
-    private String userId;
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "member_id")
+    private Member member;
 
     private Long wins;
     private Long loses;
     private Long totalGames;
+
     private Long exp;
     private Level level;
 
+    private boolean visibleGameResult;
+
     @Builder
-    public Player(String userId, Long wins, Long loses, Long totalGames, Long exp, Level level) {
-        this.userId = userId;
+    public Player(Member member, Long wins, Long loses, Long totalGames, Long exp, Level level) {
+        this.member = member;
         this.wins = wins;
         this.loses = loses;
         this.totalGames = totalGames;
         this.exp = exp;
         this.level = level;
+        this.visibleGameResult = true;
     }
 
-    public static Player of(String userId) {
+    public static Player of(Member member) {
         return Player.builder()
-                .userId(userId)
+                .member(member)
                 .wins(0L)
                 .loses(0L)
                 .totalGames(0L)
@@ -60,5 +67,9 @@ public class Player {
         return ++totalGames;
     }
 
+    public boolean updateVisibleGameResult() {
+        if (isVisibleGameResult()) return this.visibleGameResult = false;
+        return this.visibleGameResult = true;
+    }
 
 }

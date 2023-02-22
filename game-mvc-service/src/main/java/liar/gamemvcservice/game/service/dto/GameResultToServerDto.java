@@ -19,7 +19,7 @@ public class GameResultToServerDto extends GameResultBaseDto{
 
     protected GameResultToServerDto(String gameId, String roomId, String gameName, String hostId,
                                     Long topicId, int totalUserCnt, GameRole winner,
-                                    List<PlayerResultInfo> playersInfo, List<VotedResultDto> votedResults
+                                    List<PlayerResultInfoDto> playersInfo, List<VotedResultDto> votedResults
                                     ) {
         super(gameId, winner, playersInfo);
         this.roomId = roomId;

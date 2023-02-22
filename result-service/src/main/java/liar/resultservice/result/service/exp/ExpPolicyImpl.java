@@ -11,7 +11,6 @@ import static liar.resultservice.result.domain.GameRole.LIAR;
 @Component
 public class ExpPolicyImpl implements ExpPolicy {
 
-
     @Value("${game.member.limit.min}")
     private int limitMin;
 
