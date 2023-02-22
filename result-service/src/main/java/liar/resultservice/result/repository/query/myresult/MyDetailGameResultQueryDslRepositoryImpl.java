@@ -16,9 +16,10 @@ import java.util.List;
 
 import static liar.resultservice.other.member.QMember.member;
 import static liar.resultservice.other.topic.QTopic.topic;
-import static liar.resultservice.result.domain.QGameResult.*;
+import static liar.resultservice.result.domain.QGameResult.gameResult;
 import static liar.resultservice.result.domain.QPlayer.player;
 import static liar.resultservice.result.domain.QPlayerResult.playerResult;
+
 
 @Repository
 @RequiredArgsConstructor

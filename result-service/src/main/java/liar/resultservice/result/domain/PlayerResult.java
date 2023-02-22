@@ -13,7 +13,7 @@ import java.util.concurrent.atomic.AtomicLong;
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(indexes = {
-        @Index(name = "player_result_user_id_index", columnList = "user_id")
+        @Index(name = "player_result_user_id_index", columnList = "userId")
 })
 public class PlayerResult extends BaseEntity {
 
