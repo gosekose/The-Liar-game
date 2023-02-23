@@ -1,7 +1,7 @@
 package liar.resultservice.result.controller.dto.message;
 
-import liar.gamemvcservice.game.controller.dto.message.code.SuccessCode;
-import liar.gamemvcservice.game.controller.dto.message.message.SuccessMessage;
+import liar.resultservice.result.controller.dto.message.code.SuccessCode;
+import liar.resultservice.result.controller.dto.message.message.SuccessMessage;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 

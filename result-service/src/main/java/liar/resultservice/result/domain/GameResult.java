@@ -10,14 +10,16 @@ import java.util.concurrent.atomic.AtomicLong;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Table(indexes = {
+@Table(
+        name = "game_result",
+        indexes = {
         @Index(name = "game_result_game_id_index", columnList = "gameId")
 })
 public class GameResult extends BaseEntity {
 
     @Id @GeneratedValue
     @Column(name = "game_result_id")
-    private AtomicLong id;
+    private Long id;
 
     private String gameId;
     private String roomId;
@@ -33,6 +35,7 @@ public class GameResult extends BaseEntity {
 
     @Builder
     public GameResult(String gameId, String roomId, String hostId, Topic topic, String gameName, GameRole winner, int totalUsers) {
+        this.id = new AtomicLong().incrementAndGet();
         this.gameId = gameId;
         this.roomId = roomId;
         this.hostId = hostId;

@@ -1,7 +1,7 @@
 package liar.resultservice.result.controller.dto.message.message;
 
 
-import liar.gamemvcservice.game.controller.dto.message.ChatMessage;
+import liar.resultservice.result.controller.dto.message.ChatMessage;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 

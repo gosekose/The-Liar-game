@@ -12,13 +12,13 @@ import java.util.concurrent.atomic.AtomicLong;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(indexes = {
         @Index(name = "player_exp_index", columnList = "exp"),
-        @Index(name = "player_member_index", columnList = "member")
+        @Index(name = "player_member_index", columnList = "member_id")
 })
 public class Player extends BaseEntity {
 
     @Id @GeneratedValue
     @Column(name = "player_id")
-    private AtomicLong id;
+    private Long id;
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
@@ -35,6 +35,7 @@ public class Player extends BaseEntity {
 
     @Builder
     public Player(Member member, Long wins, Long loses, Long totalGames, Long exp, Level level) {
+        this.id = new AtomicLong().incrementAndGet();
         this.member = member;
         this.wins = wins;
         this.loses = loses;
