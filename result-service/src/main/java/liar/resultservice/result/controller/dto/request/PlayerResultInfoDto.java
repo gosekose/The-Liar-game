@@ -1,4 +1,4 @@
-package liar.resultservice.result.controller.dto;
+package liar.resultservice.result.controller.dto.request;
 
 import liar.resultservice.result.domain.GameRole;
 import lombok.AllArgsConstructor;

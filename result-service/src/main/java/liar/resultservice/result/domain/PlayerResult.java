@@ -1,10 +1,7 @@
 package liar.resultservice.result.domain;
 
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -30,4 +27,14 @@ public class PlayerResult extends BaseEntity {
     private Boolean answers;
     private Boolean isWin;
     private Long exp;
+
+    @Builder
+    public PlayerResult(GameResult gameResult, String userId, GameRole gameRole, Boolean answers, Boolean isWin, Long exp) {
+        this.gameResult = gameResult;
+        this.userId = userId;
+        this.gameRole = gameRole;
+        this.answers = answers;
+        this.isWin = isWin;
+        this.exp = exp;
+    }
 }

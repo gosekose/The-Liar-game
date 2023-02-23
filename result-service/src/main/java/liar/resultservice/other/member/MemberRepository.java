@@ -15,4 +15,5 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     List<UserIdOnly> findProjectionByUsername(String userName);
 
     UserIdOnly findProjectionById(AtomicLong id);
+    Member findByUserId(String userId);
 }

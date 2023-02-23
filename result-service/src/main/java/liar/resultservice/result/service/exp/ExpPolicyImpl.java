@@ -26,8 +26,8 @@ public class ExpPolicyImpl implements ExpPolicy {
      * @return long
      */
     @Override
-    public int calculateExp(GameRole role, boolean win, boolean answer, int totalGameMember) {
-        int baseExp = 10;
+    public Long calculateExp(GameRole role, boolean win, boolean answer, int totalGameMember) {
+        long baseExp = 10L;
 
         if (role == LIAR) {
             baseExp += win ? 40 - (totalGameMember - limitMin) : 5;

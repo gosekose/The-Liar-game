@@ -1,4 +1,4 @@
-package liar.resultservice.result.controller.dto;
+package liar.resultservice.result.controller.dto.request;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
