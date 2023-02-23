@@ -10,5 +10,4 @@ public interface RankingPolicy {
 
     Slice<PlayerRankingDto> fetchPlayerRanking(Pageable pageable);
 
-
 }

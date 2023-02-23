@@ -8,4 +8,7 @@ import java.util.concurrent.atomic.AtomicLong;
 
 @Repository
 public interface GameResultRepository extends JpaRepository<GameResult, AtomicLong> {
+
+    GameResult findGameResultByGameId(String gameId);
+
 }

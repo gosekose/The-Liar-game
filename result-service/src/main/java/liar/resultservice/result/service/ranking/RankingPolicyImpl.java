@@ -11,10 +11,10 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class RankingPolicyImpl implements RankingPolicy {
 
-    private final PlayerRankingQueryDslRepository playerRankingQueryDslRepository;
+    private final PlayerRankingQueryDslRepository repository;
 
     @Override
     public Slice<PlayerRankingDto> fetchPlayerRanking(Pageable pageable) {
-        return playerRankingQueryDslRepository.fetchPlayerRanking(pageable);
+        return repository.fetchPlayerRanking(pageable);
     }
 }

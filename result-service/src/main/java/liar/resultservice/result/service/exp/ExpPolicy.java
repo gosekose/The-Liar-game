@@ -11,7 +11,7 @@ public interface ExpPolicy {
      * 게임 결과에 따라 exp를 계산한다.
      * @return long
      */
-    int calculateExp(GameRole role, boolean win, boolean answer, int totalGameMember);
+    Long calculateExp(GameRole role, boolean win, boolean answer, int totalGameMember);
 
     /**
      * exp를 받아 level을 구성한다
