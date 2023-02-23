@@ -18,8 +18,11 @@ public class Topic {
 
     @Id @GeneratedValue
     @Column(name = "topic_id")
-    private AtomicLong id;
+    private Long id;
 
     private String topicName;
 
+    public Topic(String topicName) {
+        this.topicName = topicName;
+    }
 }

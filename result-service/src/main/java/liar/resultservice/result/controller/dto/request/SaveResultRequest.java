@@ -18,7 +18,7 @@ public class SaveResultRequest {
     private String roomId;
     private String gameName;
     private String hostId;
-    private AtomicLong topicId;
+    private Long topicId;
     private int totalUserCnt;
     private List<VotedResultDto> votedResults;
 }

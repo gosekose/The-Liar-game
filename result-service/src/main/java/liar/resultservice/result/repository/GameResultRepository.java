@@ -7,7 +7,7 @@ import org.springframework.stereotype.Repository;
 import java.util.concurrent.atomic.AtomicLong;
 
 @Repository
-public interface GameResultRepository extends JpaRepository<GameResult, AtomicLong> {
+public interface GameResultRepository extends JpaRepository<GameResult, Long> {
 
     GameResult findGameResultByGameId(String gameId);
 

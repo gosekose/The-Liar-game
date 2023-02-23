@@ -8,6 +8,6 @@ import org.springframework.stereotype.Repository;
 import java.util.concurrent.atomic.AtomicLong;
 
 @Repository
-public interface PlayerRepository extends JpaRepository<Player, AtomicLong> {
+public interface PlayerRepository extends JpaRepository<Player, Long> {
     Player findPlayerByMember(Member member);
 }

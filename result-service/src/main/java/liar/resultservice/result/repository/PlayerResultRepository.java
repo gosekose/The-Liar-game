@@ -7,5 +7,5 @@ import org.springframework.stereotype.Repository;
 import java.util.concurrent.atomic.AtomicLong;
 
 @Repository
-public interface PlayerResultRepository extends JpaRepository<PlayerResult, AtomicLong> {
+public interface PlayerResultRepository extends JpaRepository<PlayerResult, Long> {
 }

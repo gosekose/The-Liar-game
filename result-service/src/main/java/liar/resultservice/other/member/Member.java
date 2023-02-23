@@ -16,7 +16,7 @@ public class Member implements Serializable {
 
     @Id @GeneratedValue
     @Column(name = "member_id")
-    private AtomicLong id;
+    private Long id;
     private String userId;
     private String username;
 
