@@ -50,7 +50,7 @@ public class ExpPolicyImpl implements ExpPolicy {
                 return level;
             }
         }
-        return Level.MASTER;
+        return Level.LIAR;
     }
 
     @Override

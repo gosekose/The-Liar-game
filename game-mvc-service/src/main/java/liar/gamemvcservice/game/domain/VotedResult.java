@@ -22,10 +22,6 @@ public class VotedResult {
 
     public void addUserId(String userId) {
         userIds.add(userId);
+        cnt++;
     }
-
-    public void updateCnt() {
-        this.cnt++;
-    }
-
 }
