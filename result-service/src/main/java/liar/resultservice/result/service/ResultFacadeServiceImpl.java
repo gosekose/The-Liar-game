@@ -25,8 +25,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 @Component
+@Transactional
 @RequiredArgsConstructor
 public class ResultFacadeServiceImpl implements ResultFacadeService {
 
@@ -90,20 +92,20 @@ public class ResultFacadeServiceImpl implements ResultFacadeService {
     /**
      * playerResult를 저장하고 id를 반환
      *
-     * @return boolean
+     * @return String
      */
     @Override
-    public void savePlayerResult(SaveResultRequest request, GameResult gameResult,
+    public String savePlayerResult(SaveResultRequest request, GameResult gameResult,
                                     PlayerResultInfoDto dto, Long exp) {
 
-        playerResultRepository.save(PlayerResult.builder()
+        return playerResultRepository.save(PlayerResult.builder()
                 .gameResult(gameResult)
                 .userId(dto.getUserId())
                 .answers(dto.getAnswers())
                 .isWin(dto.getGameRole() == gameResult.getWinner())
                 .gameRole(dto.getGameRole())
                 .exp(exp)
-                .build());
+                .build()).getId();
     }
 
     /**

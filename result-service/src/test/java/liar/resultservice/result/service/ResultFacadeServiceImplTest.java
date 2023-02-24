@@ -1,6 +1,8 @@
 package liar.resultservice.result.service;
 
 import liar.resultservice.exception.exception.NotFoundGameException;
+import liar.resultservice.exception.exception.NotFoundUserException;
+import liar.resultservice.other.member.Member;
 import liar.resultservice.other.member.MemberRepository;
 import liar.resultservice.other.topic.Topic;
 import liar.resultservice.other.topic.TopicRepository;
@@ -10,10 +12,11 @@ import liar.resultservice.result.controller.dto.request.SaveResultRequest;
 import liar.resultservice.result.controller.dto.request.VotedResultDto;
 import liar.resultservice.result.domain.GameResult;
 import liar.resultservice.result.domain.GameRole;
+import liar.resultservice.result.domain.Player;
+import liar.resultservice.result.domain.PlayerResult;
 import liar.resultservice.result.repository.GameResultRepository;
 import liar.resultservice.result.repository.PlayerRepository;
-import org.assertj.core.api.Assertions;
-import org.junit.jupiter.api.AfterEach;
+import liar.resultservice.result.repository.PlayerResultRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -21,10 +24,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
+import static liar.resultservice.result.domain.Level.GOLD1;
+import static liar.resultservice.result.domain.Level.GOLD2;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
@@ -39,28 +45,32 @@ class ResultFacadeServiceImplTest extends MemberDummyInfo {
     TopicRepository topicRepository;
     @Autowired
     GameResultRepository gameResultRepository;
-
     @Autowired
     PlayerRepository playerRepository;
 
     List<PlayerResultInfoDto> playerResultInfoDtos = new ArrayList<>();
     List<VotedResultDto>votedResultDtos = new ArrayList<>();
-    SaveResultRequest saveResultRequest;
+    SaveResultRequest request;
+    Topic topic;
+    @Autowired
+    private PlayerResultRepository playerResultRepository;
 
     @BeforeEach
     public void init() {
-        Topic topic = topicRepository.save(new Topic("game"));
+        topic = topicRepository.save(new Topic("game"));
+        topicRepository.flush();
+
         createVotedResultDtos();
         createPlayerResultInfoDtos();
-        saveResultRequest = new SaveResultRequest("gameId", GameRole.LIAR, playerResultInfoDtos, "roomId", "gameName",
+        request = new SaveResultRequest("gameId", GameRole.LIAR, playerResultInfoDtos, "roomId", "gameName",
                 hostId, topic.getId(), playerResultInfoDtos.size(), votedResultDtos);
     }
-    
+
     @Test
     @DisplayName("단일 스레드에서 saveGameResult")
-    public void saveGameResult() throws Exception {
+    public void saveGameResult_single() throws Exception {
         //given
-        GameResult gameResult = resultFacadeService.saveGameResult(saveResultRequest);
+        GameResult gameResult = resultFacadeService.saveGameResult(request);
 
         //when
         GameResult findGameResult = gameResultRepository.findById(gameResult.getId()).orElseThrow(NotFoundGameException::new);
@@ -70,6 +80,155 @@ class ResultFacadeServiceImplTest extends MemberDummyInfo {
         assertThat(gameResult.getGameId()).isEqualTo(findGameResult.getGameId());
     }
 
+    @Test
+    @DisplayName("멀티 스레드에서 saveGameResult")
+    public void saveGameResult_multiThread() throws Exception {
+        //given
+        int threadCount = 5;
+        ExecutorService executorService = Executors.newFixedThreadPool(32);
+        CountDownLatch countDownLatch = new CountDownLatch(threadCount);
+        GameResult[] gameResults = new GameResult[threadCount];
+
+        //when
+        for (int i = 0; i < threadCount; i++) {
+            int finalIdx = i;
+            executorService.submit(() -> {
+                try {
+                    gameResults[finalIdx] = resultFacadeService
+                            .saveGameResult(makeSaveResultRequest(UUID.randomUUID().toString()));
+                } finally {
+                    countDownLatch.countDown();
+                }
+            });
+        }
+        countDownLatch.await();
+
+        Set<String> idSet = new HashSet<>();
+        for (int i = 0; i < threadCount; i++) {
+            String id = gameResults[i].getId();
+            System.out.println("id = " + id);
+            idSet.add(id);
+        }
+
+        //then
+        assertThat(idSet.size()).isEqualTo(threadCount);
+    }
+
+    @Test
+    @DisplayName("단일 스레드에서 savePlayer")
+    public void savePlayer_single() throws Exception {
+        //given
+        GameResult gameResult = resultFacadeService.saveGameResult(request);
+        Player player = getPlayer(playerResultInfoDtos.get(0));
+
+        //when
+        resultFacadeService.savePlayer(gameResult, player, GameRole.LIAR, 300L);
+        Player findPlayer = playerRepository.findById(player.getId()).orElseThrow(NotFoundUserException::new);
+
+        //then
+        assertThat(player.getId()).isEqualTo(findPlayer.getId());
+        assertThat(player.getExp()).isEqualTo(findPlayer.getExp());
+    }
+
+    @Test
+    @DisplayName("멀티 스레드에서 savePlayer")
+    public void savePlayer_multiThread() throws Exception {
+        //given
+        int threadCount = 5;
+        ExecutorService executorService = Executors.newFixedThreadPool(32);
+        CountDownLatch countDownLatch = new CountDownLatch(threadCount);
+        GameResult gameResult = resultFacadeService.saveGameResult(request);
+        Player player = getPlayer(playerResultInfoDtos.get(0));
+
+        //when
+        for (int i = 0; i < threadCount; i++) {
+            int finalIdx = i;
+            executorService.submit(() -> {
+                try{
+                    resultFacadeService.savePlayer(gameResult, player, GameRole.LIAR, 300L);
+                } finally {
+                    countDownLatch.countDown();
+                }
+            });
+        }
+
+        countDownLatch.await();
+        Player findPlayer = playerRepository.findById(player.getId()).orElseThrow();
+
+        //then
+        assertThat(findPlayer.getExp()).isEqualTo(1500L);
+        assertThat(findPlayer.getLevel()).isEqualTo(GOLD2);
+    }
+
+    @Test
+    @DisplayName("단일 스레드에서 savePlayerResult")
+    public void savePlayerResult_single() throws Exception {
+        //given
+        int count = 4;
+        GameResult gameResult = resultFacadeService.saveGameResult(request);
+
+        //when
+        for (int i = 0; i < count; i++) {
+            getPlayer(playerResultInfoDtos.get(i));
+        }
+
+        for (int i = 0; i < count; i++) {
+            resultFacadeService.
+                    savePlayerResult(request, gameResult, playerResultInfoDtos.get(i), 100L);
+        }
+
+        List<PlayerResult> playerResults = playerResultRepository.findPlayerResultsByGameResult(gameResult);
+
+        //then
+        assertThat(playerResults.size()).isEqualTo(count);
+        assertThat(playerResults.get(0).getGameResult().getId()).isEqualTo(gameResult.getId());
+        assertThat(playerResults.get(0).getExp()).isEqualTo(100L);
+    }
+
+    @Test
+    @DisplayName("멀티 스레드에서 savePlayerResult")
+    public void savePlayerResult_multiThread() throws Exception {
+        //given
+        int threadCount = 4;
+        ExecutorService executorService = Executors.newFixedThreadPool(32);
+        CountDownLatch countDownLatch = new CountDownLatch(threadCount);
+        GameResult gameResult = resultFacadeService.saveGameResult(request);
+        gameResultRepository.flush();
+        String[] playerIds = new String[threadCount];
+
+        for (int i = 0; i < threadCount; i++) {
+            getPlayer(playerResultInfoDtos.get(i));
+        }
+
+        //when
+        for (int i = 0; i < threadCount; i++) {
+            int finalIdx = i;
+            executorService.submit(() -> {
+               try{
+                   playerIds[finalIdx] = resultFacadeService.
+                           savePlayerResult(request, gameResult, playerResultInfoDtos.get(finalIdx), 100L);
+               } catch (Exception e) {
+                   e.printStackTrace();
+               }
+               finally {
+                   countDownLatch.countDown();
+               }
+            });
+        }
+
+        countDownLatch.await();
+
+        for (String playerId : playerIds) {
+            System.out.println("playerId = " + playerId);
+        }
+
+        List<PlayerResult> playerResultByGameResult = playerResultRepository.findPlayerResultsByGameResult(gameResult);
+
+        //then
+        assertThat(playerResultByGameResult.size()).isEqualTo(threadCount);
+        assertThat(playerResultByGameResult.get(0).getExp()).isEqualTo(100L);
+        assertThat(playerResultByGameResult.get(0).getGameResult().getId()).isEqualTo(gameResult.getId());
+    }
 
     private void createPlayerResultInfoDtos() {
         playerResultInfoDtos.add(new PlayerResultInfoDto(hostId, GameRole.LIAR, false));
@@ -86,8 +245,26 @@ class ResultFacadeServiceImplTest extends MemberDummyInfo {
     }
 
     private SaveResultRequest makeSaveResultRequest(String gameId) {
-        Topic topic = topicRepository.save(new Topic("game"));
-        return new SaveResultRequest("gameId", GameRole.LIAR, playerResultInfoDtos, "roomId", "gameName",
+        topic = topicRepository.save(new Topic("game"));
+        return new SaveResultRequest(gameId, GameRole.LIAR, playerResultInfoDtos, "roomId", "gameName",
                 hostId, topic.getId(), playerResultInfoDtos.size(), votedResultDtos);
+    }
+
+
+    private Player getPlayer(PlayerResultInfoDto dto) {
+        Member member = getMember(dto);
+        Player player = playerRepository.findPlayerByMember(member);
+        if (player == null) {
+            return playerRepository.save(Player.of(member));
+        }
+        return player;
+    }
+
+    private Member getMember(PlayerResultInfoDto dto) {
+        Member member = memberRepository.findByUserId(dto.getUserId());
+        if (member == null) {
+            throw new NotFoundUserException();
+        }
+        return member;
     }
 }

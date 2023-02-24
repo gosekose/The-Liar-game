@@ -1,6 +1,5 @@
 package liar.resultservice.result.repository;
 
-import liar.resultservice.common.redis.RedissonLock;
 import liar.resultservice.other.topic.Topic;
 import liar.resultservice.other.topic.TopicRepository;
 import liar.resultservice.result.domain.GameResult;
@@ -71,7 +70,6 @@ class GameResultRepositoryTest {
 
 
     @Test
-    @RedissonLock(key = "id")
     @DisplayName("멀티 스레드 환경에서 GameResult 생성시 id가 모두 다른 것이 보장 되어야 한다.")
     public void save_multiThread() throws Exception {
         //given

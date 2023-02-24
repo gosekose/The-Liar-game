@@ -12,8 +12,10 @@ import liar.resultservice.result.service.dto.SaveResultMessage;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
+@Transactional
 public interface ResultFacadeService {
 
     /**
@@ -37,9 +39,9 @@ public interface ResultFacadeService {
 
     /**
      * playerResult를 저장하고 id를 반환
-     * @return boolean
+     * @return String
      */
-    void savePlayerResult(SaveResultRequest request, GameResult gameResult,
+    String savePlayerResult(SaveResultRequest request, GameResult gameResult,
                              PlayerResultInfoDto dto, Long exp);
 
 
