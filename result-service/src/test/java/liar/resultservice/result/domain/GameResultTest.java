@@ -1,6 +1,5 @@
 package liar.resultservice.result.domain;
 
-import liar.resultservice.exception.exception.NotFoundGameException;
 import liar.resultservice.other.topic.Topic;
 import liar.resultservice.other.topic.TopicRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -8,13 +7,15 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+
+import static org.assertj.core.api.Assertions.assertThat;
+
 @DataJpaTest
 class GameResultTest {
 
     @Autowired
     TopicRepository topicRepository;
 
-    private Long topicId;
     private Topic topic;
 
     @BeforeEach
@@ -35,7 +36,9 @@ class GameResultTest {
                 .totalUsers(7)
                 .build();
 
+
+        //then
+        assertThat(gameResult.getId()).isInstanceOf(String.class);
+
     }
-
-
 }

@@ -33,6 +33,9 @@ dependencies {
 
     implementation 'com.github.gavlyukovskiy:p6spy-spring-boot-starter:1.5.6'
 
+    //redissonClient
+    implementation 'org.redisson:redisson-spring-boot-starter:3.17.7'
+
 
     //common
     //jwt

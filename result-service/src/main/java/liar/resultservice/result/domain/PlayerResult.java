@@ -3,6 +3,7 @@ package liar.resultservice.result.domain;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.UUID;
 import java.util.concurrent.atomic.AtomicLong;
 
 @Entity
@@ -16,9 +17,9 @@ import java.util.concurrent.atomic.AtomicLong;
 })
 public class PlayerResult extends BaseEntity {
 
-    @Id @GeneratedValue
+    @Id
     @Column(name = "player_result_id")
-    private Long id;
+    private String id;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "game_result_id")
@@ -32,7 +33,7 @@ public class PlayerResult extends BaseEntity {
 
     @Builder
     public PlayerResult(GameResult gameResult, String userId, GameRole gameRole, Boolean answers, Boolean isWin, Long exp) {
-        this.id = new AtomicLong().incrementAndGet();
+        this.id = UUID.randomUUID().toString();
         this.gameResult = gameResult;
         this.userId = userId;
         this.gameRole = gameRole;

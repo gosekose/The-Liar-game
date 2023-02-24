@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import liar.resultservice.other.member.Member;
 import lombok.*;
 
+import java.util.UUID;
 import java.util.concurrent.atomic.AtomicLong;
 
 @Entity
@@ -16,9 +17,9 @@ import java.util.concurrent.atomic.AtomicLong;
 })
 public class Player extends BaseEntity {
 
-    @Id @GeneratedValue
+    @Id
     @Column(name = "player_id")
-    private Long id;
+    private String id;
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
@@ -35,7 +36,7 @@ public class Player extends BaseEntity {
 
     @Builder
     public Player(Member member, Long wins, Long loses, Long totalGames, Long exp, Level level) {
-        this.id = new AtomicLong().incrementAndGet();
+        this.id = UUID.randomUUID().toString();
         this.member = member;
         this.wins = wins;
         this.loses = loses;
