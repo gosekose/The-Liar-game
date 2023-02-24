@@ -41,7 +41,7 @@ public interface ResultFacadeService {
      * playerResult를 저장하고 id를 반환
      * @return String
      */
-    String savePlayerResult(SaveResultRequest request, GameResult gameResult,
+    String savePlayerResult(SaveResultRequest request, String gameResultId,
                              PlayerResultInfoDto dto, Long exp);
 
 

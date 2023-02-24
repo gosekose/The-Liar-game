@@ -55,30 +55,37 @@ public class RedisLockAspect {
         }
     }
 
-//    @Around("execution(* liar.resultservice.result.service.ResultFacadeService.savePlayerResult(..)) && args(request, gameResult, dto, exp)")
-//    public void voteLiarUserWithRedisLock(ProceedingJoinPoint joinPoint, SaveResultRequest request, GameResult gameResult,
-//                                             PlayerResultInfoDto dto, Long exp) throws Throwable {
-//
-//        String lockKey = "VoteLiarUser: " + gameResult.getId();
-//        voidJoinPointRedissonRLock(joinPoint, lockKey);
-//    }
-//
-//    public Object executeWithRedisLock(ProceedingJoinPoint joinPoint, String lockKey) throws Throwable {
-//        RLock lock = redissonClient.getLock(lockKey);
-//
-//        try {
-//            boolean isLocked = lock.tryLock(2, 3, TimeUnit.SECONDS);
-//            if (!isLocked) {
-//                throw new RedisLockException();
-//            }
-//            return joinPoint.proceed();
-//
-//        } finally {
-//            if (lock.isHeldByCurrentThread()) {
-//                lock.unlock();
-//            }
-//        }
-//    }
+    @Around("execution(* liar.resultservice.result.service.ResultFacadeService.saveAllResultOfGame(..)) && args(request)")
+    public void saveAllResultOfGame(ProceedingJoinPoint joinPoint, SaveResultRequest request) throws Throwable {
+
+        String lockKey = "saveAllResultOfGame: " + request.getGameId();
+        voidJoinPointRedissonRLock(joinPoint, lockKey);
+    }
+
+    @Around("execution(* liar.resultservice.result.service.ResultFacadeService.saveGameResult(..)) && args(request)")
+    public GameResult saveGameResult(ProceedingJoinPoint joinPoint, SaveResultRequest request) throws Throwable {
+
+        String lockKey = "saveAllResultOfGame: " + request.getGameId();
+        return (GameResult) executeWithRedisLock(joinPoint, lockKey);
+    }
+
+
+    public Object executeWithRedisLock(ProceedingJoinPoint joinPoint, String lockKey) throws Throwable {
+        RLock lock = redissonClient.getLock(lockKey);
+
+        try {
+            boolean isLocked = lock.tryLock(2, 3, TimeUnit.SECONDS);
+            if (!isLocked) {
+                throw new RedisLockException();
+            }
+            return joinPoint.proceed();
+
+        } finally {
+            if (lock.isHeldByCurrentThread()) {
+                lock.unlock();
+            }
+        }
+    }
 
 
     private void voidJoinPointRedissonRLock(ProceedingJoinPoint joinPoint, String lockKey) throws Throwable {
