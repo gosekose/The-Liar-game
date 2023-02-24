@@ -42,7 +42,6 @@ public class Vote {
                 .findFirst()
                 .ifPresent(votedResult -> {
                     votedResult.addUserId(userId);
-                    votedResult.updateCnt();
                     modifiedAt = LocalDateTime.now();
                 });
 
