@@ -1,5 +1,7 @@
 package liar.resultservice.result.service;
 
+import jakarta.transaction.Transactional;
+import liar.resultservice.exception.exception.NotFoundGameResultException;
 import liar.resultservice.exception.exception.NotFoundUserException;
 import liar.resultservice.other.member.Member;
 import liar.resultservice.other.member.MemberRepository;
@@ -24,9 +26,11 @@ import liar.resultservice.result.service.ranking.RankingPolicy;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
+import org.springframework.data.jpa.repository.Lock;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
-@Component
+@Service
 @RequiredArgsConstructor
 public class ResultFacadeServiceImpl implements ResultFacadeService {
 
@@ -45,6 +49,7 @@ public class ResultFacadeServiceImpl implements ResultFacadeService {
      * @return allResultSavedWellDto
      */
     @Override
+    @Transactional
     public void saveAllResultOfGame(SaveResultRequest request) {
         GameResult gameResult = saveGameResult(request);
         request.getPlayersInfo()
@@ -53,7 +58,7 @@ public class ResultFacadeServiceImpl implements ResultFacadeService {
                             Long exp = calculateExp(gameResult, playerDto);
                             Player player = getPlayer(playerDto);
                             savePlayer(gameResult, player, playerDto.getGameRole(), exp);
-                            savePlayerResult(request, gameResult, playerDto, exp);});
+                            savePlayerResult(request, gameResult.getId(), playerDto, exp);});
     }
 
     /**
@@ -62,6 +67,7 @@ public class ResultFacadeServiceImpl implements ResultFacadeService {
      * @return boolean
      */
     @Override
+    @Transactional
     public GameResult saveGameResult(SaveResultRequest request) {
         Topic topic = topicRepository.findById(request.getTopicId()).orElseThrow();
         return gameResultRepository.save(
@@ -82,6 +88,7 @@ public class ResultFacadeServiceImpl implements ResultFacadeService {
      * @return boolean
      */
     @Override
+    @Transactional
     public void savePlayer(GameResult gameResult, Player player, GameRole playerRole, Long exp) {
         player.levelUp(expPolicy.nextLevel(player.updateExp(exp)));
         player.updateGameResult(playerRole == gameResult.getWinner());
@@ -90,20 +97,22 @@ public class ResultFacadeServiceImpl implements ResultFacadeService {
     /**
      * playerResult를 저장하고 id를 반환
      *
-     * @return boolean
+     * @return String
      */
     @Override
-    public void savePlayerResult(SaveResultRequest request, GameResult gameResult,
+    @Transactional
+    public String savePlayerResult(SaveResultRequest request, String gameResultId,
                                     PlayerResultInfoDto dto, Long exp) {
 
-        playerResultRepository.save(PlayerResult.builder()
+        GameResult gameResult = gameResultRepository.findById(gameResultId).orElseThrow(NotFoundGameResultException::new);
+        return playerResultRepository.save(PlayerResult.builder()
                 .gameResult(gameResult)
                 .userId(dto.getUserId())
                 .answers(dto.getAnswers())
                 .isWin(dto.getGameRole() == gameResult.getWinner())
                 .gameRole(dto.getGameRole())
                 .exp(exp)
-                .build());
+                .build()).getId();
     }
 
     /**
@@ -143,6 +152,7 @@ public class ResultFacadeServiceImpl implements ResultFacadeService {
                         playerDto.getAnswers(), gameResult.getTotalUsers());
     }
 
+    @Transactional
     private Player getPlayer(PlayerResultInfoDto dto) {
         Member member = getMember(dto);
         Player player = playerRepository.findPlayerByMember(member);
@@ -152,6 +162,7 @@ public class ResultFacadeServiceImpl implements ResultFacadeService {
         return player;
     }
 
+    @Transactional
     private Member getMember(PlayerResultInfoDto dto) {
         Member member = memberRepository.findByUserId(dto.getUserId());
         if (member == null) {

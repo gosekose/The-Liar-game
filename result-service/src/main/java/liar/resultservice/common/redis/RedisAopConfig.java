@@ -10,8 +10,8 @@ import org.springframework.context.annotation.EnableAspectJAutoProxy;
 public class RedisAopConfig {
 
     @Bean
-    public RedisLockAspect redisLockAspect(RedissonClient redissonClient, RedissonCallTransaction redissonCallTransaction) {
-        return new RedisLockAspect(redissonClient, redissonCallTransaction);
+    public RedisLockAspect redisLockAspect(RedissonClient redissonClient) {
+        return new RedisLockAspect(redissonClient);
     }
 
 }

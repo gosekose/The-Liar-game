@@ -1,6 +1,8 @@
 package liar.resultservice.common.redis;
 
 import liar.resultservice.exception.exception.RedisLockException;
+import liar.resultservice.result.controller.dto.request.PlayerResultInfoDto;
+import liar.resultservice.result.controller.dto.request.SaveResultRequest;
 import liar.resultservice.result.domain.GameResult;
 import liar.resultservice.result.domain.Player;
 import liar.resultservice.result.domain.PlayerResult;
@@ -24,7 +26,6 @@ import java.util.concurrent.TimeUnit;
 public class RedisLockAspect {
 
     private final RedissonClient redissonClient;
-    private final RedissonCallTransaction redissonCallTransaction;
 
     @Around(
             "execution(* liar.resultservice.result.repository..*.save(..)) || " +
@@ -54,57 +55,18 @@ public class RedisLockAspect {
         }
     }
 
-    @Around("@annotation(liar.resultservice.common.redis.RedissonLock)")
-    public Object lock(final ProceedingJoinPoint joinPoint) throws Throwable {
-        MethodSignature signature = (MethodSignature) joinPoint.getSignature();
-        Method method = signature.getMethod();
-        RedissonLock redissonLock = method.getAnnotation(RedissonLock.class);
+    @Around("execution(* liar.resultservice.result.service.ResultFacadeService.saveAllResultOfGame(..)) && args(request)")
+    public void saveAllResultOfGame(ProceedingJoinPoint joinPoint, SaveResultRequest request) throws Throwable {
 
-        /* create key */
-        String key = this.createKey(signature.getParameterNames(), joinPoint.getArgs(), redissonLock.key());
-
-        /* get rLock 객체 */
-        RLock lock = redissonClient.getLock(key);
-
-        try {
-            /* get lock */
-            boolean isPossible = lock.tryLock(redissonLock.waitTime(), redissonLock.leaseTime(), redissonLock.timeUnit());
-            if (!isPossible) {
-                return false;
-            }
-
-            log.info("Redisson Lock Key : {}", key);
-
-            /* service call */
-            return redissonCallTransaction.proceed(joinPoint);
-        } catch (Exception e) {
-            throw new InterruptedException();
-        } finally {
-            if (lock.isHeldByCurrentThread()) {
-                lock.unlock();
-            }
-        }
+        String lockKey = "saveAllResultOfGame: " + request.getGameId();
+        voidJoinPointRedissonRLock(joinPoint, lockKey);
     }
 
-    /**
-     * Redisson Key Create
-     * @param parameterNames
-     * @param args
-     * @param key
-     * @return
-     */
-    private String createKey(String[] parameterNames, Object[] args, String key) {
-        String resultKey = key;
+    @Around("execution(* liar.resultservice.result.service.ResultFacadeService.saveGameResult(..)) && args(request)")
+    public GameResult saveGameResult(ProceedingJoinPoint joinPoint, SaveResultRequest request) throws Throwable {
 
-        /* key = parameterName */
-        for (int i = 0; i < parameterNames.length; i++) {
-            if (parameterNames[i].equals(key)) {
-                resultKey += args[i];
-                break;
-            }
-        }
-
-        return resultKey;
+        String lockKey = "saveAllResultOfGame: " + request.getGameId();
+        return (GameResult) executeWithRedisLock(joinPoint, lockKey);
     }
 
 

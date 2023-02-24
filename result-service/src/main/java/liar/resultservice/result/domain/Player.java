@@ -3,6 +3,7 @@ package liar.resultservice.result.domain;
 import jakarta.persistence.*;
 import liar.resultservice.other.member.Member;
 import lombok.*;
+import org.springframework.data.domain.Persistable;
 
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicLong;
@@ -15,7 +16,7 @@ import java.util.concurrent.atomic.AtomicLong;
         @Index(name = "player_exp_index", columnList = "exp"),
         @Index(name = "player_member_index", columnList = "member_id")
 })
-public class Player extends BaseEntity {
+public class Player extends BaseEntity implements Persistable<String>  {
 
     @Id
     @Column(name = "player_id")
@@ -33,6 +34,17 @@ public class Player extends BaseEntity {
     private Level level;
 
     private boolean visibleGameResult;
+
+    @Override
+    public String getId() {
+        return id;
+    }
+
+    @Override
+    public boolean isNew() {
+        return super.getCreatedAt() == null;
+    }
+
 
     @Builder
     public Player(Member member, Long wins, Long loses, Long totalGames, Long exp, Level level) {
