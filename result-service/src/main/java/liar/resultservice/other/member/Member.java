@@ -25,4 +25,6 @@ public class Member implements Serializable {
             mappedBy = "member",
             cascade = CascadeType.ALL)
     private Player player;
+
+
 }

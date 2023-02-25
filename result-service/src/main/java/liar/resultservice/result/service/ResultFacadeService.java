@@ -1,5 +1,7 @@
 package liar.resultservice.result.service;
 
+import liar.resultservice.exception.exception.NotFoundUserException;
+import liar.resultservice.other.member.Member;
 import liar.resultservice.result.controller.dto.request.PlayerResultInfoDto;
 import liar.resultservice.result.controller.dto.request.SaveResultRequest;
 import liar.resultservice.result.domain.GameResult;
@@ -44,6 +46,9 @@ public interface ResultFacadeService {
     String savePlayerResult(SaveResultRequest request, String gameResultId,
                              PlayerResultInfoDto dto, Long exp);
 
+    Player getPlayer(PlayerResultInfoDto dto) throws InterruptedException;
+
+    Member getMember(PlayerResultInfoDto dto);
 
     /**
      * 게임 결과가 저장되었다는 메세지를 전송

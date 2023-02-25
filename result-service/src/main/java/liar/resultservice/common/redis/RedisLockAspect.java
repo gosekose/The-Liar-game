@@ -1,9 +1,8 @@
 package liar.resultservice.common.redis;
 
 import liar.resultservice.exception.exception.RedisLockException;
-import liar.resultservice.result.controller.dto.request.PlayerResultInfoDto;
-import liar.resultservice.result.controller.dto.request.SaveResultRequest;
 import liar.resultservice.result.domain.GameResult;
+import liar.resultservice.result.domain.GameRole;
 import liar.resultservice.result.domain.Player;
 import liar.resultservice.result.domain.PlayerResult;
 import lombok.RequiredArgsConstructor;
@@ -28,9 +27,9 @@ public class RedisLockAspect {
     private final RedissonClient redissonClient;
 
     @Around(
-            "execution(* liar.resultservice.result.repository..*.save(..)) || " +
-            "execution(* liar.resultservice.result.repository..*.delete(..)) || " +
-            "execution(* liar.resultservice.result.repository..*.findById(..))"
+            "execution(* liar.resultservice.result.repository.PlayerRepository.save(..)) || " +
+            "execution(* liar.resultservice.result.repository..*.delete(..))"
+//            "execution(* liar.resultservice.other.member.MemberRepository.findByUserId(..))"
     )
     public Object executeWithRock(ProceedingJoinPoint joinPoint) throws Throwable {
         MethodSignature signature = (MethodSignature) joinPoint.getSignature();
@@ -41,7 +40,7 @@ public class RedisLockAspect {
         RLock lock = redissonClient.getLock(lockKey);
 
         try{
-            boolean isLocked = lock.tryLock(2, 3, TimeUnit.SECONDS);
+            boolean isLocked = lock.tryLock(10, 12, TimeUnit.SECONDS);
             if (!isLocked) {
                 throw new RedisLockException();
             }
@@ -55,26 +54,25 @@ public class RedisLockAspect {
         }
     }
 
-    @Around("execution(* liar.resultservice.result.service.ResultFacadeService.saveAllResultOfGame(..)) && args(request)")
-    public void saveAllResultOfGame(ProceedingJoinPoint joinPoint, SaveResultRequest request) throws Throwable {
+    @Around("execution(* liar.resultservice.result.service.ResultFacadeServiceImpl.savePlayer(..)) && args(gameResult, player, playerRole, exp)")
+    public void savePlayer(ProceedingJoinPoint joinPoint, GameResult gameResult, Player player, GameRole playerRole, Long exp) throws Throwable {
 
-        String lockKey = "saveAllResultOfGame: " + request.getGameId();
+        String lockKey = "savePlayer: " + player.getMember().getId();
         voidJoinPointRedissonRLock(joinPoint, lockKey);
     }
 
-    @Around("execution(* liar.resultservice.result.service.ResultFacadeService.saveGameResult(..)) && args(request)")
-    public GameResult saveGameResult(ProceedingJoinPoint joinPoint, SaveResultRequest request) throws Throwable {
-
-        String lockKey = "saveAllResultOfGame: " + request.getGameId();
-        return (GameResult) executeWithRedisLock(joinPoint, lockKey);
-    }
-
+//    @Around("execution(* liar.resultservice.result.service.ResultFacadeServiceImpl.getPlayer(..)) && args(dto)")
+//    public Player getPlayer(ProceedingJoinPoint joinPoint, PlayerResultInfoDto dto) throws Throwable {
+//
+//        String lockKey = "getPlayer: " + dto.getUserId();
+//        return (Player) executeWithRedisLock(joinPoint, lockKey);
+//    }
 
     public Object executeWithRedisLock(ProceedingJoinPoint joinPoint, String lockKey) throws Throwable {
         RLock lock = redissonClient.getLock(lockKey);
 
         try {
-            boolean isLocked = lock.tryLock(2, 3, TimeUnit.SECONDS);
+            boolean isLocked = lock.tryLock(20, 3, TimeUnit.SECONDS);
             if (!isLocked) {
                 throw new RedisLockException();
             }
