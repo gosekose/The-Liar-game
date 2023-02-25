@@ -3,6 +3,7 @@ package liar.resultservice.result.domain;
 import jakarta.persistence.*;
 import liar.resultservice.other.member.Member;
 import lombok.*;
+import org.hibernate.validator.constraints.UniqueElements;
 import org.springframework.data.domain.Persistable;
 
 import java.util.UUID;
@@ -22,8 +23,8 @@ public class Player extends BaseEntity implements Persistable<String>  {
     @Column(name = "player_id")
     private String id;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "member_id")
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinColumn(name = "member_id", unique = true)
     private Member member;
 
     private Long wins;

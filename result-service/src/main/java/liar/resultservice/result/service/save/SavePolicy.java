@@ -13,15 +13,16 @@ public interface SavePolicy {
 
     /**
      * gameResult를 저장하고 id를 반환
-     * @return boolean
+     * @return GameResult
      */
     GameResult saveGameResult(SaveResultRequest saveResultRequest);
 
+    Player savePlayer(Member member);
+
     /**
-     * player를 저장하고 boolean를 반환
-     * @return boolean
+     * player를 업데이트
      */
-    void savePlayer(GameResult gameResult, Player player, GameRole playerRole, Long exp);
+    void updatePlayer(GameResult gameResult, Player player, GameRole playerRole, Long exp);
 
     /**
      * playerResult를 저장하고 id를 반환

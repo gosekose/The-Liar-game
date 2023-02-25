@@ -1,9 +1,11 @@
 package liar.resultservice.result.service;
 
 import liar.resultservice.result.controller.dto.request.SaveResultRequest;
+import liar.resultservice.result.domain.Player;
 import liar.resultservice.result.repository.query.myresult.MyDetailGameResultCond;
 import liar.resultservice.result.repository.query.myresult.MyDetailGameResultDto;
 import liar.resultservice.result.repository.query.rank.PlayerRankingDto;
+import liar.resultservice.result.service.dto.SaveInitPlayerDto;
 import liar.resultservice.result.service.dto.SaveResultMessage;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
@@ -19,6 +21,13 @@ public interface ResultFacadeService {
      * @return allResultSavedWellDto
      */
     void saveAllResultOfGame(SaveResultRequest saveResultRequest);
+
+    /**
+     * player를 생성하여 저장한다.
+     * @param saveInitPlayerDto
+     * @return playerId
+     */
+    String savePlayer(SaveInitPlayerDto saveInitPlayerDto);
 
     /**
      * 게임 결과가 저장되었다는 메세지를 전송

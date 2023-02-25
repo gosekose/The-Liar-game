@@ -1,5 +1,6 @@
 package liar.resultservice.result.service;
 
+import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
 import liar.resultservice.exception.exception.NotFoundUserException;
 import liar.resultservice.other.member.Member;
@@ -17,6 +18,7 @@ import liar.resultservice.result.domain.PlayerResult;
 import liar.resultservice.result.repository.GameResultRepository;
 import liar.resultservice.result.repository.PlayerRepository;
 import liar.resultservice.result.repository.PlayerResultRepository;
+import liar.resultservice.result.service.dto.SaveInitPlayerDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -70,7 +72,6 @@ class ResultFacadeServiceImplTest extends MemberDummyInfo {
     public void saveAllResultOfGame_single() throws Exception {
         //given
         int multiRequest = 10;
-        GameResult[] gameResults = new GameResult[multiRequest];
 
         //when
         for (int i = 0; i < multiRequest; i++) {
@@ -81,7 +82,7 @@ class ResultFacadeServiceImplTest extends MemberDummyInfo {
 
         GameResult gameResult = gameResultRepository.findGameResultByGameId(request.getGameId());
         List<PlayerResult> playerResults = playerResultRepository.findPlayerResultsByGameResult(gameResult);
-        GameResult findGameResult = gameResultRepository.findGameResultByGameId("gameId");
+        GameResult findGameResult = gameResultRepository.findGameResultByGameId("1");
         memberRepository.findByUserId(devUser1Id);
 
         //then
@@ -99,6 +100,10 @@ class ResultFacadeServiceImplTest extends MemberDummyInfo {
         ExecutorService executorService = Executors.newFixedThreadPool(32);
         CountDownLatch countDownLatch = new CountDownLatch(threadCount);
 
+        for (int i = 0; i < threadCount; i++) {
+            resultFacadeService.savePlayer(new SaveInitPlayerDto(playerResultInfoDtos.get(i).getUserId()));
+        }
+        
         //when
         for (int i = 0; i < threadCount; i++) {
             int finalIdx = i;
@@ -132,7 +137,7 @@ class ResultFacadeServiceImplTest extends MemberDummyInfo {
         List<PlayerResult> playerResults2 = playerResultRepository.findPlayerResultsByGameResult(gameResult2);
         List<PlayerResult> playerResults3 = playerResultRepository.findPlayerResultsByGameResult(gameResult3);
         List<PlayerResult> playerResults4 = playerResultRepository.findPlayerResultsByGameResult(gameResult4);
-        Player playerByMember = playerRepository.findPlayerByMember(memberRepository.findByUserId(devUser1Id));
+        Player playerByMember = playerRepository.findWithMemberForUpdate(memberRepository.findByUserId(devUser1Id));
 
         //then
         assertThat(gameResult1.getHostId()).isEqualTo(hostId);
@@ -157,19 +162,5 @@ class ResultFacadeServiceImplTest extends MemberDummyInfo {
         votedResultDtos.add(new VotedResultDto(devUser1Id, Arrays.asList(devUser2Id, devUser3Id), 2));
         votedResultDtos.add(new VotedResultDto(devUser2Id, Arrays.asList(hostId), 1));
         votedResultDtos.add(new VotedResultDto(devUser3Id, Arrays.asList(), 0));
-    }
-
-    private SaveResultRequest makeSaveResultRequest(String gameId) {
-        topic = topicRepository.save(new Topic("game"));
-        return new SaveResultRequest(gameId, GameRole.LIAR, playerResultInfoDtos, "roomId", "gameName",
-                hostId, topic.getId(), playerResultInfoDtos.size(), votedResultDtos);
-    }
-
-    private Member getMember(PlayerResultInfoDto dto) {
-        Member member = memberRepository.findByUserId(dto.getUserId());
-        if (member == null) {
-            throw new NotFoundUserException();
-        }
-        return member;
     }
 }

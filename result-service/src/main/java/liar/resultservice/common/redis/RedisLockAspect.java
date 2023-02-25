@@ -55,7 +55,7 @@ public class RedisLockAspect {
         }
     }
 
-    @Around("execution(* liar.resultservice.result.service.ResultFacadeServiceImpl.savePlayer(..)) && args(gameResult, player, playerRole, exp)")
+    @Around("execution(* liar.resultservice.result.service.save.SavePolicyImpl.updatePlayer(..)) && args(gameResult, player, playerRole, exp)")
     public void savePlayer(ProceedingJoinPoint joinPoint, GameResult gameResult, Player player, GameRole playerRole, Long exp) throws Throwable {
 
         String lockKey = "savePlayer: " + player.getMember().getId();
@@ -94,7 +94,7 @@ public class RedisLockAspect {
         RLock lock = redissonClient.getLock(lockKey);
 
         try {
-            boolean isLocked = lock.tryLock(2, 3, TimeUnit.SECONDS);
+            boolean isLocked = lock.tryLock(60, TimeUnit.SECONDS);
             if (!isLocked) {
                 throw new RedisLockException();
             }

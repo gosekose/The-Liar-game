@@ -122,7 +122,7 @@ class SavePolicyTest extends MemberDummyInfo {
         Player player = getPlayer(playerResultInfoDtos.get(0));
 
         //when
-        savePolicy.savePlayer(gameResult, player, GameRole.LIAR, 300L);
+        savePolicy.updatePlayer(gameResult, player, GameRole.LIAR, 300L);
         Player findPlayer = playerRepository.findById(player.getId()).orElseThrow(NotFoundUserException::new);
 
         //then
@@ -145,7 +145,7 @@ class SavePolicyTest extends MemberDummyInfo {
             int finalIdx = i;
             executorService.submit(() -> {
                 try{
-                    savePolicy.savePlayer(gameResult, player, GameRole.LIAR, 300L);
+                    savePolicy.updatePlayer(gameResult, player, GameRole.LIAR, 300L);
                 } finally {
                     countDownLatch.countDown();
                 }
@@ -251,7 +251,7 @@ class SavePolicyTest extends MemberDummyInfo {
 
     private Player getPlayer(PlayerResultInfoDto dto) {
         Member member = getMember(dto);
-        Player player = playerRepository.findPlayerByMember(member);
+        Player player = playerRepository.findWithMemberForUpdate(member);
         if (player == null) {
             return playerRepository.save(Player.of(member));
         }
