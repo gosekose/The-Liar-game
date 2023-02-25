@@ -1,12 +1,6 @@
 package liar.resultservice.result.service;
 
-import liar.resultservice.exception.exception.NotFoundUserException;
-import liar.resultservice.other.member.Member;
-import liar.resultservice.result.controller.dto.request.PlayerResultInfoDto;
 import liar.resultservice.result.controller.dto.request.SaveResultRequest;
-import liar.resultservice.result.domain.GameResult;
-import liar.resultservice.result.domain.GameRole;
-import liar.resultservice.result.domain.Player;
 import liar.resultservice.result.repository.query.myresult.MyDetailGameResultCond;
 import liar.resultservice.result.repository.query.myresult.MyDetailGameResultDto;
 import liar.resultservice.result.repository.query.rank.PlayerRankingDto;
@@ -25,30 +19,6 @@ public interface ResultFacadeService {
      * @return allResultSavedWellDto
      */
     void saveAllResultOfGame(SaveResultRequest saveResultRequest);
-
-
-    /**
-     * gameResult를 저장하고 id를 반환
-     * @return boolean
-     */
-    GameResult saveGameResult(SaveResultRequest saveResultRequest);
-
-    /**
-     * player를 저장하고 boolean를 반환
-     * @return boolean
-     */
-    void savePlayer(GameResult gameResult, Player player, GameRole playerRole, Long exp);
-
-    /**
-     * playerResult를 저장하고 id를 반환
-     * @return String
-     */
-    String savePlayerResult(SaveResultRequest request, String gameResultId,
-                             PlayerResultInfoDto dto, Long exp);
-
-    Player getPlayer(PlayerResultInfoDto dto) throws InterruptedException;
-
-    Member getMember(PlayerResultInfoDto dto);
 
     /**
      * 게임 결과가 저장되었다는 메세지를 전송
