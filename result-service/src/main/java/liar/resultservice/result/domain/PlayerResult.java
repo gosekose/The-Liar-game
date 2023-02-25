@@ -22,7 +22,7 @@ public class PlayerResult extends BaseEntity implements Persistable<String>  {
     @Column(name = "player_result_id")
     private String id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.MERGE, CascadeType.REFRESH})
     @JoinColumn(name = "game_result_id")
     private GameResult gameResult;
 

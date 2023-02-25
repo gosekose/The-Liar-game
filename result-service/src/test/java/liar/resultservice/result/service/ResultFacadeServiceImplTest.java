@@ -1,5 +1,6 @@
 package liar.resultservice.result.service;
 
+import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
 import liar.resultservice.exception.exception.NotFoundGameException;
 import liar.resultservice.exception.exception.NotFoundUserException;
@@ -18,6 +19,7 @@ import liar.resultservice.result.domain.PlayerResult;
 import liar.resultservice.result.repository.GameResultRepository;
 import liar.resultservice.result.repository.PlayerRepository;
 import liar.resultservice.result.repository.PlayerResultRepository;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -65,6 +67,7 @@ class ResultFacadeServiceImplTest extends MemberDummyInfo {
         request = new SaveResultRequest("gameId", GameRole.LIAR, playerResultInfoDtos, "roomId", "gameName",
                 hostId, topic.getId(), playerResultInfoDtos.size(), votedResultDtos);
     }
+
 
     @Test
     @DisplayName("단일 스레드에서 saveGameResult")
@@ -195,7 +198,7 @@ class ResultFacadeServiceImplTest extends MemberDummyInfo {
         ExecutorService executorService = Executors.newFixedThreadPool(32);
         GameResult gameResult = resultFacadeService.saveGameResult(request);
         CountDownLatch countDownLatch = new CountDownLatch(threadCount);
-        String[] playerIds = new String[threadCount];
+        System.out.println("gameResult = " + gameResult.getId());
 
         for (int i = 0; i < threadCount; i++) {
             getPlayer(playerResultInfoDtos.get(i));
@@ -206,10 +209,11 @@ class ResultFacadeServiceImplTest extends MemberDummyInfo {
             int finalIdx = i;
             executorService.submit(() -> {
                try{
-                   playerIds[finalIdx] = resultFacadeService.
+                   resultFacadeService.
                            savePlayerResult(request, gameResult.getId(), playerResultInfoDtos.get(finalIdx), 100L);
                } catch (Exception e) {
                    e.printStackTrace();
+                   e.getCause();
                }
                finally {
                    countDownLatch.countDown();
@@ -219,17 +223,11 @@ class ResultFacadeServiceImplTest extends MemberDummyInfo {
 
         countDownLatch.await();
 
-        for (String playerId : playerIds) {
-            System.out.println("playerId = " + playerId);
-        }
-
-        for (int i = 0; i < threadCount; i++) {
-            System.out.println("playerIds = " + playerIds[i]);
-        }
-        
-        for (int i = 0; i < threadCount; i++) {
-            assertThat(playerIds[i]).isNotNull();
-        }
+        //then
+        GameResult findGameResult = gameResultRepository.findById(gameResult.getId()).orElseThrow();
+        System.out.println("findGameResult.getId() = " + findGameResult.getId());
+        List<PlayerResult> playerResultsByGameResult = playerResultRepository.findPlayerResultsByGameResult(findGameResult);
+        assertThat(playerResultsByGameResult.size()).isEqualTo(4);
 
     }
 
@@ -237,12 +235,20 @@ class ResultFacadeServiceImplTest extends MemberDummyInfo {
     @DisplayName("saveAllResultOfGame")
     public void saveAllResultOfGame_single() throws Exception {
         //given
-        resultFacadeService.saveAllResultOfGame(request);
+        int multiRequest = 10;
+        GameResult[] gameResults = new GameResult[multiRequest];
 
         //when
+        for (int i = 0; i < multiRequest; i++) {
+            request = new SaveResultRequest(String.valueOf(i), GameRole.LIAR, playerResultInfoDtos, "roomId", "gameName",
+                    hostId, topic.getId(), playerResultInfoDtos.size(), votedResultDtos);
+            resultFacadeService.saveAllResultOfGame(request);
+        }
+
         GameResult gameResult = gameResultRepository.findGameResultByGameId(request.getGameId());
         List<PlayerResult> playerResults = playerResultRepository.findPlayerResultsByGameResult(gameResult);
         GameResult findGameResult = gameResultRepository.findGameResultByGameId("gameId");
+        memberRepository.findByUserId(devUser1Id);
 
         //then
         assertThat(findGameResult).isNotNull();
@@ -261,11 +267,13 @@ class ResultFacadeServiceImplTest extends MemberDummyInfo {
 
         //when
         for (int i = 0; i < threadCount; i++) {
-            SaveResultRequest resultTest = new SaveResultRequest(String.valueOf(i), GameRole.LIAR, playerResultInfoDtos, "roomId", "gameName",
-                    hostId, topic.getId(), playerResultInfoDtos.size(), votedResultDtos);
-
+            int finalIdx = i;
             executorService.submit(() -> {
                 try{
+                    Topic savedTopic = topicRepository.save(new Topic("test"));
+                    SaveResultRequest resultTest = new SaveResultRequest(String.valueOf(finalIdx), GameRole.LIAR, playerResultInfoDtos,
+                            "roomId", "gameName",
+                            hostId, savedTopic.getId(), playerResultInfoDtos.size(), votedResultDtos);
                     resultFacadeService.saveAllResultOfGame(resultTest);
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -275,6 +283,8 @@ class ResultFacadeServiceImplTest extends MemberDummyInfo {
                 }
             });
         }
+
+        countDownLatch.await();
 
         GameResult gameResult1 = gameResultRepository.findGameResultByGameId("0");
         GameResult gameResult2 = gameResultRepository.findGameResultByGameId("1");
@@ -288,6 +298,7 @@ class ResultFacadeServiceImplTest extends MemberDummyInfo {
         List<PlayerResult> playerResults2 = playerResultRepository.findPlayerResultsByGameResult(gameResult2);
         List<PlayerResult> playerResults3 = playerResultRepository.findPlayerResultsByGameResult(gameResult3);
         List<PlayerResult> playerResults4 = playerResultRepository.findPlayerResultsByGameResult(gameResult4);
+        Player playerByMember = playerRepository.findPlayerByMember(memberRepository.findByUserId(devUser1Id));
 
         //then
         assertThat(gameResult1.getHostId()).isEqualTo(hostId);
