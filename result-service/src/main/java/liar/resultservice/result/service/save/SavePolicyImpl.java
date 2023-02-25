@@ -1,5 +1,6 @@
 package liar.resultservice.result.service.save;
 
+import jakarta.persistence.LockModeType;
 import liar.resultservice.exception.exception.NotFoundGameResultException;
 import liar.resultservice.exception.exception.NotFoundTopicException;
 import liar.resultservice.exception.exception.NotFoundUserException;
@@ -19,8 +20,8 @@ import liar.resultservice.result.repository.PlayerResultRepository;
 import liar.resultservice.result.service.exp.ExpPolicy;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.jpa.repository.Lock;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
@@ -38,8 +39,7 @@ public class SavePolicyImpl implements SavePolicy {
 
     /**
      * gameResult를 저장하고 id를 반환
-     *
-     * @return boolean
+     * @return GameResult
      */
     @Override
     @Transactional
@@ -55,20 +55,24 @@ public class SavePolicyImpl implements SavePolicy {
                         .winner(request.getWinner())
                         .totalUsers(request.getTotalUserCnt())
                         .build());
-        gameResultRepository.flush();
         return gameResult;
     }
 
+    @Override
+    @Transactional
+    public Player savePlayer(Member member) {
+        return playerRepository.save(Player.of(member));
+    }
+
     /**
-     * player를 저장하고 boolean를 반환
-     *
-     * @return boolean
+     * player를 업데이트
      */
     @Override
-    @Transactional(isolation = Isolation.READ_COMMITTED)
-    public void savePlayer(GameResult gameResult, Player player, GameRole playerRole, Long exp) {
+    @Transactional
+    public void updatePlayer(GameResult gameResult, Player player, GameRole playerRole, Long exp) {
         player.levelUp(expPolicy.nextLevel(player.updateExp(exp)));
         player.updateGameResult(playerRole == gameResult.getWinner());
+        playerRepository.saveAndFlush(player);
     }
 
     /**
@@ -82,7 +86,7 @@ public class SavePolicyImpl implements SavePolicy {
                                    PlayerResultInfoDto dto, Long exp) {
 
         GameResult gameResult = gameResultRepository.findById(gameResultId).orElseThrow(NotFoundGameResultException::new);
-        System.out.println("gameResult = " + gameResult.getId());
+        log.info("gameResult = {}", gameResult.getId());
         return playerResultRepository.save(PlayerResult.builder()
                 .gameResult(gameResult)
                 .userId(dto.getUserId())
@@ -96,13 +100,17 @@ public class SavePolicyImpl implements SavePolicy {
 
 
     @Override
-    @Transactional(isolation = Isolation.READ_COMMITTED)
+    @Lock(value = LockModeType.PESSIMISTIC_WRITE)
+    @Transactional
     public Player getPlayer(PlayerResultInfoDto dto) {
         Member member = getMember(dto);
-        Player player = playerRepository.findPlayerByMember(member);
+        Player player = playerRepository.findWithMemberForUpdate(member);
         if (player == null) {
+            log.info("처음 요청: dto.userId = {}", dto.getUserId());
             return playerRepository.save(Player.of(member));
         }
+        log.info("dto.userId = {}", dto.getUserId());
+        log.info("이미 player가 있으므로 player 리턴 = {}", player.getMember().getId());
         return player;
     }
 

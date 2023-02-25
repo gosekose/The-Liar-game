@@ -1,12 +1,16 @@
 package liar.resultservice.result.service;
 
+import liar.resultservice.exception.exception.NotFoundUserException;
+import liar.resultservice.other.member.MemberRepository;
 import liar.resultservice.result.controller.dto.request.PlayerResultInfoDto;
 import liar.resultservice.result.controller.dto.request.SaveResultRequest;
 import liar.resultservice.result.domain.GameResult;
 import liar.resultservice.result.domain.Player;
+import liar.resultservice.result.repository.PlayerRepository;
 import liar.resultservice.result.repository.query.myresult.MyDetailGameResultCond;
 import liar.resultservice.result.repository.query.myresult.MyDetailGameResultDto;
 import liar.resultservice.result.repository.query.rank.PlayerRankingDto;
+import liar.resultservice.result.service.dto.SaveInitPlayerDto;
 import liar.resultservice.result.service.dto.SaveResultMessage;
 import liar.resultservice.result.service.exp.ExpPolicy;
 import liar.resultservice.result.service.myresult.MyGameResultPolicy;
@@ -14,7 +18,6 @@ import liar.resultservice.result.service.ranking.RankingPolicy;
 import liar.resultservice.result.service.save.SavePolicy;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.redisson.api.RedissonClient;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
@@ -24,11 +27,12 @@ import org.springframework.transaction.annotation.Transactional;
 @Slf4j
 @RequiredArgsConstructor
 public class ResultFacadeServiceImpl implements ResultFacadeService {
+    private final PlayerRepository playerRepository;
+    private final MemberRepository memberRepository;
 
     private final ExpPolicy expPolicy;
     private final RankingPolicy rankingPolicy;
     private final MyGameResultPolicy myGameResultPolicy;
-    private final RedissonClient redissonClient;
     private final SavePolicy savePolicy;
     /**
      * gameResult 관련 GameResult, player, playerResult 모두 저장
@@ -37,20 +41,33 @@ public class ResultFacadeServiceImpl implements ResultFacadeService {
      */
     @Override
     public void saveAllResultOfGame(SaveResultRequest request) {
+        // 트랜젝션
         GameResult gameResult = savePolicy.saveGameResult(request);
+        // 커밋 완료
+
         request.getPlayersInfo()
                 .stream()
                 .forEach(playerDto -> {
                     Long exp = calculateExp(gameResult, playerDto);
-                    Player player = null;
+                    Player player;
                     try {
                         player = savePolicy.getPlayer(playerDto);
                     } catch (InterruptedException e) {
-                        throw new RuntimeException(e);
+                        throw new NotFoundUserException();
                     }
-                    savePolicy.savePlayer(gameResult, player, playerDto.getGameRole(), exp);
+                    savePolicy.updatePlayer(gameResult, player, playerDto.getGameRole(), exp);
                     savePolicy.savePlayerResult(request, gameResult.getId(), playerDto, exp);
                 });
+    }
+
+    @Override
+    @Transactional
+    public String savePlayer(SaveInitPlayerDto saveInitPlayerDto) {
+        Player player = playerRepository.findWithMemberForUpdate(memberRepository.findByUserId(saveInitPlayerDto.getUserId()));
+        if (player == null) {
+            return savePolicy.savePlayer(memberRepository.findByUserId(saveInitPlayerDto.getUserId())).getId();
+        }
+        return player.getId();
     }
 
     /**
