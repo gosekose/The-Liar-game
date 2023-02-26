@@ -28,7 +28,7 @@ public class RedisLockAspect {
     private final RedissonClient redissonClient;
 
     @Around(
-            "execution(* liar.resultservice.result.repository.PlayerRepository.save(..)) || " +
+//            "execution(* liar.resultservice.result.repository.PlayerRepository.save(..)) || " +
             "execution(* liar.resultservice.result.repository..*.delete(..))"
 //            "execution(* liar.resultservice.other.member.MemberRepository.findByUserId(..))"
     )
@@ -54,20 +54,20 @@ public class RedisLockAspect {
             }
         }
     }
-
-    @Around("execution(* liar.resultservice.result.service.save.SavePolicyImpl.updatePlayer(..)) && args(gameResult, player, playerRole, exp)")
-    public void savePlayer(ProceedingJoinPoint joinPoint, GameResult gameResult, Player player, GameRole playerRole, Long exp) throws Throwable {
-
-        String lockKey = "savePlayer: " + player.getMember().getId();
-        voidJoinPointRedissonRLock(joinPoint, lockKey);
-    }
-
-    @Around("execution(* liar.resultservice.result.service.save.SavePolicyImpl.getPlayer(..)) && args(dto)")
-    public Player getPlayer(ProceedingJoinPoint joinPoint, PlayerResultInfoDto dto) throws Throwable {
-
-        String lockKey = "getPlayer: " + dto.getUserId();
-        return (Player) executeWithRedisLock(joinPoint, lockKey);
-    }
+//
+//    @Around("execution(* liar.resultservice.result.service.save.SavePolicyImpl.updatePlayer(..)) && args(gameResult, player, playerRole, exp)")
+//    public void savePlayer(ProceedingJoinPoint joinPoint, GameResult gameResult, Player player, GameRole playerRole, Long exp) throws Throwable {
+//
+//        String lockKey = "savePlayer: " + player.getMember().getId();
+//        voidJoinPointRedissonRLock(joinPoint, lockKey);
+//    }
+//
+//    @Around("execution(* liar.resultservice.result.service.save.SavePolicyImpl.getPlayer(..)) && args(dto)")
+//    public Player getPlayer(ProceedingJoinPoint joinPoint, PlayerResultInfoDto dto) throws Throwable {
+//
+//        String lockKey = "getPlayer: " + dto.getUserId();
+//        return (Player) executeWithRedisLock(joinPoint, lockKey);
+//    }
 
     public Object executeWithRedisLock(ProceedingJoinPoint joinPoint, String lockKey) throws Throwable {
         RLock lock = redissonClient.getLock(lockKey);
