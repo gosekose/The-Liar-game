@@ -16,6 +16,7 @@ public interface PlayerRepository extends JpaRepository<Player, String> {
     @Query("select p from Player p where p.member = :member")
     Player findWithMemberForUpdate(@Param("member") Member member);
 
+    Player findPlayerByMember(Member member);
 
     @Query(value = "SELECT * FROM player WHERE member_id = :memberId FOR UPDATE", nativeQuery = true)
     Player findWithMemberForUpdate(@Param("memberId") Long memberId);

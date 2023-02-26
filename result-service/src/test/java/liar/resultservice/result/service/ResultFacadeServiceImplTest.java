@@ -1,9 +1,6 @@
 package liar.resultservice.result.service;
 
-import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
-import liar.resultservice.exception.exception.NotFoundUserException;
-import liar.resultservice.other.member.Member;
 import liar.resultservice.other.member.MemberRepository;
 import liar.resultservice.other.topic.Topic;
 import liar.resultservice.other.topic.TopicRepository;
@@ -35,7 +32,6 @@ import java.util.concurrent.Executors;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
-@Transactional
 class ResultFacadeServiceImplTest extends MemberDummyInfo {
 
     @Autowired
@@ -64,10 +60,11 @@ class ResultFacadeServiceImplTest extends MemberDummyInfo {
         createVotedResultDtos();
         createPlayerResultInfoDtos();
         request = new SaveResultRequest("gameId", GameRole.LIAR, playerResultInfoDtos, "roomId", "gameName",
-                hostId, topic.getId(), playerResultInfoDtos.size(), votedResultDtos);
+                devUser1Id, topic.getId(), playerResultInfoDtos.size(), votedResultDtos);
     }
 
     @Test
+    @Transactional
     @DisplayName("saveAllResultOfGame")
     public void saveAllResultOfGame_single() throws Exception {
         //given
@@ -76,7 +73,7 @@ class ResultFacadeServiceImplTest extends MemberDummyInfo {
         //when
         for (int i = 0; i < multiRequest; i++) {
             request = new SaveResultRequest(String.valueOf(i), GameRole.LIAR, playerResultInfoDtos, "roomId", "gameName",
-                    hostId, topic.getId(), playerResultInfoDtos.size(), votedResultDtos);
+                    devUser1Id, topic.getId(), playerResultInfoDtos.size(), votedResultDtos);
             resultFacadeService.saveAllResultOfGame(request);
         }
 
@@ -88,7 +85,7 @@ class ResultFacadeServiceImplTest extends MemberDummyInfo {
         //then
         assertThat(findGameResult).isNotNull();
         assertThat(findGameResult.getGameName()).isNotNull();
-        assertThat(gameResult.getHostId()).isEqualTo(hostId);
+        assertThat(gameResult.getHostId()).isEqualTo(devUser1Id);
         assertThat(playerResults.size()).isEqualTo(4);
     }
 
@@ -137,30 +134,31 @@ class ResultFacadeServiceImplTest extends MemberDummyInfo {
         List<PlayerResult> playerResults2 = playerResultRepository.findPlayerResultsByGameResult(gameResult2);
         List<PlayerResult> playerResults3 = playerResultRepository.findPlayerResultsByGameResult(gameResult3);
         List<PlayerResult> playerResults4 = playerResultRepository.findPlayerResultsByGameResult(gameResult4);
-        Player playerByMember = playerRepository.findWithMemberForUpdate(memberRepository.findByUserId(devUser1Id));
+        Player playerByMember = playerRepository.findPlayerByMember(memberRepository.findByUserId(devUser1Id));
 
         //then
-        assertThat(gameResult1.getHostId()).isEqualTo(hostId);
+        assertThat(gameResult1.getHostId()).isEqualTo(devUser1Id);
         assertThat(playerResults1.size()).isEqualTo(4);
-        assertThat(gameResult2.getHostId()).isEqualTo(hostId);
+        assertThat(gameResult2.getHostId()).isEqualTo(devUser1Id);
         assertThat(playerResults2.size()).isEqualTo(4);
-        assertThat(gameResult3.getHostId()).isEqualTo(hostId);
+        assertThat(gameResult3.getHostId()).isEqualTo(devUser1Id);
         assertThat(playerResults3.size()).isEqualTo(4);
-        assertThat(gameResult4.getHostId()).isEqualTo(hostId);
+        assertThat(gameResult4.getHostId()).isEqualTo(devUser1Id);
         assertThat(playerResults4.size()).isEqualTo(4);
+        assertThat(playerByMember.getExp()).isEqualTo(49L * 4);
     }
 
     private void createPlayerResultInfoDtos() {
-        playerResultInfoDtos.add(new PlayerResultInfoDto(hostId, GameRole.LIAR, false));
-        playerResultInfoDtos.add(new PlayerResultInfoDto(devUser1Id, GameRole.CITIZEN, false));
+        playerResultInfoDtos.add(new PlayerResultInfoDto(devUser1Id, GameRole.LIAR, false));
         playerResultInfoDtos.add(new PlayerResultInfoDto(devUser2Id, GameRole.CITIZEN, false));
         playerResultInfoDtos.add(new PlayerResultInfoDto(devUser3Id, GameRole.CITIZEN, false));
+        playerResultInfoDtos.add(new PlayerResultInfoDto(devUser4Id, GameRole.CITIZEN, false));
     }
 
     private void createVotedResultDtos() {
-        votedResultDtos.add(new VotedResultDto(hostId, Arrays.asList(devUser1Id), 1));
-        votedResultDtos.add(new VotedResultDto(devUser1Id, Arrays.asList(devUser2Id, devUser3Id), 2));
-        votedResultDtos.add(new VotedResultDto(devUser2Id, Arrays.asList(hostId), 1));
-        votedResultDtos.add(new VotedResultDto(devUser3Id, Arrays.asList(), 0));
+        votedResultDtos.add(new VotedResultDto(devUser1Id, Arrays.asList(devUser4Id), 1));
+        votedResultDtos.add(new VotedResultDto(devUser2Id, Arrays.asList(devUser2Id, devUser3Id), 2));
+        votedResultDtos.add(new VotedResultDto(devUser3Id, Arrays.asList(devUser1Id), 1));
+        votedResultDtos.add(new VotedResultDto(devUser4Id, Arrays.asList(), 0));
     }
 }

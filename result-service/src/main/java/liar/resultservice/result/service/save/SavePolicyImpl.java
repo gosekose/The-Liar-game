@@ -24,6 +24,8 @@ import org.springframework.data.jpa.repository.Lock;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import static org.springframework.transaction.annotation.Isolation.SERIALIZABLE;
+
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -61,7 +63,7 @@ public class SavePolicyImpl implements SavePolicy {
     @Override
     @Transactional
     public Player savePlayer(Member member) {
-        return playerRepository.save(Player.of(member));
+        return playerRepository.saveAndFlush(Player.of(member));
     }
 
     /**
@@ -71,8 +73,8 @@ public class SavePolicyImpl implements SavePolicy {
     @Transactional
     public void updatePlayer(GameResult gameResult, Player player, GameRole playerRole, Long exp) {
         player.levelUp(expPolicy.nextLevel(player.updateExp(exp)));
+        log.info("player.getExp = {}",player.getExp());
         player.updateGameResult(playerRole == gameResult.getWinner());
-        playerRepository.saveAndFlush(player);
     }
 
     /**
