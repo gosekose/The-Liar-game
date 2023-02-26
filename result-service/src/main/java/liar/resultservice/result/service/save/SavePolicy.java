@@ -6,6 +6,7 @@ import liar.resultservice.result.controller.dto.request.SaveResultRequest;
 import liar.resultservice.result.domain.GameResult;
 import liar.resultservice.result.domain.GameRole;
 import liar.resultservice.result.domain.Player;
+import liar.resultservice.result.service.dto.SaveResultDto;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -15,7 +16,7 @@ public interface SavePolicy {
      * gameResult를 저장하고 id를 반환
      * @return GameResult
      */
-    GameResult saveGameResult(SaveResultRequest saveResultRequest);
+    GameResult saveGameResult(SaveResultDto saveResultDto);
 
     Player savePlayer(Member member);
 
@@ -28,10 +29,9 @@ public interface SavePolicy {
      * playerResult를 저장하고 id를 반환
      * @return String
      */
-    String savePlayerResult(SaveResultRequest request, String gameResultId,
-                            PlayerResultInfoDto dto, Long exp);
+    String savePlayerResult(String gameResultId, PlayerResultInfoDto dto, Long exp);
 
-    Player getPlayer(PlayerResultInfoDto dto) throws InterruptedException;
+    Player getPlayer(PlayerResultInfoDto dto);
 
     Member getMember(PlayerResultInfoDto dto);
 

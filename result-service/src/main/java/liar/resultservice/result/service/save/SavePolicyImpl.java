@@ -17,6 +17,7 @@ import liar.resultservice.result.domain.PlayerResult;
 import liar.resultservice.result.repository.GameResultRepository;
 import liar.resultservice.result.repository.PlayerRepository;
 import liar.resultservice.result.repository.PlayerResultRepository;
+import liar.resultservice.result.service.dto.SaveResultDto;
 import liar.resultservice.result.service.exp.ExpPolicy;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -45,17 +46,17 @@ public class SavePolicyImpl implements SavePolicy {
      */
     @Override
     @Transactional
-    public GameResult saveGameResult(SaveResultRequest request) {
-        Topic topic = topicRepository.findById(request.getTopicId()).orElseThrow(NotFoundTopicException::new);
+    public GameResult saveGameResult(SaveResultDto dto) {
+        Topic topic = topicRepository.findById(dto.getTopicId()).orElseThrow(NotFoundTopicException::new);
         GameResult gameResult = gameResultRepository.save(
                 GameResult.builder()
-                        .gameId(request.getGameId())
-                        .gameName(request.getGameName())
-                        .hostId(request.getHostId())
-                        .roomId(request.getRoomId())
+                        .gameId(dto.getGameId())
+                        .gameName(dto.getGameName())
+                        .hostId(dto.getHostId())
+                        .roomId(dto.getRoomId())
                         .topic(topic)
-                        .winner(request.getWinner())
-                        .totalUsers(request.getTotalUserCnt())
+                        .winner(dto.getWinner())
+                        .totalUsers(dto.getTotalUserCnt())
                         .build());
         return gameResult;
     }
@@ -66,12 +67,14 @@ public class SavePolicyImpl implements SavePolicy {
         return playerRepository.saveAndFlush(Player.of(member));
     }
 
+
     /**
      * player를 업데이트
      */
     @Override
     @Transactional
     public void updatePlayer(GameResult gameResult, Player player, GameRole playerRole, Long exp) {
+        log.info("player.getExp = {}",player.getExp());
         player.levelUp(expPolicy.nextLevel(player.updateExp(exp)));
         log.info("player.getExp = {}",player.getExp());
         player.updateGameResult(playerRole == gameResult.getWinner());
@@ -84,8 +87,7 @@ public class SavePolicyImpl implements SavePolicy {
      */
     @Override
     @Transactional
-    public String savePlayerResult(SaveResultRequest request, String gameResultId,
-                                   PlayerResultInfoDto dto, Long exp) {
+    public String savePlayerResult(String gameResultId, PlayerResultInfoDto dto, Long exp) {
 
         GameResult gameResult = gameResultRepository.findById(gameResultId).orElseThrow(NotFoundGameResultException::new);
         log.info("gameResult = {}", gameResult.getId());
@@ -107,10 +109,12 @@ public class SavePolicyImpl implements SavePolicy {
     public Player getPlayer(PlayerResultInfoDto dto) {
         Member member = getMember(dto);
         Player player = playerRepository.findWithMemberForUpdate(member);
+
         if (player == null) {
             log.info("처음 요청: dto.userId = {}", dto.getUserId());
             return playerRepository.save(Player.of(member));
         }
+
         log.info("dto.userId = {}", dto.getUserId());
         log.info("이미 player가 있으므로 player 리턴 = {}", player.getMember().getId());
         return player;

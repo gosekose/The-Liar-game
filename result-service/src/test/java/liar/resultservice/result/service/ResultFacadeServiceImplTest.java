@@ -16,6 +16,7 @@ import liar.resultservice.result.repository.GameResultRepository;
 import liar.resultservice.result.repository.PlayerRepository;
 import liar.resultservice.result.repository.PlayerResultRepository;
 import liar.resultservice.result.service.dto.SaveInitPlayerDto;
+import liar.resultservice.result.service.dto.SaveResultDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -47,7 +48,7 @@ class ResultFacadeServiceImplTest extends MemberDummyInfo {
 
     List<PlayerResultInfoDto> playerResultInfoDtos = new ArrayList<>();
     List<VotedResultDto>votedResultDtos = new ArrayList<>();
-    SaveResultRequest request;
+    SaveResultDto request;
     Topic topic;
     @Autowired
     private PlayerResultRepository playerResultRepository;
@@ -59,8 +60,8 @@ class ResultFacadeServiceImplTest extends MemberDummyInfo {
 
         createVotedResultDtos();
         createPlayerResultInfoDtos();
-        request = new SaveResultRequest("gameId", GameRole.LIAR, playerResultInfoDtos, "roomId", "gameName",
-                devUser1Id, topic.getId(), playerResultInfoDtos.size(), votedResultDtos);
+        request = new SaveResultDto(new SaveResultRequest("gameId", GameRole.LIAR, playerResultInfoDtos, "roomId", "gameName",
+                devUser1Id, topic.getId(), playerResultInfoDtos.size(), votedResultDtos));
     }
 
     @Test
@@ -68,36 +69,37 @@ class ResultFacadeServiceImplTest extends MemberDummyInfo {
     @DisplayName("saveAllResultOfGame")
     public void saveAllResultOfGame_single() throws Exception {
         //given
-        int multiRequest = 10;
+        int multiRequest = 4;
 
         //when
         for (int i = 0; i < multiRequest; i++) {
-            request = new SaveResultRequest(String.valueOf(i), GameRole.LIAR, playerResultInfoDtos, "roomId", "gameName",
-                    devUser1Id, topic.getId(), playerResultInfoDtos.size(), votedResultDtos);
+            request = new SaveResultDto(new SaveResultRequest(String.valueOf(i), GameRole.LIAR, playerResultInfoDtos, "roomId", "gameName",
+                    devUser1Id, topic.getId(), playerResultInfoDtos.size(), votedResultDtos));
             resultFacadeService.saveAllResultOfGame(request);
         }
 
         GameResult gameResult = gameResultRepository.findGameResultByGameId(request.getGameId());
         List<PlayerResult> playerResults = playerResultRepository.findPlayerResultsByGameResult(gameResult);
         GameResult findGameResult = gameResultRepository.findGameResultByGameId("1");
-        memberRepository.findByUserId(devUser1Id);
+        Player playerByMember = playerRepository.findPlayerByMember(memberRepository.findByUserId(devUser1Id));
 
         //then
         assertThat(findGameResult).isNotNull();
         assertThat(findGameResult.getGameName()).isNotNull();
         assertThat(gameResult.getHostId()).isEqualTo(devUser1Id);
         assertThat(playerResults.size()).isEqualTo(4);
+        assertThat(playerByMember.getExp()).isEqualTo(49L * 4);
     }
 
     @Test
     @DisplayName("saveAllResultOfGame_multiThread")
     public void saveAllResultOfGame_multiThread() throws Exception {
         //given
-        int threadCount = 4;
+        int threadCount = 10;
         ExecutorService executorService = Executors.newFixedThreadPool(32);
         CountDownLatch countDownLatch = new CountDownLatch(threadCount);
 
-        for (int i = 0; i < threadCount; i++) {
+        for (int i = 0; i < playerResultInfoDtos.size(); i++) {
             resultFacadeService.savePlayer(new SaveInitPlayerDto(playerResultInfoDtos.get(i).getUserId()));
         }
         
@@ -107,9 +109,9 @@ class ResultFacadeServiceImplTest extends MemberDummyInfo {
             executorService.submit(() -> {
                 try{
                     Topic savedTopic = topicRepository.save(new Topic("test"));
-                    SaveResultRequest resultTest = new SaveResultRequest(String.valueOf(finalIdx), GameRole.LIAR, playerResultInfoDtos,
+                    SaveResultDto resultTest = new SaveResultDto(new SaveResultRequest(String.valueOf(finalIdx), GameRole.LIAR, playerResultInfoDtos,
                             "roomId", "gameName",
-                            hostId, savedTopic.getId(), playerResultInfoDtos.size(), votedResultDtos);
+                            devUser1Id, savedTopic.getId(), playerResultInfoDtos.size(), votedResultDtos));
                     resultFacadeService.saveAllResultOfGame(resultTest);
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -134,7 +136,8 @@ class ResultFacadeServiceImplTest extends MemberDummyInfo {
         List<PlayerResult> playerResults2 = playerResultRepository.findPlayerResultsByGameResult(gameResult2);
         List<PlayerResult> playerResults3 = playerResultRepository.findPlayerResultsByGameResult(gameResult3);
         List<PlayerResult> playerResults4 = playerResultRepository.findPlayerResultsByGameResult(gameResult4);
-        Player playerByMember = playerRepository.findPlayerByMember(memberRepository.findByUserId(devUser1Id));
+        Player player1ByMember = playerRepository.findPlayerByMember(memberRepository.findByUserId(devUser1Id));
+        Player player2ByMember = playerRepository.findPlayerByMember(memberRepository.findByUserId(devUser2Id));
 
         //then
         assertThat(gameResult1.getHostId()).isEqualTo(devUser1Id);
@@ -145,7 +148,9 @@ class ResultFacadeServiceImplTest extends MemberDummyInfo {
         assertThat(playerResults3.size()).isEqualTo(4);
         assertThat(gameResult4.getHostId()).isEqualTo(devUser1Id);
         assertThat(playerResults4.size()).isEqualTo(4);
-        assertThat(playerByMember.getExp()).isEqualTo(49L * 4);
+        assertThat(player1ByMember.getExp()).isEqualTo(49L * 4);
+        assertThat(player2ByMember.getExp()).isEqualTo(15L * 4);
+
     }
 
     private void createPlayerResultInfoDtos() {
@@ -156,8 +161,8 @@ class ResultFacadeServiceImplTest extends MemberDummyInfo {
     }
 
     private void createVotedResultDtos() {
-        votedResultDtos.add(new VotedResultDto(devUser1Id, Arrays.asList(devUser4Id), 1));
-        votedResultDtos.add(new VotedResultDto(devUser2Id, Arrays.asList(devUser2Id, devUser3Id), 2));
+        votedResultDtos.add(new VotedResultDto(devUser2Id, Arrays.asList(devUser4Id), 1));
+        votedResultDtos.add(new VotedResultDto(devUser1Id, Arrays.asList(devUser2Id, devUser3Id), 2));
         votedResultDtos.add(new VotedResultDto(devUser3Id, Arrays.asList(devUser1Id), 1));
         votedResultDtos.add(new VotedResultDto(devUser4Id, Arrays.asList(), 0));
     }
