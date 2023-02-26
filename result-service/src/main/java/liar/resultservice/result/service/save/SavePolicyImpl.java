@@ -25,6 +25,8 @@ import org.springframework.data.jpa.repository.Lock;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.concurrent.ConcurrentHashMap;
+
 import static org.springframework.transaction.annotation.Isolation.SERIALIZABLE;
 
 @Service
@@ -39,6 +41,9 @@ public class SavePolicyImpl implements SavePolicy {
     private final PlayerRepository playerRepository;
     private final PlayerResultRepository playerResultRepository;
     private final MemberRepository memberRepository;
+
+
+    private final ConcurrentHashMap<String, Player> players = new ConcurrentHashMap<>();
 
     /**
      * gameResult를 저장하고 id를 반환
@@ -101,23 +106,23 @@ public class SavePolicyImpl implements SavePolicy {
                 .build()).getId();
     }
 
-
-
     @Override
-    @Lock(value = LockModeType.PESSIMISTIC_WRITE)
-    @Transactional
     public Player getPlayer(PlayerResultInfoDto dto) {
-        Member member = getMember(dto);
-        Player player = playerRepository.findWithMemberForUpdate(member);
 
-        if (player == null) {
-            log.info("처음 요청: dto.userId = {}", dto.getUserId());
-            return playerRepository.save(Player.of(member));
+        if (players.size() >= 100) {
+            log.info("ConcurrentHashMap clear= {}", players.size());
+            players.clear();
         }
 
-        log.info("dto.userId = {}", dto.getUserId());
-        log.info("이미 player가 있으므로 player 리턴 = {}", player.getMember().getId());
-        return player;
+        return players.computeIfAbsent(dto.getUserId(), userId -> {
+            log.info("ConcurrentHashMap put = {}", userId);
+            Member member = getMember(dto);
+            Player player = playerRepository.findWithMemberForUpdate(member);
+            if (player == null) {
+                return savePlayer(member);
+            }
+            return player;
+        });
     }
 
     @Transactional(readOnly = true)

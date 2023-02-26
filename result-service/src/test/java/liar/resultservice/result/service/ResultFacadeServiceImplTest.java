@@ -17,11 +17,13 @@ import liar.resultservice.result.repository.PlayerRepository;
 import liar.resultservice.result.repository.PlayerResultRepository;
 import liar.resultservice.result.service.dto.SaveInitPlayerDto;
 import liar.resultservice.result.service.dto.SaveResultDto;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.transaction.interceptor.TransactionAspectSupport;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -64,6 +66,14 @@ class ResultFacadeServiceImplTest extends MemberDummyInfo {
                 devUser1Id, topic.getId(), playerResultInfoDtos.size(), votedResultDtos));
     }
 
+    @AfterEach
+    public void tearDown() {
+        playerRepository.deleteAll();
+        playerResultRepository.deleteAll();
+        gameResultRepository.deleteAll();
+        topicRepository.deleteAll();
+    }
+
     @Test
     @Transactional
     @DisplayName("saveAllResultOfGame")
@@ -95,7 +105,7 @@ class ResultFacadeServiceImplTest extends MemberDummyInfo {
     @DisplayName("saveAllResultOfGame_multiThread")
     public void saveAllResultOfGame_multiThread() throws Exception {
         //given
-        int threadCount = 10;
+        int threadCount = 4;
         ExecutorService executorService = Executors.newFixedThreadPool(32);
         CountDownLatch countDownLatch = new CountDownLatch(threadCount);
 
@@ -128,10 +138,6 @@ class ResultFacadeServiceImplTest extends MemberDummyInfo {
         GameResult gameResult2 = gameResultRepository.findGameResultByGameId("1");
         GameResult gameResult3 = gameResultRepository.findGameResultByGameId("2");
         GameResult gameResult4 = gameResultRepository.findGameResultByGameId("3");
-        System.out.println("gameResult4.getId() = " + gameResult1.getId());
-        System.out.println("gameResult4.getId() = " + gameResult2.getId());
-        System.out.println("gameResult4.getId() = " + gameResult3.getId());
-        System.out.println("gameResult4.getId() = " + gameResult4.getId());
         List<PlayerResult> playerResults1 = playerResultRepository.findPlayerResultsByGameResult(gameResult1);
         List<PlayerResult> playerResults2 = playerResultRepository.findPlayerResultsByGameResult(gameResult2);
         List<PlayerResult> playerResults3 = playerResultRepository.findPlayerResultsByGameResult(gameResult3);
@@ -150,6 +156,52 @@ class ResultFacadeServiceImplTest extends MemberDummyInfo {
         assertThat(playerResults4.size()).isEqualTo(4);
         assertThat(player1ByMember.getExp()).isEqualTo(49L * 4);
         assertThat(player2ByMember.getExp()).isEqualTo(15L * 4);
+
+    }
+
+    @Test
+    @DisplayName("saveAllResultOfGame_multiThread 10개")
+    public void saveAllResultOfGame_multiThread_more() throws Exception {
+        //given
+        int threadCount = 10;
+        ExecutorService executorService = Executors.newFixedThreadPool(32);
+        CountDownLatch countDownLatch = new CountDownLatch(threadCount);
+
+        for (int i = 0; i < playerResultInfoDtos.size(); i++) {
+            resultFacadeService.savePlayer(new SaveInitPlayerDto(playerResultInfoDtos.get(i).getUserId()));
+        }
+
+        //when
+        for (int i = 0; i < threadCount; i++) {
+            int finalIdx = i;
+            executorService.submit(() -> {
+                try{
+                    Topic savedTopic = topicRepository.save(new Topic("test"));
+                    SaveResultDto resultTest = new SaveResultDto(new SaveResultRequest(String.valueOf(finalIdx), GameRole.LIAR, playerResultInfoDtos,
+                            "roomId", "gameName",
+                            devUser1Id, savedTopic.getId(), playerResultInfoDtos.size(), votedResultDtos));
+                    resultFacadeService.saveAllResultOfGame(resultTest);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                finally {
+                    countDownLatch.countDown();
+                }
+            });
+        }
+
+        countDownLatch.await();
+
+        GameResult gameResult1 = gameResultRepository.findGameResultByGameId("0");
+        List<PlayerResult> playerResults1 = playerResultRepository.findPlayerResultsByGameResult(gameResult1);
+        Player player1ByMember = playerRepository.findPlayerByMember(memberRepository.findByUserId(devUser1Id));
+        Player player2ByMember = playerRepository.findPlayerByMember(memberRepository.findByUserId(devUser2Id));
+
+        //then
+        assertThat(gameResult1.getHostId()).isEqualTo(devUser1Id);
+        assertThat(playerResults1.size()).isEqualTo(4);
+        assertThat(player1ByMember.getExp()).isEqualTo(49L * 10);
+        assertThat(player2ByMember.getExp()).isEqualTo(15L * 10);
 
     }
 

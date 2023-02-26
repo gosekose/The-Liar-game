@@ -23,7 +23,7 @@ public class Player extends BaseEntity implements Persistable<String>  {
     @Column(name = "player_id")
     private String id;
 
-    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id", unique = true)
     private Member member;
 
