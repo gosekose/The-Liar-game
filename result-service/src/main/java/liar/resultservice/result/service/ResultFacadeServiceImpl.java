@@ -11,6 +11,7 @@ import liar.resultservice.result.repository.query.myresult.MyDetailGameResultCon
 import liar.resultservice.result.repository.query.myresult.MyDetailGameResultDto;
 import liar.resultservice.result.repository.query.rank.PlayerRankingDto;
 import liar.resultservice.result.service.dto.SaveInitPlayerDto;
+import liar.resultservice.result.service.dto.SaveResultDto;
 import liar.resultservice.result.service.dto.SaveResultMessage;
 import liar.resultservice.result.service.exp.ExpPolicy;
 import liar.resultservice.result.service.myresult.MyGameResultPolicy;
@@ -40,23 +41,14 @@ public class ResultFacadeServiceImpl implements ResultFacadeService {
      * @return allResultSavedWellDto
      */
     @Override
-    public void saveAllResultOfGame(SaveResultRequest request) {
-        // 트랜젝션
-        GameResult gameResult = savePolicy.saveGameResult(request);
-        // 커밋 완료
-
-        request.getPlayersInfo()
+    public void saveAllResultOfGame(SaveResultDto dto) {
+        GameResult gameResult = savePolicy.saveGameResult(dto);
+        dto.getPlayersInfo()
                 .stream()
                 .forEach(playerDto -> {
                     Long exp = calculateExp(gameResult, playerDto);
-                    Player player;
-                    try {
-                        player = savePolicy.getPlayer(playerDto);
-                    } catch (InterruptedException e) {
-                        throw new NotFoundUserException();
-                    }
-                    savePolicy.updatePlayer(gameResult, player, playerDto.getGameRole(), exp);
-                    savePolicy.savePlayerResult(request, gameResult.getId(), playerDto, exp);
+                    savePolicy.updatePlayer(gameResult, savePolicy.getPlayer(playerDto), playerDto.getGameRole(), exp);
+                    savePolicy.savePlayerResult(gameResult.getId(), playerDto, exp);
                 });
     }
 

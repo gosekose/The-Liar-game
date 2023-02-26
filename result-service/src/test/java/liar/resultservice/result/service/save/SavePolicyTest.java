@@ -18,6 +18,7 @@ import liar.resultservice.result.domain.PlayerResult;
 import liar.resultservice.result.repository.GameResultRepository;
 import liar.resultservice.result.repository.PlayerRepository;
 import liar.resultservice.result.repository.PlayerResultRepository;
+import liar.resultservice.result.service.dto.SaveResultDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -49,7 +50,7 @@ class SavePolicyTest extends MemberDummyInfo {
 
     List<PlayerResultInfoDto> playerResultInfoDtos = new ArrayList<>();
     List<VotedResultDto>votedResultDtos = new ArrayList<>();
-    SaveResultRequest request;
+    SaveResultDto request;
     Topic topic;
     @Autowired
     private PlayerResultRepository playerResultRepository;
@@ -61,8 +62,8 @@ class SavePolicyTest extends MemberDummyInfo {
 
         createVotedResultDtos();
         createPlayerResultInfoDtos();
-        request = new SaveResultRequest("gameId", GameRole.LIAR, playerResultInfoDtos, "roomId", "gameName",
-                hostId, topic.getId(), playerResultInfoDtos.size(), votedResultDtos);
+        request = new SaveResultDto(new SaveResultRequest("gameId", GameRole.LIAR, playerResultInfoDtos, "roomId", "gameName",
+                hostId, topic.getId(), playerResultInfoDtos.size(), votedResultDtos));
     }
 
 
@@ -95,7 +96,7 @@ class SavePolicyTest extends MemberDummyInfo {
             executorService.submit(() -> {
                 try {
                     gameResults[finalIdx] = savePolicy
-                            .saveGameResult(makeSaveResultRequest(UUID.randomUUID().toString()));
+                            .saveGameResult(makeSaveResultDto(UUID.randomUUID().toString()));
                 } finally {
                     countDownLatch.countDown();
                 }
@@ -174,7 +175,7 @@ class SavePolicyTest extends MemberDummyInfo {
 
         for (int i = 0; i < count; i++) {
             savePolicy.
-                    savePlayerResult(request, gameResult.getId(), playerResultInfoDtos.get(i), 100L);
+                    savePlayerResult(gameResult.getId(), playerResultInfoDtos.get(i), 100L);
         }
 
 
@@ -207,7 +208,7 @@ class SavePolicyTest extends MemberDummyInfo {
             executorService.submit(() -> {
                 try{
                     savePolicy.
-                            savePlayerResult(request, gameResult.getId(), playerResultInfoDtos.get(finalIdx), 100L);
+                            savePlayerResult(gameResult.getId(), playerResultInfoDtos.get(finalIdx), 100L);
                 } catch (Exception e) {
                     e.printStackTrace();
                     e.getCause();
@@ -242,10 +243,10 @@ class SavePolicyTest extends MemberDummyInfo {
         votedResultDtos.add(new VotedResultDto(devUser3Id, Arrays.asList(), 0));
     }
 
-    private SaveResultRequest makeSaveResultRequest(String gameId) {
+    private SaveResultDto makeSaveResultDto(String gameId) {
         topic = topicRepository.save(new Topic("game"));
-        return new SaveResultRequest(gameId, GameRole.LIAR, playerResultInfoDtos, "roomId", "gameName",
-                hostId, topic.getId(), playerResultInfoDtos.size(), votedResultDtos);
+        return new SaveResultDto(new SaveResultRequest(gameId, GameRole.LIAR, playerResultInfoDtos, "roomId", "gameName",
+                hostId, topic.getId(), playerResultInfoDtos.size(), votedResultDtos));
     }
 
 
