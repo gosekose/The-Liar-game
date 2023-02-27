@@ -8,6 +8,7 @@ import liar.resultservice.result.MemberDummyInfo;
 import liar.resultservice.result.controller.dto.request.PlayerResultInfoDto;
 import liar.resultservice.result.controller.dto.request.SaveResultRequest;
 import liar.resultservice.result.controller.dto.request.VotedResultDto;
+import liar.resultservice.result.controller.util.RequestMapperFactory;
 import liar.resultservice.result.domain.GameResult;
 import liar.resultservice.result.domain.GameRole;
 import liar.resultservice.result.domain.Player;
@@ -62,7 +63,7 @@ class ResultFacadeServiceImplTest extends MemberDummyInfo {
 
         createVotedResultDtos();
         createPlayerResultInfoDtos();
-        request = new SaveResultDto(new SaveResultRequest("gameId", GameRole.LIAR, playerResultInfoDtos, "roomId", "gameName",
+        request = RequestMapperFactory.mapper(new SaveResultRequest("gameId", GameRole.LIAR, playerResultInfoDtos, "roomId", "gameName",
                 devUser1Id, topic.getId(), playerResultInfoDtos.size(), votedResultDtos));
     }
 
@@ -83,7 +84,7 @@ class ResultFacadeServiceImplTest extends MemberDummyInfo {
 
         //when
         for (int i = 0; i < multiRequest; i++) {
-            request = new SaveResultDto(new SaveResultRequest(String.valueOf(i), GameRole.LIAR, playerResultInfoDtos, "roomId", "gameName",
+            request = RequestMapperFactory.mapper(new SaveResultRequest(String.valueOf(i), GameRole.LIAR, playerResultInfoDtos, "roomId", "gameName",
                     devUser1Id, topic.getId(), playerResultInfoDtos.size(), votedResultDtos));
             resultFacadeService.saveAllResultOfGame(request);
         }
@@ -119,9 +120,7 @@ class ResultFacadeServiceImplTest extends MemberDummyInfo {
             executorService.submit(() -> {
                 try{
                     Topic savedTopic = topicRepository.save(new Topic("test"));
-                    SaveResultDto resultTest = new SaveResultDto(new SaveResultRequest(String.valueOf(finalIdx), GameRole.LIAR, playerResultInfoDtos,
-                            "roomId", "gameName",
-                            devUser1Id, savedTopic.getId(), playerResultInfoDtos.size(), votedResultDtos));
+                    SaveResultDto resultTest = getSaveResultDto(finalIdx, savedTopic);
                     resultFacadeService.saveAllResultOfGame(resultTest);
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -177,9 +176,7 @@ class ResultFacadeServiceImplTest extends MemberDummyInfo {
             executorService.submit(() -> {
                 try{
                     Topic savedTopic = topicRepository.save(new Topic("test"));
-                    SaveResultDto resultTest = new SaveResultDto(new SaveResultRequest(String.valueOf(finalIdx), GameRole.LIAR, playerResultInfoDtos,
-                            "roomId", "gameName",
-                            devUser1Id, savedTopic.getId(), playerResultInfoDtos.size(), votedResultDtos));
+                    SaveResultDto resultTest = getSaveResultDto(finalIdx, savedTopic);
                     resultFacadeService.saveAllResultOfGame(resultTest);
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -217,5 +214,12 @@ class ResultFacadeServiceImplTest extends MemberDummyInfo {
         votedResultDtos.add(new VotedResultDto(devUser1Id, Arrays.asList(devUser2Id, devUser3Id), 2));
         votedResultDtos.add(new VotedResultDto(devUser3Id, Arrays.asList(devUser1Id), 1));
         votedResultDtos.add(new VotedResultDto(devUser4Id, Arrays.asList(), 0));
+    }
+
+    private SaveResultDto getSaveResultDto(int finalIdx, Topic savedTopic) {
+        SaveResultDto resultTest = RequestMapperFactory.mapper(new SaveResultRequest(String.valueOf(finalIdx), GameRole.LIAR, playerResultInfoDtos,
+                "roomId", "gameName",
+                devUser1Id, savedTopic.getId(), playerResultInfoDtos.size(), votedResultDtos));
+        return resultTest;
     }
 }

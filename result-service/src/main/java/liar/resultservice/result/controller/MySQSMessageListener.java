@@ -1,10 +1,12 @@
-package liar.resultservice.common.aws;
+package liar.resultservice.result.controller;
 
 import com.amazonaws.services.sqs.AmazonSQS;
 import com.amazonaws.services.sqs.model.DeleteMessageRequest;
 import com.amazonaws.services.sqs.model.Message;
 import com.amazonaws.services.sqs.model.ReceiveMessageRequest;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import liar.resultservice.result.controller.dto.request.SaveResultRequest;
+import liar.resultservice.result.controller.util.RequestMapperFactory;
 import liar.resultservice.result.service.ResultFacadeService;
 import liar.resultservice.result.service.dto.SaveResultDto;
 import lombok.RequiredArgsConstructor;
@@ -39,8 +41,8 @@ public class MySQSMessageListener {
                 messages.stream()
                         .forEach(message -> {
                             try {
-                                SaveResultDto saveResultDto = objectMapper.readValue(message.getBody(), SaveResultDto.class);
-                                resultFacadeService.saveAllResultOfGame(saveResultDto);
+                                SaveResultRequest request = objectMapper.readValue(message.getBody(), SaveResultRequest.class);
+                                resultFacadeService.saveAllResultOfGame(RequestMapperFactory.mapper(request));
 
                                 String receiptHandle = message.getReceiptHandle();
                                 amazonSQS.deleteMessage(new DeleteMessageRequest(queueUrl, receiptHandle));

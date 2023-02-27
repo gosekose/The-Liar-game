@@ -11,6 +11,7 @@ import liar.resultservice.result.MemberDummyInfo;
 import liar.resultservice.result.controller.dto.request.PlayerResultInfoDto;
 import liar.resultservice.result.controller.dto.request.SaveResultRequest;
 import liar.resultservice.result.controller.dto.request.VotedResultDto;
+import liar.resultservice.result.controller.util.RequestMapperFactory;
 import liar.resultservice.result.domain.GameResult;
 import liar.resultservice.result.domain.GameRole;
 import liar.resultservice.result.domain.Player;
@@ -62,7 +63,7 @@ class SavePolicyTest extends MemberDummyInfo {
 
         createVotedResultDtos();
         createPlayerResultInfoDtos();
-        request = new SaveResultDto(new SaveResultRequest("gameId", GameRole.LIAR, playerResultInfoDtos, "roomId", "gameName",
+        request = RequestMapperFactory.mapper(new SaveResultRequest("gameId", GameRole.LIAR, playerResultInfoDtos, "roomId", "gameName",
                 hostId, topic.getId(), playerResultInfoDtos.size(), votedResultDtos));
     }
 
@@ -245,7 +246,7 @@ class SavePolicyTest extends MemberDummyInfo {
 
     private SaveResultDto makeSaveResultDto(String gameId) {
         topic = topicRepository.save(new Topic("game"));
-        return new SaveResultDto(new SaveResultRequest(gameId, GameRole.LIAR, playerResultInfoDtos, "roomId", "gameName",
+        return RequestMapperFactory.mapper(new SaveResultRequest(gameId, GameRole.LIAR, playerResultInfoDtos, "roomId", "gameName",
                 hostId, topic.getId(), playerResultInfoDtos.size(), votedResultDtos));
     }
 
