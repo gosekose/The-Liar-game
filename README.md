@@ -31,7 +31,10 @@ IDE: Intellij
 * 0.0.1 기본 infra 구축 
 * 0.0.2 gateway-server, member-service 인증/인가 처리 구현
 * 0.0.3 wait-service 도메인 개발 완료, docs 발행
-* 0.0.4 game-service 도메인 개발 중 입니다. (mvc)
+* 0.0.4 game-service 도메인 개발 완료, dosc 발행
+* 0.0.5 result-service 도메인 개발 완료, docs 발행
+* 0.0.6 부가 기능 테스트 중
+
 
 ![](../header.png)
 ## 정보
@@ -54,25 +57,16 @@ IDE: Intellij
 
 
 ## 단위/기능 테스트 실행 (ubuntu)
-단위/기능 테스트를 진행할 때는 rdbms(dev: h2) 와 redis, rabbitmq, config.server를 반드시 실행시켜주어야 합니다. 
+단위/기능 테스트를 진행할 때는 
+rdbms(dev: h2) 와 redis, rabbitmq, config.server를 반드시 실행시켜주어야 합니다. 
 
-member-service 실행시 
+ex) member-service 실행시 
 ```
 ./h2.sh
 java -jar config-server.jar
 java -jar eureka-server.jar
 java -jar gateway-server.jar
 
-systemctl start rabbitmq-server
-redis-server --port 6379
-redis-server --port 6380
-redis-cli -h 127.0.0.1 -p 6380
-```
-
-wait-service 실행시 
-```
-./h2.sh
-java -jar config-server.jar
 systemctl start rabbitmq-server
 redis-server --port 6379
 redis-server --port 6380

@@ -6,6 +6,7 @@ import liar.resultservice.result.controller.dto.request.SaveResultRequest;
 import liar.resultservice.result.controller.dto.request.VotedResultDto;
 import liar.resultservice.result.domain.GameRole;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 
 import java.util.List;
@@ -25,15 +26,18 @@ public class SaveResultDto {
     private int totalUserCnt;
     private CopyOnWriteArrayList<VotedResultDto> votedResults;
 
-    public SaveResultDto(SaveResultRequest request) {
-        this.gameId = request.getGameId();
-        this.winner = request.getWinner();
-        this.playersInfo = new CopyOnWriteArrayList<>(request.getPlayersInfo());
-        this.roomId = request.getRoomId();
-        this.gameName = request.getGameName();
-        this.hostId = request.getHostId();
-        this.topicId = request.getTopicId();
-        this.totalUserCnt = request.getTotalUserCnt();
-        this.votedResults = new CopyOnWriteArrayList<>(request.getVotedResults());
+    @Builder
+    public SaveResultDto(String gameId, GameRole winner, List<PlayerResultInfoDto> playersInfo,
+                         String roomId, String gameName, String hostId, Long topicId,
+                         int totalUserCnt, List<VotedResultDto> votedResults) {
+        this.gameId = gameId;
+        this.winner = winner;
+        this.playersInfo = new CopyOnWriteArrayList<>(playersInfo);
+        this.roomId = roomId;
+        this.gameName = gameName;
+        this.hostId = hostId;
+        this.topicId = topicId;
+        this.totalUserCnt = totalUserCnt;
+        this.votedResults = new CopyOnWriteArrayList<>(votedResults);
     }
 }
