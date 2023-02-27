@@ -110,10 +110,6 @@ class ResultFacadeServiceImplTest extends MemberDummyInfo {
         ExecutorService executorService = Executors.newFixedThreadPool(32);
         CountDownLatch countDownLatch = new CountDownLatch(threadCount);
 
-        for (int i = 0; i < playerResultInfoDtos.size(); i++) {
-            resultFacadeService.savePlayer(new SaveInitPlayerDto(playerResultInfoDtos.get(i).getUserId()));
-        }
-        
         //when
         for (int i = 0; i < threadCount; i++) {
             int finalIdx = i;
@@ -165,10 +161,6 @@ class ResultFacadeServiceImplTest extends MemberDummyInfo {
         int threadCount = 10;
         ExecutorService executorService = Executors.newFixedThreadPool(32);
         CountDownLatch countDownLatch = new CountDownLatch(threadCount);
-
-        for (int i = 0; i < playerResultInfoDtos.size(); i++) {
-            resultFacadeService.savePlayer(new SaveInitPlayerDto(playerResultInfoDtos.get(i).getUserId()));
-        }
 
         //when
         for (int i = 0; i < threadCount; i++) {
