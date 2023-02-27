@@ -77,4 +77,21 @@ class RankingPolicyTest extends MemberDummyInfo {
         assertThat(playerRankingDtos.getContent().size()).isEqualTo(5);
         assertThat(playerRankingDtos.getContent().get(0).getExp()).isEqualTo(630L);
     }
+
+    @Test
+    @DisplayName("플레이어가 공개 여부를 비공개로 하면, 랭킹 시스템에서 제외한다.")
+    public void fetchPlayerRanking_visible_X() throws Exception {
+        //given
+        Player player = playerRepository.findPlayerByMember(memberRepository.findByUserId(devUser6Id));
+        player.updateVisibleGameResult();
+
+        //when
+        Pageable page = PageRequest.of(0, 5);
+        Slice<PlayerRankingDto> playerRankingDtos = rankingPolicy.fetchPlayerRanking(page);
+
+        //then
+        assertThat(playerRankingDtos.getSize()).isEqualTo(5);
+        assertThat(playerRankingDtos.getContent().size()).isEqualTo(5);
+        assertThat(playerRankingDtos.getContent().get(0).getExp()).isEqualTo(530L);
+    }
 }
