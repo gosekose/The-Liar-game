@@ -39,12 +39,12 @@ public class PlayerRankingQueryDslRepositoryImpl implements PlayerRankingQueryDs
                 )
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
+                .orderBy(player.exp.desc())
                 .fetch();
 
         JPAQuery<Long> countQuery = query
                 .select(player.count())
                 .from(player)
-                .join(player.member, member)
                 .where(
                         player.visibleGameResult.isTrue()
                 );

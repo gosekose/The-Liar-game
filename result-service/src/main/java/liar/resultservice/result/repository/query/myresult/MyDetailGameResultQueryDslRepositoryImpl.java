@@ -50,11 +50,11 @@ public class MyDetailGameResultQueryDslRepositoryImpl implements MyDetailGameRes
                         )
                 )
                 .from(playerResult)
-                .join(topic, gameResult.topic)
-                .join(member, player.member)
                 .join(playerResult.gameResult, gameResult)
+                .join(gameResult.topic, topic)
+                .join(playerResult)
                 .where(
-                        member.userId.eq(cond.getUserId()),
+                        playerResult.userId.eq(cond.getUserId()),
                         playerWinEq(cond.getViewOnlyWin()),
                         playerLoseEq(cond.getViewOnlyLose()),
                         gameNameContains(cond.getSearchGameName())
@@ -71,9 +71,8 @@ public class MyDetailGameResultQueryDslRepositoryImpl implements MyDetailGameRes
             return query
                     .select(playerResult.count())
                     .from(playerResult)
-                    .join(member, player.member)
                     .where(
-                            member.userId.eq(cond.getUserId()),
+                            playerResult.userId.eq(cond.getUserId()),
                             playerWinEq(cond.getViewOnlyWin()),
                             playerLoseEq(cond.getViewOnlyLose())
                     );
@@ -82,10 +81,9 @@ public class MyDetailGameResultQueryDslRepositoryImpl implements MyDetailGameRes
             return query
                     .select(playerResult.count())
                     .from(playerResult)
-                    .join(member, player.member)
                     .join(playerResult.gameResult, gameResult)
                     .where(
-                            member.userId.eq(cond.getUserId()),
+                            playerResult.userId.eq(cond.getUserId()),
                             gameNameContains(cond.getSearchGameName())
                     );
         }

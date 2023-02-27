@@ -1,7 +1,9 @@
 package liar.resultservice.result.controller;
 
 import liar.resultservice.result.controller.dto.message.SendSuccessBody;
+import liar.resultservice.result.controller.dto.request.MyDetailGameResultRequest;
 import liar.resultservice.result.controller.interceptor.anno.MyDetailGameResult;
+import liar.resultservice.result.controller.util.RequestMapperFactory;
 import liar.resultservice.result.repository.query.myresult.MyDetailGameResultCond;
 import liar.resultservice.result.service.ResultFacadeService;
 import lombok.RequiredArgsConstructor;
@@ -25,10 +27,11 @@ public class FetchResultController {
     @GetMapping("/{userId}")
     @MyDetailGameResult
     public ResponseEntity fetchMyDetailGameResult(@PathVariable String userId,
-                                                  @RequestBody MyDetailGameResultCond cond,
+                                                  @RequestBody MyDetailGameResultRequest request,
                                                   Pageable pageable) {
         return ResponseEntity.ok()
-                .body(SendSuccessBody.of(resultFacadeService.fetchMyDetailGameResult(cond, pageable)));
+                .body(SendSuccessBody
+                        .of(resultFacadeService.fetchMyDetailGameResult(RequestMapperFactory.mapper(request), pageable)));
     }
 
 }

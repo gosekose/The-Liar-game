@@ -22,9 +22,6 @@ public class Member implements Serializable {
 
     @OneToOne(
             fetch = FetchType.LAZY,
-            mappedBy = "member",
-            cascade = CascadeType.ALL)
+            mappedBy = "member")
     private Player player;
-
-
 }
