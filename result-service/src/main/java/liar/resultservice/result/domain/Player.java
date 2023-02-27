@@ -3,11 +3,9 @@ package liar.resultservice.result.domain;
 import jakarta.persistence.*;
 import liar.resultservice.other.member.Member;
 import lombok.*;
-import org.hibernate.validator.constraints.UniqueElements;
 import org.springframework.data.domain.Persistable;
 
 import java.util.UUID;
-import java.util.concurrent.atomic.AtomicLong;
 
 @Entity
 @Getter
