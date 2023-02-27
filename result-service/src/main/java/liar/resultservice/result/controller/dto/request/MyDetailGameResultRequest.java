@@ -13,4 +13,21 @@ public class MyDetailGameResultRequest {
     private Boolean viewOnlyWin;
     private Boolean viewOnlyLose;
     private String searchGameName;
+
+    public boolean hasAtMostOneNonUserIdField() {
+        int count = 0;
+        if (viewLatest != null) {
+            count++;
+        }
+        if (viewOnlyWin != null) {
+            count++;
+        }
+        if (viewOnlyLose != null) {
+            count++;
+        }
+        if (searchGameName != null) {
+            count++;
+        }
+        return count <= 1;
+    }
 }
