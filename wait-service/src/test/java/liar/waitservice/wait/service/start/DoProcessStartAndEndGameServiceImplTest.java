@@ -15,7 +15,7 @@ import liar.waitservice.wait.domain.utils.WaitRoomCompleteStatus;
 import liar.waitservice.wait.repository.rdbms.WaitRoomCompleteRepository;
 import liar.waitservice.wait.repository.redis.JoinMemberRedisRepository;
 import liar.waitservice.wait.repository.redis.WaitRoomRedisRepository;
-import liar.waitservice.wait.service.WaitRoomCompleteService;
+import liar.waitservice.wait.service.waitroom.WaitRoomServiceImpl;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -44,7 +44,7 @@ class DoProcessStartAndEndGameServiceImplTest extends MemberDummyInfo {
     DoProcessStartAndEndGameServiceImpl updateWaitRoomStatusService;
 
     @Autowired
-    WaitRoomCompleteService waitRoomCompleteService;
+    WaitRoomServiceImpl waitRoomCompleteServiceImpl;
 
     WaitRoom waitRoom;
 
@@ -160,7 +160,7 @@ class DoProcessStartAndEndGameServiceImplTest extends MemberDummyInfo {
         //when
         PostProcessEndGameDto postProcessEndGameDto = new PostProcessEndGameDto<String>(waitRoom.getId());
         updateWaitRoomStatusService.doPostProcessAfterGameEnd(postProcessEndGameDto);
-        WaitRoomComplete waitRoomComplete = waitRoomCompleteService.findWaitRoomCompleteByWaitRoomId(waitRoom.getId());
+        WaitRoomComplete waitRoomComplete = waitRoomCompleteServiceImpl.findWaitRoomCompleteByWaitRoomId(waitRoom.getId());
 
         //then
         assertThat(waitRoomComplete.getWaitRoomCompleteStatus()).isEqualTo(WaitRoomCompleteStatus.END);

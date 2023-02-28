@@ -24,19 +24,6 @@ public interface ResultFacadeService {
     void saveAllResultOfGame(SaveResultDto saveResultDto);
 
     /**
-     * player를 생성하여 저장한다.
-     * @param saveInitPlayerDto
-     * @return playerId
-     */
-    String savePlayer(SaveInitPlayerDto saveInitPlayerDto);
-
-    /**
-     * 게임 결과가 저장되었다는 메세지를 전송
-     * @return boolean
-     */
-    SaveResultMessage sendMessageThatResultIsSaved();
-
-    /**
      * playerRanking을 slice 방식으로 가져온다.
      * @param pageable pageable
      * @return

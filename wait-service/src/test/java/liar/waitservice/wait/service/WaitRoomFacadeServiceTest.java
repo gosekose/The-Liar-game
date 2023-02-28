@@ -7,6 +7,7 @@ import liar.waitservice.wait.controller.dto.CreateWaitRoomDto;
 import liar.waitservice.wait.controller.dto.RequestWaitRoomDto;
 import liar.waitservice.wait.domain.WaitRoom;
 import liar.waitservice.wait.repository.redis.WaitRoomRedisRepository;
+import liar.waitservice.wait.service.waitroom.WaitRoomService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -18,10 +19,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-class WaitRoomServiceTest extends MemberDummyInfo {
+class WaitRoomFacadeServiceTest extends MemberDummyInfo {
 
     @Autowired
     WaitRoomRedisRepository waitRoomRedisRepository;
+    @Autowired
+    WaitRoomFacadeService waitRoomFacadeService;
     @Autowired
     WaitRoomService waitRoomService;
 
@@ -64,7 +67,7 @@ class WaitRoomServiceTest extends MemberDummyInfo {
     @DisplayName("memberService에서 userName을 가져온 후 waitRoom을 생성하여 redis에 저장")
     public void saveWaitRoom() throws Exception {
         //given
-        String roomId = waitRoomService.saveWaitRoomByHost(waitRoomDto);
+        String roomId = waitRoomFacadeService.saveWaitRoomByHost(waitRoomDto);
 
         //when
         WaitRoom waitRoom = waitRoomService.findWaitRoomId(roomId);
@@ -81,11 +84,11 @@ class WaitRoomServiceTest extends MemberDummyInfo {
         boolean[] results = new boolean[limitMembers - 1];
 
         CreateWaitRoomDto createWaitRoomDto = new CreateWaitRoomDto(hostId, "game", limitMembers);
-        String roomId = waitRoomService.saveWaitRoomByHost(createWaitRoomDto);
+        String roomId = waitRoomFacadeService.saveWaitRoomByHost(createWaitRoomDto);
 
         //when
         for (int i = 0; i < limitMembers - 1; i++) {
-            results[i] = waitRoomService.addMembers(new RequestWaitRoomDto(String.valueOf(i), roomId));
+            results[i] = waitRoomFacadeService.addMembers(new RequestWaitRoomDto(String.valueOf(i), roomId));
         }
         WaitRoom findOne = waitRoomService.findWaitRoomId(roomId);
 
@@ -102,13 +105,13 @@ class WaitRoomServiceTest extends MemberDummyInfo {
     public void addMembersFalseBecauseFullMembers() throws Exception {
         //given
         boolean[] results = new boolean[6];
-        String roomId = waitRoomService.saveWaitRoomByHost(waitRoomDto);
+        String roomId = waitRoomFacadeService.saveWaitRoomByHost(waitRoomDto);
 
         //when
         for (int i = 0; i < 6; i++) {
-            results[i] = waitRoomService.addMembers(new RequestWaitRoomDto(String.valueOf(i), roomId));
+            results[i] = waitRoomFacadeService.addMembers(new RequestWaitRoomDto(String.valueOf(i), roomId));
         }
-        boolean isSavedMembers = waitRoomService.addMembers(new RequestWaitRoomDto("7", roomId));
+        boolean isSavedMembers = waitRoomFacadeService.addMembers(new RequestWaitRoomDto("7", roomId));
         WaitRoom findRoom = waitRoomService.findWaitRoomId(roomId);
 
         //then
@@ -125,14 +128,14 @@ class WaitRoomServiceTest extends MemberDummyInfo {
     public void leaveMemberTrue() throws Exception {
         //given
         boolean[] results = new boolean[6];
-        String roomId = waitRoomService.saveWaitRoomByHost(waitRoomDto);
+        String roomId = waitRoomFacadeService.saveWaitRoomByHost(waitRoomDto);
         for (int i = 0; i < 6; i++) {
-            waitRoomService.addMembers(new RequestWaitRoomDto(String.valueOf(i), roomId));
+            waitRoomFacadeService.addMembers(new RequestWaitRoomDto(String.valueOf(i), roomId));
         }
 
         //when
         for (int i = 0; i < 3; i++) {
-            results[i] = waitRoomService.leaveMember(new RequestWaitRoomDto(String.valueOf(i), roomId));
+            results[i] = waitRoomFacadeService.leaveMember(new RequestWaitRoomDto(String.valueOf(i), roomId));
         }
         WaitRoom findRoom = waitRoomService.findWaitRoomId(roomId);
 
@@ -149,16 +152,16 @@ class WaitRoomServiceTest extends MemberDummyInfo {
     public void leaveMemberFalseBecauseNotCondition() throws Exception {
         //given
         boolean[] results = new boolean[4];
-        String roomId = waitRoomService.saveWaitRoomByHost(waitRoomDto);
+        String roomId = waitRoomFacadeService.saveWaitRoomByHost(waitRoomDto);
         for (int i = 3; i < 9; i++) {
-            waitRoomService.addMembers(new RequestWaitRoomDto(String.valueOf(i), roomId));
+            waitRoomFacadeService.addMembers(new RequestWaitRoomDto(String.valueOf(i), roomId));
         }
 
         //when
         for (int i = 0; i < 3; i++) {
-            results[i] = waitRoomService.leaveMember(new RequestWaitRoomDto(String.valueOf(i), roomId));
+            results[i] = waitRoomFacadeService.leaveMember(new RequestWaitRoomDto(String.valueOf(i), roomId));
         }
-        results[3] = waitRoomService.leaveMember(new RequestWaitRoomDto(hostId, roomId));
+        results[3] = waitRoomFacadeService.leaveMember(new RequestWaitRoomDto(hostId, roomId));
         WaitRoom findRoom = waitRoomService.findWaitRoomId(roomId);
 
         //then
@@ -172,10 +175,10 @@ class WaitRoomServiceTest extends MemberDummyInfo {
     @DisplayName("대기방 호스트가 퇴장하면, 방은 제거된다.")
     public void deleteWaitRoomTrue() throws Exception {
         //given
-        String roomId = waitRoomService.saveWaitRoomByHost(waitRoomDto);
+        String roomId = waitRoomFacadeService.saveWaitRoomByHost(waitRoomDto);
 
         //when
-        boolean result = waitRoomService.deleteWaitRoomByHost(new RequestWaitRoomDto(hostId, roomId));
+        boolean result = waitRoomFacadeService.deleteWaitRoomByHost(new RequestWaitRoomDto(hostId, roomId));
 
         //then
         assertThat(result).isTrue();
@@ -187,10 +190,10 @@ class WaitRoomServiceTest extends MemberDummyInfo {
     @DisplayName("대기방의 호스트가 아닌 요청은, 방이 제거되지 않는다")
     public void deleteWaitRoomFalseBecauseNotHostId() throws Exception {
         //given
-        String roomId = waitRoomService.saveWaitRoomByHost(waitRoomDto);
+        String roomId = waitRoomFacadeService.saveWaitRoomByHost(waitRoomDto);
 
         //when
-        boolean result = waitRoomService.deleteWaitRoomByHost(new RequestWaitRoomDto("1", roomId));
+        boolean result = waitRoomFacadeService.deleteWaitRoomByHost(new RequestWaitRoomDto("1", roomId));
 
         //then
         assertThat(result).isFalse();

@@ -52,26 +52,6 @@ public class ResultFacadeServiceImpl implements ResultFacadeService {
                 });
     }
 
-    @Override
-    @Transactional
-    public String savePlayer(SaveInitPlayerDto saveInitPlayerDto) {
-        Player player = playerRepository.findWithMemberForUpdate(memberRepository.findByUserId(saveInitPlayerDto.getUserId()));
-        if (player == null) {
-            return savePolicy.savePlayer(memberRepository.findByUserId(saveInitPlayerDto.getUserId())).getId();
-        }
-        return player.getId();
-    }
-
-    /**
-     * 게임 결과가 저장되었다는 메세지를 전송
-     *
-     * @return boolean
-     */
-    @Override
-    public SaveResultMessage sendMessageThatResultIsSaved() {
-        return null;
-    }
-
     /**
      * playerRanking을 slice 방식으로 가져온다.
      * @param pageable pageable
@@ -95,6 +75,12 @@ public class ResultFacadeServiceImpl implements ResultFacadeService {
         return myGameResultPolicy.fetchMyGameResultInfoByCond(cond, pageable);
     }
 
+    /**
+     * exp 계산하여 exp를 리턴한다.
+     * @param gameResult
+     * @param playerDto
+     * @return Long exp
+     */
     private Long calculateExp(GameResult gameResult, PlayerResultInfoDto playerDto) {
         return expPolicy
                 .calculateExp(gameResult.getWinner(), playerDto.getGameRole() == gameResult.getWinner(),
