@@ -14,7 +14,7 @@ import java.util.List;
 
 @Component
 @RequiredArgsConstructor
-public class SearchConnector {
+public class SearchFacadeService {
 
     private final RoomIdSearchService roomIdSearchService;
     private final RoomNameSearchService roomNameSearchService;

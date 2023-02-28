@@ -20,10 +20,10 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-class SearchConnectorTest {
+class SearchFacadeServiceTest {
 
     @Autowired
-    SearchConnector searchConnector;
+    SearchFacadeService searchFacadeService;
 
     @Autowired
     WaitRoomRedisRepository waitRoomRedisRepository;
@@ -57,7 +57,7 @@ class SearchConnectorTest {
         }
 
         //when
-        List<WaitRoomViewsDto> waitRoomViewsDtos = searchConnector.searchWaitRoomCondition(new SearchWaitRoomDto("koseUsername", SearchType.HOSTNAME.getTypeName()));
+        List<WaitRoomViewsDto> waitRoomViewsDtos = searchFacadeService.searchWaitRoomCondition(new SearchWaitRoomDto("koseUsername", SearchType.HOSTNAME.getTypeName()));
 
         //then
         assertThat(waitRoomViewsDtos.size()).isEqualTo(11);
@@ -78,7 +78,7 @@ class SearchConnectorTest {
         }
 
         //when
-        List<WaitRoomViewsDto> waitRoomViewsDtos = searchConnector.searchWaitRoomCondition(new SearchWaitRoomDto("koseRoomName", SearchType.WAITROOMNAME.getTypeName()));
+        List<WaitRoomViewsDto> waitRoomViewsDtos = searchFacadeService.searchWaitRoomCondition(new SearchWaitRoomDto("koseRoomName", SearchType.WAITROOMNAME.getTypeName()));
 
         //then
         assertThat(waitRoomViewsDtos.size()).isEqualTo(11);
@@ -101,7 +101,7 @@ class SearchConnectorTest {
         }
 
         //when
-        List<WaitRoomViewsDto> waitRoomViewsDtos = searchConnector.searchWaitRoomCondition(new SearchWaitRoomDto(waitRoom.getId(), SearchType.WAITROOMID.name()));
+        List<WaitRoomViewsDto> waitRoomViewsDtos = searchFacadeService.searchWaitRoomCondition(new SearchWaitRoomDto(waitRoom.getId(), SearchType.WAITROOMID.name()));
 
         //then
         assertThat(waitRoomViewsDtos.size()).isEqualTo(1);

@@ -1,8 +1,8 @@
 package liar.waitservice.wait.service.search;
 
 import liar.waitservice.wait.domain.WaitRoom;
-import liar.waitservice.wait.service.WaitRoomService;
 import liar.waitservice.wait.service.search.dto.WaitRoomViewsDto;
+import liar.waitservice.wait.service.waitroom.WaitRoomService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;

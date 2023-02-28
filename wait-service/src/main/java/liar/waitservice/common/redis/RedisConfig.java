@@ -1,9 +1,10 @@
-package liar.waitservice.common.config;
+package liar.waitservice.common.redis;
 
 import jakarta.persistence.EntityManagerFactory;
-import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.PersistenceUnit;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.redisson.Redisson;
+import org.redisson.api.RedissonClient;
+import org.redisson.config.Config;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.CacheManager;
 import org.springframework.context.annotation.Bean;
@@ -14,15 +15,12 @@ import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.repository.configuration.EnableRedisRepositories;
 import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.transaction.PlatformTransactionManager;
-import org.springframework.transaction.annotation.EnableTransactionManagement;
-import org.springframework.web.client.RestTemplate;
 
 import java.sql.SQLException;
 import java.time.Duration;
@@ -98,5 +96,12 @@ public class RedisConfig {
         return builder.build();
     }
 
+
+    @Bean
+    public RedissonClient redissonClient() {
+        Config config = new Config();
+        config.useSingleServer().setAddress("redis://localhost:6381");
+        return Redisson.create(config);
+    }
 
 }

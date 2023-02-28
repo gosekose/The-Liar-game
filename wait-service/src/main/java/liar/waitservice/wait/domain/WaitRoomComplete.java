@@ -11,7 +11,7 @@ import static jakarta.persistence.EnumType.STRING;
 
 @Entity
 @Getter
-@Table(indexes = {@Index(name = "wait_room_index",columnList = "wait_room_id")})
+@Table(indexes = {@Index(name = "wait_room_index",columnList = "waitRoomId")})
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class WaitRoomComplete extends BaseTimeEntity {
 

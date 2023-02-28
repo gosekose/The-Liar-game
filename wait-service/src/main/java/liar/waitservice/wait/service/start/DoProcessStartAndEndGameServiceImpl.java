@@ -1,12 +1,15 @@
 package liar.waitservice.wait.service.start;
 
 import liar.waitservice.exception.exception.NotEqualHostIdException;
+import liar.waitservice.exception.exception.NotFoundWaitRoomException;
 import liar.waitservice.exception.exception.NotSatisfiedMinJoinMembers;
 import liar.waitservice.wait.controller.dto.PostProcessEndGameDto;
 import liar.waitservice.wait.controller.dto.RequestWaitRoomDto;
+import liar.waitservice.wait.domain.JoinMember;
 import liar.waitservice.wait.domain.WaitRoom;
-import liar.waitservice.wait.service.WaitRoomCompleteService;
-import liar.waitservice.wait.service.WaitRoomService;
+import liar.waitservice.wait.repository.redis.JoinMemberRedisRepository;
+import liar.waitservice.wait.repository.redis.WaitRoomRedisRepository;
+import liar.waitservice.wait.service.waitroom.WaitRoomService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -15,24 +18,43 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class DoProcessStartAndEndGameServiceImpl implements DoProcessStartAndEndGameService<RequestWaitRoomDto, PostProcessEndGameDto<String>> {
 
-    private final WaitRoomCompleteService waitRoomCompleteService;
     private final WaitRoomService waitRoomService;
+    private final WaitRoomRedisRepository waitRoomRedisRepository;
+    private final JoinMemberRedisRepository joinMemberRedisRepository;
 
     @Value("${game.member.limit.min}")
     private int limitMin;
 
     @Override
     public void doPreProcessBeforeGameStart(RequestWaitRoomDto saveRequest) {
-        WaitRoom waitRoom = waitRoomService.findWaitRoomId(saveRequest.getRoomId());
+        WaitRoom waitRoom = waitRoomRedisRepository.findById(saveRequest.getRoomId()).orElseThrow(NotFoundWaitRoomException::new);
         if (isValidated(waitRoom, saveRequest.getUserId())) {
-            waitRoomCompleteService.save(waitRoom);
+            waitRoomService.saveWaitRoomComplete(waitRoom);
         }
     }
 
     @Override
     public void doPostProcessAfterGameEnd(PostProcessEndGameDto<String> request) {
-        waitRoomCompleteService.updateWaitRoomCompleteStatusEnd(request.getRoomId());
-        waitRoomService.deleteWaitRoomBySuccessGameEndMsg(request);
+        waitRoomService.updateWaitRoomCompleteStatusEnd(request.getRoomId());
+        deleteWaitRoomBySuccessGameEndMsg(request);
+    }
+
+    /**
+     * 게임이 성공적으로 종료된 경우, Redis에 저장된 waitRoom 제거
+     */
+    private boolean deleteWaitRoomBySuccessGameEndMsg(PostProcessEndGameDto<String> message) {
+        try{
+            WaitRoom waitRoom = waitRoomRedisRepository.findById(message.getRoomId()).orElseThrow(NotFoundWaitRoomException::new);
+            deleteWaitRoomAndJoinMembers(waitRoom);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    private void deleteWaitRoomAndJoinMembers(WaitRoom waitRoom) {
+        waitRoom.getMembers().stream().forEach(j -> joinMemberRedisRepository.delete(new JoinMember(j, waitRoom.getId())));
+        waitRoomRedisRepository.delete(waitRoom);
     }
 
     private boolean isHost(WaitRoom waitRoom, String userId) {

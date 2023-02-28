@@ -1,4 +1,4 @@
-package liar.waitservice.wait.service.policy;
+package liar.waitservice.wait.service.join;
 
 import org.springframework.stereotype.Component;
 

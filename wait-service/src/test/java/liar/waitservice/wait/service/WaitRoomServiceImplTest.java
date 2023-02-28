@@ -12,6 +12,7 @@ import liar.waitservice.wait.repository.rdbms.WaitRoomCompleteRepository;
 import liar.waitservice.wait.repository.rdbms.WaitRoomCompleteJoinMemberRepository;
 import liar.waitservice.wait.repository.redis.JoinMemberRedisRepository;
 import liar.waitservice.wait.repository.redis.WaitRoomRedisRepository;
+import liar.waitservice.wait.service.waitroom.WaitRoomServiceImpl;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -26,10 +27,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @Transactional
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-class WaitRoomCompleteServiceTest extends MemberDummyInfo {
+class WaitRoomServiceImplTest extends MemberDummyInfo {
 
     @Autowired
-    WaitRoomCompleteService waitRoomCompleteService;
+    WaitRoomServiceImpl waitRoomCompleteServiceImpl;
 
     @Autowired
     WaitRoomRedisRepository waitRoomRedisRepository;
@@ -70,7 +71,7 @@ class WaitRoomCompleteServiceTest extends MemberDummyInfo {
     @DisplayName("waitRoom의 정보를 waitRoomComplete의 엔티티로 변환하여 값을 RDBMS에 저장한다.")
     public void save() throws Exception {
         //given
-        waitRoomCompleteService.save(waitRoom);
+        waitRoomCompleteServiceImpl.saveWaitRoomComplete(waitRoom);
 
         //when
         List<WaitRoomComplete> waitRoomCompletes = waitRoomCompleteRepository.findByHostId(hostId);
@@ -94,10 +95,10 @@ class WaitRoomCompleteServiceTest extends MemberDummyInfo {
     @DisplayName("종료 사인을 받으면, waitRoomStatus을 END로 변환하여 저장한다.")
     public void updateWaitRoomStatusDueToEndGame() throws Exception {
         //given
-        waitRoomCompleteService.save(waitRoom);
+        waitRoomCompleteServiceImpl.saveWaitRoomComplete(waitRoom);
 
         //when
-        waitRoomCompleteService.updateWaitRoomCompleteStatusEnd(waitRoom.getId());
+        waitRoomCompleteServiceImpl.updateWaitRoomCompleteStatusEnd(waitRoom.getId());
         WaitRoomComplete waitRoomComplete = waitRoomCompleteRepository
                 .findWaitRoomCompleteByWaitRoomId(waitRoom.getId()).orElseThrow(NotFoundException::new);
 

@@ -8,9 +8,14 @@ import liar.waitservice.wait.controller.dto.PostProcessEndGameDto;
 import liar.waitservice.wait.controller.dto.RequestWaitRoomDto;
 import liar.waitservice.wait.domain.JoinMember;
 import liar.waitservice.wait.domain.WaitRoom;
+import liar.waitservice.wait.domain.WaitRoomComplete;
+import liar.waitservice.wait.domain.WaitRoomCompleteJoinMember;
+import liar.waitservice.wait.repository.rdbms.WaitRoomCompleteJoinMemberRepository;
+import liar.waitservice.wait.repository.rdbms.WaitRoomCompleteRepository;
 import liar.waitservice.wait.repository.redis.JoinMemberRedisRepository;
 import liar.waitservice.wait.repository.redis.WaitRoomRedisRepository;
-import liar.waitservice.wait.service.policy.WaitRoomJoinPolicyService;
+import liar.waitservice.wait.service.join.WaitRoomJoinPolicyService;
+import liar.waitservice.wait.service.start.DoProcessStartAndEndGameService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
@@ -25,47 +30,37 @@ import java.util.List;
 @Service
 @Transactional
 @RequiredArgsConstructor
-public class WaitRoomService {
+public class WaitRoomFacadeService {
     private final JoinMemberRedisRepository joinMemberRedisRepository;
     private final WaitRoomRedisRepository waitRoomRedisRepository;
     private final MemberService memberService;
     private final WaitRoomJoinPolicyService waitRoomJoinPolicyService;
+    private final WaitRoomCompleteRepository waitRoomCompleteRepository;
+    private final WaitRoomCompleteJoinMemberRepository waitRoomCompleteJoinMemberRepository;
+    private final DoProcessStartAndEndGameService doProcessStartAndEndGameService;
 
-    /**
-     * search start
-     */
-    public WaitRoom findWaitRoomId(String roomId) {
-        return waitRoomRedisRepository.findById(roomId).orElseThrow(NotFoundWaitRoomException::new);
+    public void save(WaitRoom waitRoom) {
+        WaitRoomComplete waitRoomComplete = WaitRoomComplete.of(waitRoom);
+        waitRoomCompleteRepository.save(waitRoomComplete);
+        waitRoom.getMembers().stream().forEach(m -> waitRoomCompleteJoinMemberRepository.save(WaitRoomCompleteJoinMember.of(waitRoomComplete, m)));
     }
 
-    public WaitRoom findWaitRoomByHostId(String hostId) {
-        return waitRoomRedisRepository.findWaitRoomByHostId(hostId).orElseThrow(NotFoundWaitRoomException::new);
+    public void updateWaitRoomCompleteStatusEnd(String roomId) {
+        findWaitRoomCompleteByWaitRoomId(roomId).updateWaitRoomStatusDueToEndGame();
     }
 
-    public List<WaitRoom> findWaitRoomByHostName(String hostName) {
-        return waitRoomRedisRepository.findAllByHostName(hostName);
-    }
-
-    public List<WaitRoom> findWaitRoomByRoomName(String roomName) {
-        return waitRoomRedisRepository.findAllByRoomName(roomName);
-    }
-
-    public Slice<WaitRoom> findWaitRoomByRoomId(String roomName, Pageable pageable) {
-        return waitRoomRedisRepository.findWaitRoomById(roomName, pageable);
-    }
-
-    public Slice<WaitRoom> findWaitRoomByHostName(String hostName, Pageable pageable) {
-        return waitRoomRedisRepository.findWaitRoomByHostName(hostName, pageable);
-    }
-
-    public Slice<WaitRoom> findWaitRoomByRoomName(String roomName, Pageable pageable) {
-        return waitRoomRedisRepository.findWaitRoomByRoomName(roomName, pageable);
+    public WaitRoomComplete findWaitRoomCompleteByWaitRoomId(String roomId) {
+        return waitRoomCompleteRepository.findWaitRoomCompleteByWaitRoomId(roomId).orElseThrow(NotFoundWaitRoomException::new);
     }
 
 
-    /**
-     * search end
-     */
+    public void doPreProcessBeforeGameStart(RequestWaitRoomDto saveRequest) {
+        doProcessStartAndEndGameService.doPreProcessBeforeGameStart(saveRequest);
+    }
+
+    public void doPostProcessAfterGameEnd(PostProcessEndGameDto<String> request) {
+        doProcessStartAndEndGameService.doPostProcessAfterGameEnd(request);
+    }
 
 
     /**
@@ -117,19 +112,6 @@ public class WaitRoomService {
             return true;
         };
         return false;
-    }
-
-    /**
-     * 게임이 성공적으로 종료된 경우, Redis에 저장된 waitRoom 제거
-     */
-    public boolean deleteWaitRoomBySuccessGameEndMsg(PostProcessEndGameDto<String> message) {
-        try{
-            WaitRoom waitRoom = findById(message.getRoomId());
-            deleteWaitRoomAndJoinMembers(waitRoom);
-            return true;
-        } catch (Exception e) {
-            return false;
-        }
     }
 
     /**

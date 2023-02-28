@@ -4,6 +4,7 @@ import jakarta.validation.Valid;
 import liar.waitservice.wait.controller.dto.PostProcessEndGameDto;
 import liar.waitservice.wait.controller.dto.RequestWaitRoomDto;
 import liar.waitservice.wait.controller.dto.message.SendSuccessProcess;
+import liar.waitservice.wait.service.WaitRoomFacadeService;
 import liar.waitservice.wait.service.start.DoProcessStartAndEndGameService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -17,7 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class DoProcessStartAndEndGameController {
 
-    private final DoProcessStartAndEndGameService doProcessStartAndEndGameService;
+    private final WaitRoomFacadeService waitRoomFacadeService;
 
     /**
      * game 시작 전 작업 수행
@@ -26,7 +27,7 @@ public class DoProcessStartAndEndGameController {
      */
     @PostMapping("/game/start")
     public ResponseEntity doPreProcessBeforeGameStart(@Valid @RequestBody RequestWaitRoomDto saveRequest) {
-        doProcessStartAndEndGameService.doPreProcessBeforeGameStart(saveRequest);
+        waitRoomFacadeService.doPreProcessBeforeGameStart(saveRequest);
         return ResponseEntity.ok().body(SendSuccessProcess.of(true));
     }
 
@@ -38,7 +39,7 @@ public class DoProcessStartAndEndGameController {
      */
     @PostMapping("/game/end")
     public ResponseEntity doPostProcessAfterGameEnd(@Valid @RequestBody PostProcessEndGameDto updateRequest) {
-        doProcessStartAndEndGameService.doPostProcessAfterGameEnd(updateRequest);
+        waitRoomFacadeService.doPostProcessAfterGameEnd(updateRequest);
         return ResponseEntity.ok().body(SendSuccessProcess.of(true));
     }
 

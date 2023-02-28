@@ -1,4 +1,4 @@
-package liar.waitservice.wait.service.policy;
+package liar.waitservice.wait.service.join;
 
 import liar.waitservice.exception.exception.NotFoundWaitRoomException;
 import liar.waitservice.wait.domain.JoinMember;
