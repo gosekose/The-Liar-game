@@ -11,7 +11,6 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.redis.core.RedisHash;
 import org.springframework.data.redis.core.index.Indexed;
 
-import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.LinkedList;
 import java.util.List;
@@ -38,6 +37,7 @@ public class WaitRoom extends BaseRedisTemplateEntity {
     private String hostName;
 
     private int limitMembers;
+    private boolean waiting;
 
     private List<String> members = new LinkedList<>();
 
@@ -58,6 +58,7 @@ public class WaitRoom extends BaseRedisTemplateEntity {
         createdAt = now();
         modifiedAt = now();
         members.add(hostId);
+        waiting = true;
     }
 
     public static WaitRoom of(CreateWaitRoomDto createWaitRoomDto, String userName) {
@@ -99,6 +100,8 @@ public class WaitRoom extends BaseRedisTemplateEntity {
     public boolean isHost(String userId) {
         return userId.equals(this.hostId);
     }
+
+    public void updateWaiting() { this.waiting = false; }
 
     /**
      * 대기방 만석 파악

@@ -19,12 +19,8 @@ import liar.waitservice.wait.service.start.DoProcessStartAndEndGameService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
 
 @Slf4j
 @Service
@@ -77,13 +73,16 @@ public class WaitRoomFacadeService {
 
     /**
      * 호스트가 아닌 다른 유저 대기방 요청 승인
+     * 게임이 진행 중이거나 현재 게임 중인 유저인 경우, 현재 게임에 참여할 수 없음.
      */
-    public boolean addMembers(RequestWaitRoomDto requestWaitRoomDto) {
-        waitRoomJoinPolicyService.joinWaitRoomPolicy(requestWaitRoomDto.getUserId());
-        WaitRoom waitRoom = findById(requestWaitRoomDto.getRoomId());
+    public boolean addMembers(RequestWaitRoomDto dto) {
+        if (!validateNotPlaying(dto.getRoomId(), dto.getUserId())) return false;
 
-        if (isEnableJoinMembers(requestWaitRoomDto, waitRoom)) {
-            return saveWaitRoomAndStatusJoin(requestWaitRoomDto, waitRoom);
+        waitRoomJoinPolicyService.joinWaitRoomPolicy(dto.getUserId());
+        WaitRoom waitRoom = findById(dto.getRoomId());
+
+        if (isEnableJoinMembers(dto, waitRoom)) {
+            return saveWaitRoomAndStatusJoin(dto, waitRoom);
         }
         return false;
 
@@ -177,5 +176,10 @@ public class WaitRoomFacadeService {
     private void deleteWaitRoomAndJoinMembers(WaitRoom waitRoom) {
         waitRoom.getMembers().stream().forEach(j -> joinMemberRedisRepository.delete(new JoinMember(j, waitRoom.getId())));
         waitRoomRedisRepository.delete(waitRoom);
+    }
+
+    private boolean validateNotPlaying(String waitRoomId, String userId) {
+        return waitRoomJoinPolicyService.isNotPlayingUser(userId) &&
+                waitRoomJoinPolicyService.isNotPlayingWaitRoom(waitRoomId) ;
     }
 }
