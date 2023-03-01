@@ -28,9 +28,6 @@ import org.springframework.transaction.annotation.Transactional;
 @Slf4j
 @RequiredArgsConstructor
 public class ResultFacadeServiceImpl implements ResultFacadeService {
-    private final PlayerRepository playerRepository;
-    private final MemberRepository memberRepository;
-
     private final ExpPolicy expPolicy;
     private final RankingPolicy rankingPolicy;
     private final MyGameResultPolicy myGameResultPolicy;

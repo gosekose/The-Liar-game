@@ -28,8 +28,10 @@ public class DoProcessStartAndEndGameServiceImpl implements DoProcessStartAndEnd
     @Override
     public void doPreProcessBeforeGameStart(RequestWaitRoomDto saveRequest) {
         WaitRoom waitRoom = waitRoomRedisRepository.findById(saveRequest.getRoomId()).orElseThrow(NotFoundWaitRoomException::new);
-        if (isValidated(waitRoom, saveRequest.getUserId())) {
-            waitRoomService.saveWaitRoomComplete(waitRoom);
+        waitRoom.updateWaiting();
+        WaitRoom savedWaitRoom = waitRoomRedisRepository.save(waitRoom);
+        if (isValidated(savedWaitRoom, saveRequest.getUserId())) {
+            waitRoomService.saveWaitRoomComplete(savedWaitRoom);
         }
     }
 
@@ -40,12 +42,12 @@ public class DoProcessStartAndEndGameServiceImpl implements DoProcessStartAndEnd
     }
 
     /**
-     * 게임이 성공적으로 종료된 경우, Redis에 저장된 waitRoom 제거
+     * 게임이 성공적으로 종료된 경우, Redis에 저장된 waitRoom으로 다시 유저 이동
      */
     private boolean deleteWaitRoomBySuccessGameEndMsg(PostProcessEndGameDto<String> message) {
         try{
             WaitRoom waitRoom = waitRoomRedisRepository.findById(message.getRoomId()).orElseThrow(NotFoundWaitRoomException::new);
-            deleteWaitRoomAndJoinMembers(waitRoom);
+//            deleteWaitRoomAndJoinMembers(waitRoom);
             return true;
         } catch (Exception e) {
             return false;

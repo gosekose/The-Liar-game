@@ -35,7 +35,7 @@ public class WaitRoomOnlyOneJoinPolicyService implements WaitRoomJoinPolicyServi
     }
 
     @Override
-    public boolean isPlayingGameStatus(String userId) {
+    public boolean isNotPlayingUser(String userId) {
         List<WaitRoomComplete> waitRoomCompletes = waitRoomCompleteRepository.findByHostId(userId)
                 .stream().filter(f -> f.getWaitRoomCompleteStatus().equals(WaitRoomCompleteStatus.PLAYING))
                 .collect(Collectors.toList());
@@ -44,6 +44,12 @@ public class WaitRoomOnlyOneJoinPolicyService implements WaitRoomJoinPolicyServi
             return true;
         }
         return false;
+    }
+
+    @Override
+    public boolean isNotPlayingWaitRoom(String waitRoomId) {
+        WaitRoom waitRoom = waitRoomRedisRepository.findById(waitRoomId).orElseThrow(NotFoundWaitRoomException::new);
+        return waitRoom.isWaiting();
     }
 
     /**
