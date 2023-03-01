@@ -28,34 +28,6 @@ public class RedisLockAspect {
 
     private final RedissonClient redissonClient;
 
-//    @Around(
-//            "execution(* liar.waitservice.wait.repository.redis..*.save(..)) || " +
-//            "execution(* liar.waitservice.wait.repository.redis..*.delete(..)) || " +
-//            "execution(* liar.waitservice.wait.repository.redis..*.findById(..))"
-//    )
-//    public Object executeWithRock(ProceedingJoinPoint joinPoint) throws Throwable {
-//        MethodSignature signature = (MethodSignature) joinPoint.getSignature();
-//        Method method = signature.getMethod();
-//        Class<?> returnType = method.getReturnType();
-//
-//        String lockKey = getLockKey(joinPoint.getArgs());
-//        RLock lock = redissonClient.getLock(lockKey);
-//
-//        try{
-//            boolean isLocked = lock.tryLock(2, 3, TimeUnit.SECONDS);
-//            if (!isLocked) {
-//                throw new RedisLockException();
-//            }
-//            Object result = joinPoint.proceed();
-//            return returnType.cast(result);
-//
-//        } finally {
-//            if (lock.isHeldByCurrentThread()) {
-//                lock.unlock();
-//            }
-//        }
-//    }
-
     @Around("execution(* liar.waitservice.wait.service.WaitRoomFacadeService.saveWaitRoomByHost(..)) && args(createWaitRoomDto)")
     public String saveWaitRoomByHostWithRedisLock(ProceedingJoinPoint joinPoint, CreateWaitRoomDto createWaitRoomDto) throws Throwable {
         String lockKey = "saveWaitRoomByHost: " + createWaitRoomDto.getUserId();
@@ -65,6 +37,18 @@ public class RedisLockAspect {
     @Around("execution(* liar.waitservice.wait.service.WaitRoomFacadeService.addMembers(..)) && args(dto)")
     public boolean addMembersWithRedisLock(ProceedingJoinPoint joinPoint, RequestWaitRoomDto dto) throws Throwable {
         String lockKey = "addMembers: " + dto.getRoomId();
+        return (boolean) executeWithRedisLock(joinPoint, lockKey);
+    }
+
+    @Around("execution(* liar.waitservice.wait.service.WaitRoomFacadeService.leaveMember(..)) && args(dto)")
+    public boolean leaveMemberWithRedisLock(ProceedingJoinPoint joinPoint, RequestWaitRoomDto dto) throws Throwable {
+        String lockKey = "leaveMember: " + dto.getRoomId();
+        return (boolean) executeWithRedisLock(joinPoint, lockKey);
+    }
+
+    @Around("execution(* liar.waitservice.wait.service.WaitRoomFacadeService.deleteWaitRoomByHost(..)) && args(dto)")
+    public boolean deleteWaitRoomByHostWithRedisLock(ProceedingJoinPoint joinPoint, RequestWaitRoomDto dto) throws Throwable {
+        String lockKey = "deleteWaitRoomByHost: " + dto.getRoomId();
         return (boolean) executeWithRedisLock(joinPoint, lockKey);
     }
 
