@@ -6,14 +6,20 @@ import liar.waitservice.wait.MemberDummyInfo;
 import liar.waitservice.wait.controller.dto.CreateWaitRoomDto;
 import liar.waitservice.wait.controller.dto.RequestWaitRoomDto;
 import liar.waitservice.wait.domain.WaitRoom;
+import liar.waitservice.wait.repository.redis.JoinMemberRedisRepository;
 import liar.waitservice.wait.repository.redis.WaitRoomRedisRepository;
 import liar.waitservice.wait.service.waitroom.WaitRoomService;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.redis.core.RedisTemplate;
+
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -35,33 +41,19 @@ class WaitRoomFacadeServiceTest extends MemberDummyInfo {
     ObjectMapper objectMapper;
 
     CreateWaitRoomDto waitRoomDto;
+    @Autowired
+    private JoinMemberRedisRepository joinMemberRedisRepository;
 
     @BeforeEach
     public void init() {
         waitRoomDto = new CreateWaitRoomDto(hostId, "game", 7);
     }
 
-//    @AfterEach
-//    public void tearDown() {
-//        waitRoomRedisRepository.deleteAll();
-//    }
-
-    @Test
-    @DisplayName("test")
-    public void test() throws Exception {
-        //given
-
-        for (int i = 0; i < 15; i++) {
-            waitRoomRedisRepository.save(
-                    WaitRoom.of(new CreateWaitRoomDto(
-                            "user" + i, "koseRoomName", 7), "koseUsername"));
-        }
-        //when
-
-        //then
-
+    @AfterEach
+    public void tearDown() {
+        waitRoomRedisRepository.deleteAll();
+        joinMemberRedisRepository.deleteAll();
     }
-
 
     @Test
     @DisplayName("memberService에서 userName을 가져온 후 waitRoom을 생성하여 redis에 저장")
@@ -75,6 +67,35 @@ class WaitRoomFacadeServiceTest extends MemberDummyInfo {
         //then
         assertThat(roomId).isEqualTo(waitRoom.getId());
     }
+
+    @Test
+    @DisplayName("멀티 스레드: memberService에서 userName을 가져온 후 waitRoom을 생성하여 redis에 저장")
+    public void saveWaitRoom_multiThread() throws Exception {
+        //given
+        int threadCount = 10;
+        ExecutorService executorService = Executors.newFixedThreadPool(32);
+        CountDownLatch latch = new CountDownLatch(threadCount);
+
+        //when
+        for (int i = 0; i < threadCount; i++) {
+            int finalIdx = i;
+            executorService.submit(() -> {
+                try {
+                    waitRoomFacadeService.saveWaitRoomByHost(waitRoomDto);
+                } catch (Exception e) {
+
+                } finally {
+                    latch.countDown();
+                }
+            });
+        }
+        latch.await();
+
+        //then
+        WaitRoom waitRoom = waitRoomService.findWaitRoomByHostId(hostId);
+        assertThat(waitRoom.getHostId()).isEqualTo(hostId);
+    }
+
 
     @Test
     @DisplayName("대기방에 입장 요청이 오면, 만석이 될 때 까지 waitRoom의 members에 저장한다.")
@@ -99,6 +120,40 @@ class WaitRoomFacadeServiceTest extends MemberDummyInfo {
             assertThat(result).isTrue();
         }
     }
+
+    @Test
+    @DisplayName("대기방에 입장 요청이 오면, 만석이 될 때 까지 waitRoom의 members에 저장한다.")
+    public void addMembersSuccess_multiThread() throws Exception {
+        //given
+        int threadCount = 10;
+        ExecutorService executorService = Executors.newFixedThreadPool(32);
+        CountDownLatch latch = new CountDownLatch(threadCount);
+
+        int limitMembers = 7;
+
+        CreateWaitRoomDto createWaitRoomDto = new CreateWaitRoomDto(hostId, "game", limitMembers);
+        String roomId = waitRoomFacadeService.saveWaitRoomByHost(createWaitRoomDto);
+
+        //when
+        for (int i = 0; i < threadCount; i++) {
+            int finalIdx = i;
+            executorService.submit(() -> {
+                try {
+                    waitRoomFacadeService.addMembers(new RequestWaitRoomDto(String.valueOf(finalIdx), roomId));
+                } catch (Exception e) {
+                    e.printStackTrace();
+                } finally {
+                    latch.countDown();
+                }
+            });
+        }
+        latch.await();
+        WaitRoom findOne = waitRoomService.findWaitRoomId(roomId);
+
+        //then
+        assertThat(findOne.getMembers().size()).isEqualTo(7);
+    }
+
 
     @Test
     @DisplayName("대기방에 입장 요청을 했을 때, 만석인 경우 저장하지 않고 false를 리턴한다.")

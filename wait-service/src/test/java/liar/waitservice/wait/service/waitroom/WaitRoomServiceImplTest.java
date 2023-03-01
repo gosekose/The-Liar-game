@@ -1,4 +1,4 @@
-package liar.waitservice.wait.service;
+package liar.waitservice.wait.service.waitroom;
 
 import jakarta.ws.rs.NotFoundException;
 import liar.waitservice.wait.MemberDummyInfo;

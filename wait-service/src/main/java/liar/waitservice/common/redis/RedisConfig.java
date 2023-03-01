@@ -48,19 +48,6 @@ public class RedisConfig {
         return new LettuceConnectionFactory(host, port);
     }
 
-//    @Bean
-//    public RedisTemplate<?, ?> redisTemplate() {
-//        RedisTemplate<byte[], byte[]> redisTemplate = new RedisTemplate<>();
-////        StringRedisTemplate redisTemplate = new StringRedisTemplate();
-//        redisTemplate.setConnectionFactory(redisConnectionFactory());
-//        redisTemplate.setEnableTransactionSupport(true);
-//        return redisTemplate;
-//    }
-//    @Bean
-//    public RestTemplate getRestTemplate() {
-//        return new RestTemplate();
-//    }
-
     @Bean
     public RedisTemplate<String, Object> redisTemplate() {
 
@@ -100,7 +87,7 @@ public class RedisConfig {
     @Bean
     public RedissonClient redissonClient() {
         Config config = new Config();
-        config.useSingleServer().setAddress("redis://localhost:6381");
+        config.useSingleServer().setAddress("redis://localhost:6380");
         return Redisson.create(config);
     }
 

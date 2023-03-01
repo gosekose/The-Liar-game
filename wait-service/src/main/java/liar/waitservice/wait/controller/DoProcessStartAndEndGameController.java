@@ -5,7 +5,6 @@ import liar.waitservice.wait.controller.dto.PostProcessEndGameDto;
 import liar.waitservice.wait.controller.dto.RequestWaitRoomDto;
 import liar.waitservice.wait.controller.dto.message.SendSuccessProcess;
 import liar.waitservice.wait.service.WaitRoomFacadeService;
-import liar.waitservice.wait.service.start.DoProcessStartAndEndGameService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;

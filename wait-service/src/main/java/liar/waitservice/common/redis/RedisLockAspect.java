@@ -1,14 +1,23 @@
 package liar.waitservice.common.redis;
 
 import liar.waitservice.exception.exception.RedisLockException;
+import liar.waitservice.wait.controller.dto.CreateWaitRoomDto;
+import liar.waitservice.wait.controller.dto.RequestWaitRoomDto;
+import liar.waitservice.wait.domain.JoinMember;
+import liar.waitservice.wait.domain.WaitRoom;
+import liar.waitservice.wait.domain.WaitRoomComplete;
+import liar.waitservice.wait.domain.WaitRoomCompleteJoinMember;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
+import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
+import org.aspectj.lang.reflect.MethodSignature;
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
 import org.springframework.stereotype.Component;
 
+import java.lang.reflect.Method;
 import java.util.concurrent.TimeUnit;
 
 @Aspect
@@ -18,14 +27,11 @@ import java.util.concurrent.TimeUnit;
 public class RedisLockAspect {
 
     private final RedissonClient redissonClient;
-//
+
 //    @Around(
 //            "execution(* liar.waitservice.wait.repository.redis..*.save(..)) || " +
 //            "execution(* liar.waitservice.wait.repository.redis..*.delete(..)) || " +
-//            "execution(* liar.waitservice.wait.repository.redis..*.findVoteByGameId(..)) || " +
-//            "execution(* liar.waitservice.wait.repository.redis..*.findByGameId(..)) || " +
-//            "execution(* liar.waitservice.wait.repository.redis..*.findById(..)) || " +
-//            "execution(* liar.waitservice.wait.service.vote..*.saveVote(..))"
+//            "execution(* liar.waitservice.wait.repository.redis..*.findById(..))"
 //    )
 //    public Object executeWithRock(ProceedingJoinPoint joinPoint) throws Throwable {
 //        MethodSignature signature = (MethodSignature) joinPoint.getSignature();
@@ -50,30 +56,23 @@ public class RedisLockAspect {
 //        }
 //    }
 
-//    @Around("execution(* liar.waitservice.wait.service.vote.VotePolicy.voteLiarUser(..)) && args(gameId, userId, liarId)")
-//    public boolean voteLiarUserWithRedisLock(ProceedingJoinPoint joinPoint, String gameId, String userId, String liarId) throws Throwable {
-//        String lockKey = "VoteLiarUser: " + gameId;
-//        return (boolean) executeWithRedisLock(joinPoint, lockKey);
-//    }
-//
-//    @Around("execution(* liar.gamemvcservice.game.service.GameFacadeService.sendGameResultToServer(..)) && args(gameId)")
-//    public GameResultToServerDto messageGameResultWithRedisLock(ProceedingJoinPoint joinPoint, String gameId) throws Throwable {
-//        String lockKey = "messageGameResult: " + gameId;
-//        return (GameResultToServerDto) executeWithRedisLock(joinPoint, lockKey);
-//    }
-//
-//
-//    @Around("execution(* liar.gamemvcservice.game.service.turn.PlayerTurnPolicy.setUpTurn(..)) && args(game)")
-//    public GameTurn setUpTurn(ProceedingJoinPoint joinPoint, Game game) throws Throwable {
-//        String lockKey = "setUpTurn: " + game.getId();
-//        return (GameTurn) executeWithRedisLock(joinPoint, lockKey);
-//    }
+    @Around("execution(* liar.waitservice.wait.service.WaitRoomFacadeService.saveWaitRoomByHost(..)) && args(createWaitRoomDto)")
+    public String saveWaitRoomByHostWithRedisLock(ProceedingJoinPoint joinPoint, CreateWaitRoomDto createWaitRoomDto) throws Throwable {
+        String lockKey = "saveWaitRoomByHost: " + createWaitRoomDto.getUserId();
+        return (String) executeWithRedisLock(joinPoint, lockKey);
+    }
+
+    @Around("execution(* liar.waitservice.wait.service.WaitRoomFacadeService.addMembers(..)) && args(dto)")
+    public boolean addMembersWithRedisLock(ProceedingJoinPoint joinPoint, RequestWaitRoomDto dto) throws Throwable {
+        String lockKey = "addMembers: " + dto.getRoomId();
+        return (boolean) executeWithRedisLock(joinPoint, lockKey);
+    }
 
     public Object executeWithRedisLock(ProceedingJoinPoint joinPoint, String lockKey) throws Throwable {
         RLock lock = redissonClient.getLock(lockKey);
 
         try {
-            boolean isLocked = lock.tryLock(2, 3, TimeUnit.SECONDS);
+            boolean isLocked = lock.tryLock(30, TimeUnit.SECONDS);
             if (!isLocked) {
                 throw new RedisLockException();
             }
@@ -102,37 +101,37 @@ public class RedisLockAspect {
             }
         }
     }
-//
-//    private <T> String getLockKey(T arg) {
-//
-//        if (arg instanceof String) {
-//            return (String) arg;
-//        }
-//
-//        else if (arg instanceof Game){
-//            return ((Game) arg).getId();
-//        }
-//
-//        else if (arg instanceof GameTurn) {
-//            return ((GameTurn) arg).getId();
-//        }
-//
-//        else if (arg instanceof Vote) {
-//            return ((Vote) arg).getId();
-//        }
-//
-//        else if (arg instanceof JoinPlayer) {
-//            return ((JoinPlayer) arg).getId();
-//        }
-//
-//        else if (arg instanceof Object[]) {
-//            StringBuilder sb = new StringBuilder();
-//            for (Object obj : (Object[]) arg) {
-//                sb.append(getLockKey(obj));
-//            }
-//            return sb.toString();
-//        }
-//        throw new RedisLockException();
-//    }
+
+    private <T> String getLockKey(T arg) {
+
+        if (arg instanceof String) {
+            return (String) arg;
+        }
+
+        else if (arg instanceof WaitRoom){
+            return ((WaitRoom) arg).getId();
+        }
+
+        else if (arg instanceof JoinMember) {
+            return ((JoinMember) arg).getId();
+        }
+
+        else if (arg instanceof WaitRoomComplete) {
+            return ((WaitRoomComplete) arg).getId();
+        }
+
+        else if (arg instanceof WaitRoomCompleteJoinMember) {
+            return ((WaitRoomCompleteJoinMember) arg).getId();
+        }
+
+        else if (arg instanceof Object[]) {
+            StringBuilder sb = new StringBuilder();
+            for (Object obj : (Object[]) arg) {
+                sb.append(getLockKey(obj));
+            }
+            return sb.toString();
+        }
+        throw new RedisLockException();
+    }
 
 }

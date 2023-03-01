@@ -7,17 +7,19 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.UUID;
+
 import static jakarta.persistence.EnumType.STRING;
 
 @Entity
 @Getter
-@Table(indexes = {@Index(name = "wait_room_index",columnList = "waitRoomId")})
+@Table(indexes = {@Index(name = "wait_room_index",columnList = "wait_room_id")})
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class WaitRoomComplete extends BaseTimeEntity {
 
-    @Id @GeneratedValue
+    @Id
     @Column(name = "wait_room_complete_id")
-    private Long id;
+    private String id;
 
     @Column(name = "wait_room_id")
     private String waitRoomId;
@@ -34,6 +36,7 @@ public class WaitRoomComplete extends BaseTimeEntity {
     private WaitRoomCompleteStatus waitRoomCompleteStatus;
 
     protected WaitRoomComplete(WaitRoom waitRoom) {
+        this.id = UUID.randomUUID().toString();
         this.waitRoomId = waitRoom.getId();
         this.roomName = waitRoom.getRoomName();
         this.hostId = waitRoom.getHostId();

@@ -15,6 +15,7 @@ import java.time.LocalDateTime;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import static java.time.LocalDateTime.now;
 
@@ -39,7 +40,7 @@ public class WaitRoom extends BaseRedisTemplateEntity {
     private int limitMembers;
     private boolean waiting;
 
-    private List<String> members = new LinkedList<>();
+    private List<String> members = new CopyOnWriteArrayList<>();
 
     @JsonSerialize(using = LocalDateTimeSerializer.class)
     @JsonDeserialize(using = LocalDateTimeDeserializer.class)

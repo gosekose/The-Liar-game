@@ -1,10 +1,11 @@
-package liar.waitservice.wait.repository;
+package liar.waitservice.wait.repository.redis;
 
 import liar.waitservice.exception.exception.NotFoundWaitRoomException;
 import liar.waitservice.wait.controller.dto.CreateWaitRoomDto;
 import liar.waitservice.wait.domain.WaitRoom;
 import liar.waitservice.wait.repository.redis.WaitRoomRedisRepository;
 import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -14,6 +15,9 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Slice;
 
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -31,10 +35,10 @@ class WaitRoomRedisRepositoryTest {
         waitRoom = WaitRoom.of(roomDto, "kose");
     }
 
-//    @AfterEach
-//    void tearDown() {
-//        waitRoomRedisRepository.deleteAll();
-//    }
+    @AfterEach
+    void tearDown() {
+        waitRoomRedisRepository.deleteAll();
+    }
 
     @Test
     @DisplayName("Redis에 createWaitRoom 요청이 오면, 저장되어야 한다.")
@@ -51,6 +55,7 @@ class WaitRoomRedisRepositoryTest {
         assertThat(findWaitRoom.getLimitMembers()).isEqualTo(5);
         assertThat(findWaitRoom.getMembers().size()).isEqualTo(1);
     }
+
 
     @Test
     @DisplayName("대기방에 입장 요청이 오면, 인원을 추가하여 값을 변경하여 저장 해야 한다.")
@@ -204,7 +209,7 @@ class WaitRoomRedisRepositoryTest {
             System.out.println("room = " + room.getId());
         }
 
-        assertThat(koseRoomName.getSize()).isEqualTo(11);
+        assertThat(koseRoomName.getSize()).isEqualTo(10);
     }
 
 
