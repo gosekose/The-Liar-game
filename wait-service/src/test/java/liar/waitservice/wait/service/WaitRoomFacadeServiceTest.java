@@ -301,7 +301,7 @@ class WaitRoomFacadeServiceTest extends MultiTheadTest {
         assertThatThrownBy(() -> waitRoomService.findWaitRoomId(roomId))
                 .isInstanceOf(NotFoundWaitRoomException.class);
     }
-    
+
     @Test
     @DisplayName("대기방의 호스트가 아닌 요청은, 방이 제거되지 않는다")
     public void deleteWaitRoomFalseBecauseNotHostId() throws Exception {
