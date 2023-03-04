@@ -169,3 +169,23 @@ Connection: keep-alive
         client.assert(response.status === 200, "Response status is OK");
     });
 %}
+
+
+### 10. 회원가입 추가
+
+POST {{baseUrl}}/register
+Content-Type: application/json
+Accept: */*
+Connection: keep-alive
+
+{
+  "username": "gosekose9",
+  "email": "gosekose9@naver.com",
+  "password": "kose123456"
+}
+
+> {%
+    client.test("회원 가입 요청은 패스워드가 10자 이상 가능", function() {
+        client.assert(response.status === 200, "Response status is OK");
+    });
+%}
