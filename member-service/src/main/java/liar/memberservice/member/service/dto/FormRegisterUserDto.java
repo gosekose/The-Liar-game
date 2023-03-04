@@ -3,10 +3,11 @@ package liar.memberservice.member.service.dto;
 import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.validator.constraints.Length;
 
-@Data
+@Getter
 @NoArgsConstructor
 public class FormRegisterUserDto {
 
