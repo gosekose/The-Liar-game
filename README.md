@@ -83,4 +83,3 @@ redis-cli -h 127.0.0.1 -p 6380
 7. waitRoom의 joinPolicy 정책을 인터페이스화하여 WaitRoomService에 의존성 주입하였습니다. [commit 81a063f](https://github.com/gosekose/The-Liar-game/commit/81a063fb2a65a62be0922dc0395c2ed602662fa0) 
 8. game 시작 전에 요청되는 wait-service의 prePross와 game 종료 후에 요청되는 wait-service의 postProcess를 모든 로직 테스트 구문을 작성하였습니다. [commit c06f2d4](https://github.com/gosekose/The-Liar-game/commit/c06f2d4486bdd3435e8a336a42efb7d01f0ca734)
 9. Redis를 데이터베이스로 이용하는 과정에서, 스레드에 안전하게 데이터를 관리하기 위해 분산락과 aop를 활용하였습니다. [commit 54a1093](https://github.com/gosekose/The-Liar-game/commit/54a109380fe848cfa973c0ef9b0029f43362eefa)
-10. RDBMS를 활용하는 과정에서 다량의 데이터에 동시성 문제가 발생하였습니다. 이를 해결하기 위해 PESSIMISTIC_WRITE 와 ConcurrentHashMap을 활용하여 동시성 제어에 성공하였습니다. [commit b2766b4](https://github.com/gosekose/The-Liar-game/blob/main/result-service/src/main/java/liar/resultservice/result/service/save/SavePolicyImpl.java)
